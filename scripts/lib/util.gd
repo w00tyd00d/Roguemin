@@ -28,18 +28,23 @@ func get_bresenham_line(a: Vector2i, b: Vector2i) -> Array[Vector2i]:
     return res
 
 
-func get_square(pos: Vector2i, length: int) -> Array[Vector2i]:
+func get_square_around_pos(pos: Vector2i, length: int, filled := false) -> Array[Vector2i]:
     var half := (length-1) / 2.0
     var left := floori(-half)
     var right := floori(half)
     var res : Array[Vector2i] = []
 
-    for n in range(left, right+1):
-        res.append(Vector2i(pos.x + n, pos.x + left))
-        res.append(Vector2i(pos.x + n, pos.x + right))
-        if n > left and n < right:
-            res.append(Vector2i(pos.x + left, pos.y + n))
-            res.append(Vector2i(pos.x + right, pos.y + n))
+    if filled:
+        for y in range(left, right+1):
+            for x in range(left, right+1):
+                res.append(Vector2i(pos.x + x, pos.y + y))
+    else:
+        for n in range(left, right+1):
+            res.append(Vector2i(pos.x + n, pos.y + left))
+            res.append(Vector2i(pos.x + n, pos.y + right))
+            if n > left and n < right:
+                res.append(Vector2i(pos.x + left, pos.y + n))
+                res.append(Vector2i(pos.x + right, pos.y + n))
     
     return res
 
