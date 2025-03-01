@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://12ynotjnohm3"]
+
+[ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_rkls3"]
+
+[node name="DualMapLayer" instance=ExtResource("1_rkls3")]
