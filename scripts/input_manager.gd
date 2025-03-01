@@ -1,4 +1,4 @@
-class_name InputManager extends Node
+extends Node
 
 ## Manages all input within the game
 
