@@ -2,7 +2,8 @@ class_name Glyph extends RefCounted
 
 ## Static glyph database for abstract tileset references.
 
-# static var GRASS := Glyph.new()
+static var WALL := Glyph.new(0, Vector2(2,0), 1)
+static var GRASS := Glyph.new(0, Vector2(19, 7), 1)
 
 var source: int
 var atlas_coordinates: Vector2
@@ -23,6 +24,6 @@ static func get_from(map: TileMapLayer, pos: Vector2i) -> Glyph:
 
 
 func matches(glyph: Glyph) -> bool:
-    return (source == glyph.src and
-            atlas_coordinates == glyph.atlas_coords and
-            alternative_tile_id == glyph.alt_tile_id)
+    return (source == glyph.source and
+            atlas_coordinates == glyph.atlas_coordinates and
+            alternative_tile_id == glyph.alternative_tile_id)

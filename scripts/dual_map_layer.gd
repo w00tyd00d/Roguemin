@@ -8,5 +8,4 @@ class_name DualMapLayer extends TileMapLayer
 
 
 static func create() -> DualMapLayer:
-    var res := preload("res://prefabs/dual_map_layer.tscn").instantiate()
-    return res
+    return preload("res://prefabs/dual_map_layer.tscn").instantiate()

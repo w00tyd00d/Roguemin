@@ -23,6 +23,10 @@ Globals="*res://scripts/globals.gd"
 GameState="*res://scripts/game_state.gd"
 InputManager="*res://scripts/input_manager.gd"
 
+[debug]
+
+gdscript/warnings/unused_signal=0
+
 [display]
 
 window/size/viewport_width=640
@@ -151,4 +155,3 @@ c_escape={
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-environment/defaults/default_clear_color=Color(0, 0, 0, 1)

@@ -30,7 +30,7 @@ var adjacent : Array[Direction] :
         if not adjacent:
             var left := ALL_VECTORS[_index-1]
             var right := ALL_VECTORS[(_index+1) % 8]
-            adjacent = [Direction.by_vector(left), Direction.by_vector(right)]
+            adjacent = [Direction.by_pattern(left), Direction.by_pattern(right)]
         return adjacent
 
 var orthagonal : Array[Direction] :
@@ -38,28 +38,28 @@ var orthagonal : Array[Direction] :
         if not orthagonal:
             var left := ALL_VECTORS[_index-2]
             var right := ALL_VECTORS[(_index+2) % 8]
-            orthagonal = [Direction.by_vector(left), Direction.by_vector(right)]
+            orthagonal = [Direction.by_pattern(left), Direction.by_pattern(right)]
         return orthagonal
 
 var opposite : Direction :
     get:
         if not opposite:
-            opposite = Direction.by_vector(ALL_VECTORS[(_index-2) % 8])
+            opposite = Direction.by_pattern(ALL_VECTORS[(_index-2) % 8])
         return opposite
 
 var _index : int
 
 
-static func by_vector(vec: Vector2i) -> Direction:
-    match vec:
-        Vector2i.UP: return Direction.north
-        Vector2i.DOWN: return Direction.south
-        Vector2i.LEFT: return Direction.west
-        Vector2i.RIGHT: return Direction.east
-        Vector2i(-1,-1): return Direction.northwest
-        Vector2i(1,-1): return Direction.northeast
-        Vector2i(-1,1): return Direction.southwest
-        Vector2i(1,1): return Direction.southeast
+static func by_pattern(pattern: Variant) -> Direction:
+    match pattern:
+        &"c_up", Vector2i.UP: return Direction.north
+        &"c_down", Vector2i.DOWN: return Direction.south
+        &"c_left", Vector2i.LEFT: return Direction.west
+        &"c_right", Vector2i.RIGHT: return Direction.east
+        &"c_upleft", Vector2i(-1,-1): return Direction.northwest
+        &"c_upright", Vector2i(1,-1): return Direction.northeast
+        &"c_downleft", Vector2i(-1,1): return Direction.southwest
+        &"c_downright", Vector2i(1,1): return Direction.southeast
         _: return null
 
 

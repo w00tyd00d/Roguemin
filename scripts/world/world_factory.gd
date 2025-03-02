@@ -47,7 +47,6 @@ func _generate_rooms(world: World) -> void:
     _place_room(world, Vector2i(), Rooms.TEST)
 
 
-
 func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void:
     # Link the chunks
     for dy in room.size.y:
@@ -67,6 +66,12 @@ func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void
     
     # Place down the room tile by tile
     var start := world.get_chunk(chunk_pos).start
-    for pos in room.tile_data:
+    for pos: Vector2i in room.tile_data:
         var glyph : Glyph = room.tile_data[pos]
-        world.set_glyph(start + pos, glyph)
+        var dpos := start + pos
+        world.set_glyph(dpos, glyph)
+        
+        if glyph.matches(Glyph.GRASS):
+            world.set_tile_type(dpos, Tile.Type.GRASS)
+        elif glyph.matches(Glyph.WALL):
+            world.set_tile_type(dpos, Tile.Type.WALL)

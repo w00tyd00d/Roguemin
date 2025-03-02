@@ -6,15 +6,12 @@ class_name World extends DualMapLayer
 ## The size of the world, in nodes.
 var size : Vector2i
 
+## The dictionary of each [Tile] object populating the world.
+var tiles : Array[Array]
+
 ## The two-dimensional array of chunks making up the world.
 var chunks : Array[Array]
 
-## The dictionary of each [Tile] object currently populating the world.
-var tiles := {}
-
-## The dictionary of any void tiles currently populating the world. Void tiles
-## only exist where there is something populating a void space in the world.
-var void_tiles := {}
 
 
 static func create() -> World:
@@ -24,14 +21,9 @@ static func create() -> World:
 func setup(_size: Vector2i) -> World:
     size = _size
 
-    var res : Array[Array] = []
-    for y in size.y:
-        var row := []
-        for x in size.x:
-            row.append(Chunk.new(Vector2i(x, y)))
-        res.append(row)
-
-    chunks = res
+    tiles = _create_tiles()
+    chunks = _create_chunks()
+    
     return self
 
 
@@ -42,11 +34,15 @@ func get_chunk(vec: Vector2i) -> Chunk:
 
 
 ## Returns a tile object from a given location, returns null if non-existant.
-func get_tile(vec: Vector2i) -> Tile:
-    if void_tiles.has(vec):
-        return void_tiles.get(vec)
+func get_tile(pos: Vector2i) -> Tile:
+    if not _in_bounds(pos):
+        return null
+    return tiles[pos.y][pos.x]
 
-    return tiles.get(vec)
+
+func set_tile_type(pos: Vector2i, type: Tile.Type) -> void:
+    if not _in_bounds(pos): return
+    tiles[pos.y][pos.x].type = type
 
 
 func set_glyph(pos: Vector2i, glyph: Glyph) -> void:
@@ -55,6 +51,66 @@ func set_glyph(pos: Vector2i, glyph: Glyph) -> void:
         glyph.source,
         glyph.atlas_coordinates,
         glyph.alternative_tile_id)
+
+
+func get_glyph(pos: Vector2i) -> Glyph:
+    return Glyph.get_from(glyph_layer, pos)
+
+
+func query_direction(tile: Tile, dir: Direction) -> Tile.Type:
+    var npos := tile.grid_position + dir.vector
+    var nbr := tile.get_neighbor(dir)
+    if not nbr:
+        return Tile.Type.VOID
+    
+    # BAD SYSTEM, SHOULD REPLACE WITH DATA DRIVEN APPROACH
+    var glyph := get_glyph(npos)
+    
+    if glyph.matches(Glyph.WALL): return Tile.Type.WALL
+    if glyph.matches(Glyph.GRASS): return Tile.Type.GRASS
+    
+    return Tile.Type.VOID
+
+
+func move_entity(ent: Entity, dest: Tile) -> void:
+    var tile := ent.current_tile
+    tile.remove_entity(ent)
+    dest.add_entity(ent)
+
+    
+
+# func move_unit(unit: Unit, dest: Tile) -> void:
+#     var tile := unit.current_tile
+#     dest.units[unit] = true
+#     tile.units.erase(unit)
+
+
+func _in_bounds(vec: Vector2i) -> bool:
+    var x_end := size.x * Globals.CHUNK_SIZE.x
+    var y_end := size.y * Globals.CHUNK_SIZE.y
+    return vec.x >= 0 and vec.y >= 0 and vec.x < x_end and vec.y < y_end
+
+
+func _create_tiles() -> Array[Array]:
+    var res : Array[Array] = []
+    for y in size.y * Globals.CHUNK_SIZE.y:
+        var row := []
+        for x in size.x * Globals.CHUNK_SIZE.x:
+            row.append(Tile.new(self, Vector2i(x, y)))
+        res.append(row)
+
+    return res
+
+
+func _create_chunks() -> Array[Array]:
+    var res : Array[Array] = []
+    for y in size.y:
+        var row := []
+        for x in size.x:
+            row.append(Chunk.new(Vector2i(x, y)))
+        res.append(row)
+
+    return res
 
 
 ## Represents a point on the chunk grid.
