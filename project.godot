@@ -41,6 +41,11 @@ folder_colors={
 "res://scripts/": "blue"
 }
 
+[gui]
+
+theme/custom_font="res://assets/pixelchunk.ttf"
+theme/default_font_antialiasing=0
+
 [input]
 
 c_up={

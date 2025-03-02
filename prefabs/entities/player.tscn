@@ -12,3 +12,5 @@ script = ExtResource("2_delc5")
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="PlayerController" parent="." index="1" instance=ExtResource("3_l48dn")]
+
+[node name="Camera2D" type="Camera2D" parent="." index="2"]
