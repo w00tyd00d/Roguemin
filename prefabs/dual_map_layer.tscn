@@ -1,9 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://be46f0movhp5e"]
+[gd_scene load_steps=3 format=3 uid="uid://be46f0movhp5e"]
 
 [ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="1_x8b3s"]
+[ext_resource type="Script" path="res://scripts/dual_map_layer.gd" id="2_c11hl"]
 
 [node name="DualMapLayer" type="TileMapLayer"]
 tile_set = ExtResource("1_x8b3s")
+script = ExtResource("2_c11hl")
 
 [node name="GlyphLayer" type="TileMapLayer" parent="."]
 tile_set = ExtResource("1_x8b3s")

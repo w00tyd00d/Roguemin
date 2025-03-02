@@ -6,3 +6,7 @@ class_name DualMapLayer extends TileMapLayer
 ## the front layer (due to draw order).
 @onready var glyph_layer := $GlyphLayer as TileMapLayer
 
+
+static func create() -> DualMapLayer:
+    var res := preload("res://prefabs/dual_map_layer.tscn").instantiate()
+    return res

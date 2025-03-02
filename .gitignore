@@ -1,5 +1,6 @@
 *.code-workspace
 *.txt
+*.json
 
 # Godot 4+ specific ignores
 .godot/

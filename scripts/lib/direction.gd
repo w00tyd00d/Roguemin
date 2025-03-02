@@ -14,15 +14,60 @@ const ALL_VECTORS : Array[Vector2i] = [
     Vector2i.LEFT,
 ]
 
+static var north := Direction.new(Vector2i.UP)
+static var south := Direction.new(Vector2i.DOWN)
+static var west := Direction.new(Vector2i.LEFT)
+static var east := Direction.new(Vector2i.RIGHT)
+static var northwest := Direction.new(Vector2i(-1,-1))
+static var northeast := Direction.new(Vector2i(1,-1))
+static var southwest := Direction.new(Vector2i(-1,1))
+static var southeast := Direction.new(Vector2i(1,1))
 
-static func get_adjacent(vec: Vector2i, from := Vector2i()) -> Array[Vector2i]:
-    var i := ALL_VECTORS.find(vec)
-    assert(i != -1, "Invalid direction vector given.")
-    return [from + ALL_VECTORS[(i-1) % 8], from + ALL_VECTORS[(i+1) % 8]]
+var vector : Vector2i
+
+var adjacent : Array[Direction] :
+    get:
+        if not adjacent:
+            var left := ALL_VECTORS[_index-1]
+            var right := ALL_VECTORS[(_index+1) % 8]
+            adjacent = [Direction.by_vector(left), Direction.by_vector(right)]
+        return adjacent
+
+var orthagonal : Array[Direction] :
+    get:
+        if not orthagonal:
+            var left := ALL_VECTORS[_index-2]
+            var right := ALL_VECTORS[(_index+2) % 8]
+            orthagonal = [Direction.by_vector(left), Direction.by_vector(right)]
+        return orthagonal
+
+var opposite : Direction :
+    get:
+        if not opposite:
+            opposite = Direction.by_vector(ALL_VECTORS[(_index-2) % 8])
+        return opposite
+
+var _index : int
 
 
-static func get_orthagonal(vec: Vector2i, from := Vector2i()) -> Array[Vector2i]:
-    var i := ALL_VECTORS.find(vec)
-    assert(i != -1, "Invalid direction vector given.")
-    return [from + ALL_VECTORS[(i-2) % 8], from + ALL_VECTORS[(i+2) % 8]]
+static func by_vector(vec: Vector2i) -> Direction:
+    match vec:
+        Vector2i.UP: return Direction.north
+        Vector2i.DOWN: return Direction.south
+        Vector2i.LEFT: return Direction.west
+        Vector2i.RIGHT: return Direction.east
+        Vector2i(-1,-1): return Direction.northwest
+        Vector2i(1,-1): return Direction.northeast
+        Vector2i(-1,1): return Direction.southwest
+        Vector2i(1,1): return Direction.southeast
+        _: return null
 
+
+func _init(vec: Vector2i) -> void:
+    vector = vec
+    _index = ALL_VECTORS.find(vec)
+    assert(_index > -1, "Invalid direction given")
+
+
+func from(pos: Vector2i) -> Vector2i:
+    return vector + pos
