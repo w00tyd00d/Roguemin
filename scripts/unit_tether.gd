@@ -38,6 +38,6 @@ class Link:
     var next_link : Link
 
     func update(pos: Vector2i):
-        if pos.distance_to(next_link.grid_position) >= 2:
+        if next_link and pos.distance_to(next_link.grid_position) >= 2:
             next_link.update(grid_position)
         grid_position = pos
