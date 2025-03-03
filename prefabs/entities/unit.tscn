@@ -1,9 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://dtou5u2oxkeus"]
+[gd_scene load_steps=3 format=3 uid="uid://dtou5u2oxkeus"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_1x4tw"]
+[ext_resource type="Script" path="res://scripts/entities/unit.gd" id="2_gjyyj"]
 
 [node name="Unit00" instance=ExtResource("1_1x4tw")]
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0)
+script = ExtResource("2_gjyyj")
 
 [node name="GlyphLayer" parent="." index="0"]
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 2, 0, 4, 0)

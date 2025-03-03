@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scripts/world/world.gd" id="2_yge30"]
 
 [node name="World" instance=ExtResource("1_rkls3")]
+z_index = -1
 script = ExtResource("2_yge30")
 
 [node name="TEST" parent="." index="1" instance=ExtResource("1_rkls3")]

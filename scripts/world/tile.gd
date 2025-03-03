@@ -43,3 +43,11 @@ func remove_entity(ent: Entity) -> void:
     _entities.erase(ent)
     if ent is Player:
         has_player = false
+
+
+func add_unit(unit: Unit) -> void:
+    _units[unit] = true
+
+
+func remove_unit(unit: Unit) -> void:
+    _units.erase(unit)

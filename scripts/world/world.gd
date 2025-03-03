@@ -12,6 +12,11 @@ var tiles : Array[Array]
 ## The two-dimensional array of chunks making up the world.
 var chunks : Array[Array]
 
+## The container node of all of the unit objects in-game
+var unit_container : UnitContainer # injected upon World creation
+
+## The number of [Unit] objects currently out on the field.
+var unit_count := 0
 
 
 static func create() -> World:
@@ -23,7 +28,7 @@ func setup(_size: Vector2i) -> World:
 
     tiles = _create_tiles()
     chunks = _create_chunks()
-    
+
     return self
 
 
@@ -47,13 +52,13 @@ func set_tile_type(pos: Vector2i, type: Tile.Type) -> void:
 
 func query_tile(tile: Tile) -> Tile.Type:
     if not tile: return Tile.Type.VOID
-    
+
     # BAD SYSTEM, SHOULD REPLACE WITH DATA DRIVEN APPROACH
     var glyph := get_glyph(tile.grid_position)
-    
+
     if glyph.matches(Glyph.WALL): return Tile.Type.WALL
     if glyph.matches(Glyph.GRASS): return Tile.Type.GRASS
-    
+
     return Tile.Type.VOID
 
 
@@ -62,11 +67,25 @@ func move_entity(ent: Entity, dest: Tile) -> void:
     tile.remove_entity(ent)
     dest.add_entity(ent)
 
-    
-# func move_unit(unit: Unit, dest: Tile) -> void:
-#     var tile := unit.current_tile
-#     dest.units[unit] = true
-#     tile.units.erase(unit)
+
+func move_unit(unit: Unit, dest: Tile) -> void:
+    var tile := unit.current_tile
+    dest.add_unit(unit)
+    tile.remove_unit(unit)
+
+
+func spawn_entity(cls, pos: Vector2i) -> void:
+    var entity : Entity = cls.create()
+    add_child(entity)
+    entity.grid_position = pos
+
+
+func spawn_unit(pos: Vector2i) -> void:
+    var type : Unit.Type = [Unit.Type.RED, Unit.Type.YELLOW, Unit.Type.BLUE].pick_random()
+    var unit : Unit = unit_container.get_available_unit()
+    unit.spawn(pos, type, [true,false].pick_random())
+
+
 
 
 func _in_bounds(vec: Vector2i) -> bool:
@@ -112,10 +131,10 @@ class Chunk:
     var start : Vector2i
     ## The lower right corner of the chunk
     var end : Vector2i
-    
+
     ## The dictionary of edges connected with the chunk.
     var _edges := {}
-    
+
     func _init(_pos: Vector2i) -> void:
         chunk_position = _pos
 
@@ -127,6 +146,6 @@ class Chunk:
 
     func add_edge(dir: Direction, type: EdgeType) -> void:
         _edges[dir] = type
-    
+
     func get_edge(dir: Direction) -> EdgeType:
         return _edges.get(dir, EdgeType.NONE)

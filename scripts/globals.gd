@@ -6,7 +6,11 @@ const TILE_SIZE := Vector2i(8,8)
 ## The size of a chunk in tiles.
 const CHUNK_SIZE := Vector2i(23,23)
 
-## List of all the directional input commands
+## The amount of energy needed to make a turn.
+const ENERGY_CAP := 4
+
+
+## List of all the directional input commands.
 const DIRECTIONAL_INPUTS := [
     &"c_up",
     &"c_down",
@@ -18,7 +22,7 @@ const DIRECTIONAL_INPUTS := [
     &"c_downright"
 ]
 
-## List of all the action input commands
+## List of all the action input commands.
 const ACTION_INPUTS := [
     &"c_whistle",
     &"c_throw",

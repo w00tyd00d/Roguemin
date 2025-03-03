@@ -3,6 +3,7 @@ extends Node
 var world_factory := WorldFactory.new()
 
 @onready var game_viewport := $GameScreen/%SubViewport as SubViewport
+@onready var unit_container := $GameScreen/%UnitContainer as UnitContainer
 
 func _ready() -> void:
     # Set the default background color to black at runtime
@@ -12,6 +13,8 @@ func _ready() -> void:
     var world := world_factory.create_new_world()
     game_viewport.add_child(world)
     world_factory.setup_world(world)
+    print("Unit container is ", unit_container)
+    world.unit_container = unit_container
 
     # Immediate create the player character for now
     var player := Player.create()

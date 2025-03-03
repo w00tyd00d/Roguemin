@@ -28,14 +28,14 @@ func move_to(dest: Tile) -> void:
     unit_tether.update()
 
     # DEBUG
-    _draw_tether()
+    # _draw_tether()
 
 
-func _draw_tether() -> void:
-    for pos in test_layer.get_used_cells():
-        test_layer.set_background(pos, Glyph.NONE)
-        test_layer.set_glyph(pos, Glyph.NONE)
+# func _draw_tether() -> void:
+#     for pos in test_layer.get_used_cells():
+#         test_layer.set_background(pos, Glyph.NONE)
+#         test_layer.set_glyph(pos, Glyph.NONE)
     
-    for link in unit_tether.links:
-        test_layer.set_background(link.grid_position, Glyph.BLACK)
-        test_layer.set_glyph(link.grid_position, Glyph.TEST)
+#     for link in unit_tether.links:
+#         test_layer.set_background(link.grid_position, Glyph.BLACK)
+#         test_layer.set_glyph(link.grid_position, Glyph.TEST)
