@@ -19,5 +19,7 @@ func _ready() -> void:
 
     GameState.world = world
     GameState.player = player
+
+    player.test_layer = world.get_node("TEST")
     
     player.move_to(world.get_tile(Vector2i(15, 15)))

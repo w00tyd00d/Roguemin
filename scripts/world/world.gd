@@ -45,26 +45,11 @@ func set_tile_type(pos: Vector2i, type: Tile.Type) -> void:
     tiles[pos.y][pos.x].type = type
 
 
-func set_glyph(pos: Vector2i, glyph: Glyph) -> void:
-    glyph_layer.set_cell(
-        pos,
-        glyph.source,
-        glyph.atlas_coordinates,
-        glyph.alternative_tile_id)
-
-
-func get_glyph(pos: Vector2i) -> Glyph:
-    return Glyph.get_from(glyph_layer, pos)
-
-
-func query_direction(tile: Tile, dir: Direction) -> Tile.Type:
-    var npos := tile.grid_position + dir.vector
-    var nbr := tile.get_neighbor(dir)
-    if not nbr:
-        return Tile.Type.VOID
+func query_tile(tile: Tile) -> Tile.Type:
+    if not tile: return Tile.Type.VOID
     
     # BAD SYSTEM, SHOULD REPLACE WITH DATA DRIVEN APPROACH
-    var glyph := get_glyph(npos)
+    var glyph := get_glyph(tile.grid_position)
     
     if glyph.matches(Glyph.WALL): return Tile.Type.WALL
     if glyph.matches(Glyph.GRASS): return Tile.Type.GRASS
@@ -78,7 +63,6 @@ func move_entity(ent: Entity, dest: Tile) -> void:
     dest.add_entity(ent)
 
     
-
 # func move_unit(unit: Unit, dest: Tile) -> void:
 #     var tile := unit.current_tile
 #     dest.units[unit] = true

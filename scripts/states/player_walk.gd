@@ -43,8 +43,8 @@ func update(inp: StringName) -> Array:
     var player := GameState.player
     var tile := player.current_tile
     
-    var res := world.query_direction(tile, dir)
     var dest := tile.get_neighbor(dir)
+    var res := world.query_tile(dest)
     
     match res:
         Tile.Type.GRASS: player.move_to(dest)

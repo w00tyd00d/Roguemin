@@ -2,8 +2,13 @@ class_name Glyph extends RefCounted
 
 ## Static glyph database for abstract tileset references.
 
+static var NONE := Glyph.new(-1, Vector2(-1, -1), -1)
+static var BLACK := Glyph.new(2, Vector2())
+
 static var WALL := Glyph.new(0, Vector2(2,0), 1)
 static var GRASS := Glyph.new(0, Vector2(19, 7), 1)
+
+static var TEST := Glyph.new(0, Vector2(20, 1))
 
 var source: int
 var atlas_coordinates: Vector2
