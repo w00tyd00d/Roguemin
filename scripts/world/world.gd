@@ -63,7 +63,7 @@ func query_tile(tile: Tile) -> Type.Tile:
     # BAD SYSTEM, SHOULD REPLACE WITH DATA DRIVEN APPROACH
     var glyph := get_glyph(tile.grid_position)
 
-    if tile.has_units: return Type.Tile.UNIT
+    if tile.has_units or tile.has_player: return Type.Tile.ENTITY
     if glyph.matches(Glyph.WALL): return Type.Tile.WALL
     if glyph.matches(Glyph.GRASS): return Type.Tile.GRASS
 
@@ -80,6 +80,14 @@ func chebyshev_distance(tile: Tile, dest: Tile) -> int:
     var dx := absi(vec1.x - vec2.x)
     var dy := absi(vec1.y - vec2.y)
     return maxi(dx, dy)
+
+
+func manhattan_distance(tile: Tile, dest: Tile) -> int:
+    var vec1 := tile.grid_position
+    var vec2 := dest.grid_position
+    var dx := absi(vec1.x - vec2.x)
+    var dy := absi(vec1.y - vec2.y)
+    return dx + dy
 
 
 func move_entity(ent: Entity, dest: Tile) -> void:
@@ -103,6 +111,8 @@ func spawn_entity(cls, pos: Vector2i) -> void:
 func spawn_unit(pos: Vector2i) -> void:
     var type : Type.Unit = [Type.Unit.RED, Type.Unit.YELLOW, Type.Unit.BLUE].pick_random()
     var unit : Unit = unit_container.get_available_unit()
+    if not unit: return
+    
     unit.spawn(pos, type, [true,false].pick_random())
     get_tile(pos).add_unit(unit)
 

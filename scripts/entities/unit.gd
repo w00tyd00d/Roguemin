@@ -74,20 +74,55 @@ func move_to(dest: Tile) -> void:
     grid_position = dest.grid_position
 
 
-func update_time(world_time: int) -> void:
+func move_towards(tile: Tile) -> bool:
+    var world := GameState.world
+    var delta := tile.grid_position - grid_position
+    var ax := absi(delta.x)
+    var ay := absi(delta.y)
+
+    var vec : Vector2i
+
+    if ax >= ay * 2: vec = Vector2i(delta.sign().x, 0)
+    elif ay >= ax * 2: vec = Vector2i(0, delta.sign().y)
+    else: vec = delta.sign()
+
+    var dir := Direction.by_pattern(vec)
+
+    if _check_tile_at(grid_position + dir.vector) == Type.Tile.GRASS:
+        var dest = world.get_tile(grid_position + dir.vector)
+        move_to(dest)
+        return true
+
+    for _dir in dir.adjacent:
+        if grid_position + _dir.vector == last_position: continue
+        if _check_tile_at(grid_position + _dir.vector) == Type.Tile.GRASS:
+            var dest = world.get_tile(grid_position + _dir.vector)
+            # var dist1 = world.manhattan_distance(current_tile, dest)
+            # var dist2 = world.manhattan_distance(current_tile, tile)
+            
+            # if dist1 != dist2:
+            move_to(dest)
+            return true
+    
+    return false
+
+
+func update_time(world_time: int) -> bool:
     var old_time := time
     time = world_time
 
     if not in_limbo:
         var time_units := time - old_time
         if add_and_check_energy(time_units):
-            do_action()
+            return do_action()
+    
+    return false
 
 
-func do_action() -> void:
+func do_action() -> bool:
     match state:
         State.FOLLOWING:
-            if not GameState.player: return
+            if not GameState.player: return false
 
             var player := GameState.player
             var tether := player.unit_tether
@@ -95,11 +130,13 @@ func do_action() -> void:
 
             if (_in_range_of_tether() and
                 _can_see_tether()):
-                    move_towards(dest)
+                    return move_towards(dest)
+        
+    return false
 
 
 func _in_range_of_tether() -> bool:
-    var limit := 12
+    var limit := 32
     var world := GameState.world
     var dest := GameState.player.unit_tether.tail.current_tile
     return world.chebyshev_distance(current_tile, dest) <= limit
@@ -121,6 +158,35 @@ func _can_see_tether() -> bool:
         callback)
 
     return raycast.grid_position == tail.grid_position
+
+
+func _check_tile_at(pos: Vector2i) -> Type.Tile:
+    var world := GameState.world
+    var tile := world.get_tile(pos)
+    var res := world.query_tile(tile)
+    
+    # Cascade forward to see if we can resolve movement
+    if res == Type.Tile.ENTITY:
+        var any := false
+        for unit in tile.get_all_units():
+            if unit.time < GameState.world.time and unit.update_time(world.time):
+                any = true
+        if any:
+            return _check_tile_at(pos)
+        
+    
+    # match world.query_tile(tile):
+    #     Type.Tile.ENTITY:
+    #         for unit in tile.get_all_units():
+    #             if unit.time < GameState.world.time:
+    #                 unit.update_time(world_time)
+
+    #     Type.Tile.GRASS:
+    #         var dest = world.get_tile(pos)
+    #         move_to(dest)
+    #         return true
+
+    return res
 
 
 func _update_glyph() -> void:

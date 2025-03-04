@@ -38,7 +38,7 @@ func move_to(dest: Tile) -> void:
     grid_position = dest.grid_position
 
 
-func move_towards(target: Tile) -> void:
+func move_towards(target: Tile) -> bool:
     var world := GameState.world
     var delta := target.grid_position - grid_position
     var ax := absi(delta.x)
@@ -54,13 +54,32 @@ func move_towards(target: Tile) -> void:
 
     if world.query_tile_at(grid_position + dir.vector) == Type.Tile.GRASS:
         var dest = world.get_tile(grid_position + dir.vector)
-        return move_to(dest)
+        move_to(dest)
+        return true
 
     for _dir in dir.adjacent:
         if grid_position + _dir.vector == last_position: continue
         if world.query_tile_at(grid_position + _dir.vector) == Type.Tile.GRASS:
             var dest = world.get_tile(grid_position + _dir.vector)
-            return move_to(dest)
+            move_to(dest)
+            return true
+    
+    return false
+
+
+func update_time(world_time: int) -> bool:
+    var old_time := time
+    time = world_time
+
+    var time_units := time - old_time
+    if add_and_check_energy(time_units):
+        return do_action()
+    
+    return false
+
+
+func do_action() -> bool:
+    return false
 
 
 func add_and_check_energy(amt: int) -> bool:
