@@ -3,9 +3,12 @@ class_name PlayerWalk extends PlayerState
 
 func enter():
     super()
+    GameState.display_unit_toggle.emit(false)
 
 
 func update(inp: StringName) -> Array:
+    var player := GameState.player
+    var world := GameState.world
     var just_pressed := Input.is_action_just_pressed(inp)
     
     if just_pressed:
@@ -15,6 +18,14 @@ func update(inp: StringName) -> Array:
                 print("WHISTLE STATE!")
                 state_changed.emit("whistle")
                 return [false]
+            &"c_throw":
+                print("WE'RE THROWING")
+                state_changed.emit("throw")
+                return [false]
+            &"c_dismiss":
+                for unit in player.get_all_units():
+                    unit.go_idle()
+                return [true, 4]
             &"c_wait":
                 print("WE'RE WAITING")
                 return [true, 4]
@@ -38,8 +49,6 @@ func update(inp: StringName) -> Array:
     var dir := Direction.by_pattern(inp)
     if not dir: return [false]
 
-    var world := GameState.world
-    var player := GameState.player
     var tile := player.current_tile
     
     var dest := tile.get_neighbor(dir)

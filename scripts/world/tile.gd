@@ -16,6 +16,12 @@ var type : Type.Tile
 ## Cached indication whether the tile is inhabited by the player
 var has_player := false
 
+## Flag that returns if the cell is currently occupied.
+var is_empty : bool :
+    get: return (not has_player and
+                not has_units and
+                _entities.is_empty())
+
 ## Flag that returns whether the cell has Units in it
 var has_units : bool :
     get: return (not _units[Type.Unit.RED].is_empty() or
@@ -42,6 +48,15 @@ func get_neighbor(dir: Direction) -> Tile:
     var npos := grid_position + dir.vector
     return world.get_tile(npos)
 
+
+func get_all_neighbors() -> Array[Tile]:
+    var res : Array[Tile] = []
+    for vec in Direction.ALL_VECTORS:
+        var npos := grid_position + vec
+        var tile := world.get_tile(npos)
+        if tile: res.append(tile)
+    return res
+    
 
 func add_entity(ent: Entity) -> void:
     _entities[ent] = true
@@ -72,3 +87,12 @@ func get_all_units() -> Array[Unit]:
     for dict in _units.values():
         res.append_array((dict.keys()))
     return res
+
+
+func whistled() -> void:
+    var player := GameState.player
+    
+    for _type in player.unit_toggle:
+        if player.unit_toggle[_type]:
+            for unit: Unit in _units[_type]:
+                unit.join_squad()

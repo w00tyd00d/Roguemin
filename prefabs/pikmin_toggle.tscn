@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://dt2ovg1fyjgyq"]
+
+[ext_resource type="Script" path="res://scripts/unit_toggle.gd" id="1_m5gai"]
+
+[node name="UnitToggle" type="ColorRect"]
+offset_top = 304.0
+offset_right = 544.0
+offset_bottom = 320.0
+color = Color(0, 0, 0, 1)
+script = ExtResource("1_m5gai")
+
+[node name="ToggleLabel" type="Label" parent="."]
+offset_left = 112.0
+offset_top = 8.0
+offset_right = 176.0
+offset_bottom = 17.0
+theme_override_font_sizes/font_size = 8
+text = "Toggle:"
+
+[node name="RedLabel" type="Label" parent="."]
+self_modulate = Color(1, 0, 0, 1)
+layout_mode = 0
+offset_left = 184.0
+offset_top = 8.0
+offset_right = 248.0
+offset_bottom = 17.0
+theme_override_font_sizes/font_size = 8
+text = "1:■ Red"
+
+[node name="YellowLabel" type="Label" parent="."]
+self_modulate = Color(1, 1, 0, 1)
+offset_left = 264.0
+offset_top = 8.0
+offset_right = 344.0
+offset_bottom = 17.0
+theme_override_font_sizes/font_size = 8
+text = "2:■ Yellow"
+
+[node name="BlueLabel" type="Label" parent="."]
+self_modulate = Color(0, 0, 1, 1)
+offset_left = 368.0
+offset_top = 8.0
+offset_right = 432.0
+offset_bottom = 17.0
+theme_override_font_sizes/font_size = 8
+text = "3:■ Blue"

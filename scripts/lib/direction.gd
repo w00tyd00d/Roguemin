@@ -1,7 +1,7 @@
 class_name Direction extends Object
 
 ## Abstract class containing relative vector data for each cardinal and
-## diagonal direction.
+## is_diagonal direction.
 
 const ALL_VECTORS : Array[Vector2i] = [
     Vector2i(-1,-1),
@@ -18,12 +18,13 @@ static var north := Direction.new(Vector2i.UP)
 static var south := Direction.new(Vector2i.DOWN)
 static var west := Direction.new(Vector2i.LEFT)
 static var east := Direction.new(Vector2i.RIGHT)
-static var northwest := Direction.new(Vector2i(-1,-1))
-static var northeast := Direction.new(Vector2i(1,-1))
-static var southwest := Direction.new(Vector2i(-1,1))
-static var southeast := Direction.new(Vector2i(1,1))
+static var northwest := Direction.new(Vector2i(-1,-1), true)
+static var northeast := Direction.new(Vector2i(1,-1), true)
+static var southwest := Direction.new(Vector2i(-1,1), true)
+static var southeast := Direction.new(Vector2i(1,1), true)
 
 var vector : Vector2i
+var is_diagonal : bool
 
 var adjacent : Array[Direction] :
     get:
@@ -63,8 +64,9 @@ static func by_pattern(pattern: Variant) -> Direction:
         _: return null
 
 
-func _init(vec: Vector2i) -> void:
+func _init(vec: Vector2i, _diagonal := false) -> void:
     vector = vec
+    is_diagonal = _diagonal
     _index = ALL_VECTORS.find(vec)
     assert(_index > -1, "Invalid direction given")
 

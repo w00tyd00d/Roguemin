@@ -24,3 +24,8 @@ func update(_inp: StringName) -> Array:
 
 func exit() -> void:
 	active_state = false
+
+
+func _in_range(pos: Vector2i) -> bool:
+	var dist := Util.chebyshev_distance(GameState.player.grid_position, pos)
+	return dist <= Globals.PLAYER_MAX_RANGE

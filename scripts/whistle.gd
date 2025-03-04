@@ -56,8 +56,7 @@ var _acc := 0.0
 
 func _process(dt: float) -> void:
     if preview_view.visible:
-        var msecs := Time.get_ticks_msec() % 1000
-        preview_layers[_preview_size-1].visible = msecs < 750
+        preview_layers[_preview_size-1].visible = not Util.glyph_blinking()
     
     if _anim_target_size > 0:
         _run_anim(dt)

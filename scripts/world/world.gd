@@ -28,6 +28,9 @@ var unit_count := 0
 ## The [Whistle] object.
 @onready var whistle := $Whistle as Whistle
 
+## The throwing cursor.
+@onready var throw_cursor := $ThrowCursor as Node2D
+
 
 static func create() -> World:
     return preload("res://prefabs/world.tscn").instantiate()
@@ -54,6 +57,29 @@ func get_tile(pos: Vector2i) -> Tile:
         return null
     return tiles[pos.y][pos.x]
 
+
+func get_closest_empty_tile(pos: Vector2i) -> Tile:
+    var start := get_tile(pos)
+    if start.is_empty: return start
+    
+    var _tiles : Array[Tile] = start.get_all_neighbors()
+    var hist := {start: true}
+    
+    while true:
+        var new_tiles : Array[Tile] = []
+        for tile in _tiles:
+            if hist.has(tile): continue
+            
+            if tile.is_empty:
+                return tile
+
+            hist[tile] = true
+            new_tiles.append_array(tile.get_all_neighbors())
+        
+        _tiles = new_tiles
+    
+    return null
+        
 
 func set_tile_type(pos: Vector2i, type: Type.Tile) -> void:
     if not in_bounds(pos): return
@@ -98,10 +124,11 @@ func spawn_entity(cls, pos: Vector2i) -> void:
 func spawn_unit(pos: Vector2i) -> void:
     var type : Type.Unit = [Type.Unit.RED, Type.Unit.YELLOW, Type.Unit.BLUE].pick_random()
     var unit : Unit = unit_container.get_available_unit()
-    if not unit: return
+    var tile := get_tile(pos)
+    if not unit or not tile: return
     
     unit.spawn(pos, type, [true,false].pick_random())
-    get_tile(pos).add_unit(unit)
+    tile.add_unit(unit)
 
 
 func in_bounds(vec: Vector2i) -> bool:

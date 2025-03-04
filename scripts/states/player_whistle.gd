@@ -16,7 +16,7 @@ var whistle_level := 1 :
 func enter() -> void:
     super()
     grid_position = GameState.player.grid_position
-   
+    GameState.display_unit_toggle.emit(true)
 
 
 func update(inp: StringName) -> Array:
@@ -32,8 +32,17 @@ func update(inp: StringName) -> Array:
                 whistle_level += 1
             &"c_cycle_left":
                 whistle_level -= 1
+            &"c_toggle_red":
+                player.toggle_unit(Type.Unit.RED)
+            &"c_toggle_yellow":
+                player.toggle_unit(Type.Unit.YELLOW)
+            &"c_toggle_blue":
+                player.toggle_unit(Type.Unit.BLUE)
             &"c_whistle":
                 world.whistle.activate(whistle_level)
+                for pos in _get_whistle_area():
+                    world.get_tile(pos).whistled()
+                
                 state_changed.emit("walk")
                 return [true, ceil(whistle_level / 2.0)]
     
@@ -41,8 +50,7 @@ func update(inp: StringName) -> Array:
     if not dir: return [false]
 
     var pos := grid_position + dir.vector
-    
-    if Util.chebyshev_distance(player.grid_position, pos) <= Globals.WHISTLE_MAX_RANGE:
+    if _in_range(pos):
         grid_position = pos
     
     return [false]
@@ -55,3 +63,8 @@ func exit() -> void:
 
 func _update_preview() -> void:
     GameState.world.whistle.preview(grid_position, whistle_level)
+
+
+func _get_whistle_area() -> Array[Vector2i]:
+    var length := (whistle_level-1) * 2 + 1
+    return Util.get_square_around_pos(grid_position, length, true)

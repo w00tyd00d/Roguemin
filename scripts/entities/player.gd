@@ -4,11 +4,14 @@ class_name Player extends Entity
 
 var unit_tether := UnitTether.new(self, 3)
 
-var _units := {
-    Type.Unit.RED: {},
-    Type.Unit.YELLOW: {},
-    Type.Unit.BLUE: {},
+var unit_toggle := {
+    Type.Unit.RED: true,
+    Type.Unit.YELLOW: true,
+    Type.Unit.BLUE: true,
 }
+
+## The number of units within the player's squad
+var unit_count := 0
 
 # var whistle_size : int :
 #     set(size):
@@ -18,6 +21,12 @@ var _units := {
 #     set(size):
 #         size = clampi(size, 1, 5)
 
+
+var _units := {
+    Type.Unit.RED: {},
+    Type.Unit.YELLOW: {},
+    Type.Unit.BLUE: {},
+}
 
 @onready var camera := $Camera2D as Camera2D
 
@@ -47,11 +56,46 @@ func move_to(dest: Tile) -> void:
 
 
 func add_unit(unit: Unit) -> void:
-    _units[unit.type][unit] = true
+    if not _units[unit.type].has(unit):
+        _units[unit.type][unit] = true
+        unit_count += 1
 
 
 func remove_unit(unit: Unit) -> void:
-    _units[unit.type].erase(unit)
+    if _units[unit.type].has(unit):
+        _units[unit.type].erase(unit)
+        unit_count -= 1
+
+
+func toggle_unit(type: Type.Unit) -> void:
+    if type == Type.Unit.NONE: return
+    unit_toggle[type] = not unit_toggle[type]
+    GameState.update_unit_toggle.emit(unit_toggle)
+
+
+func get_unit_count(type := Type.Unit.NONE) -> int:
+    if type == Type.Unit.NONE:
+        return unit_count
+    return _units[type].size()    
+
+
+func grab_unit(type: Type.Unit) -> Unit:
+    if get_unit_count(type) == 0:
+        return null
+    return _units[type].keys()[0]
+
+
+func throw_unit(unit: Unit, tile: Tile) -> void:
+    if not unit: return
+    unit.throw_to(tile)
+    remove_unit(unit)
+
+
+func get_all_units() -> Array[Unit]:
+    var res : Array[Unit] = []
+    for dict in _units.values():
+        res.append_array((dict.keys()))
+    return res
 
 
 func _draw_tether() -> void:

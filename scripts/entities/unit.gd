@@ -16,9 +16,11 @@ var type : Type.Unit
 var upgraded : bool
 
 ## The current state of the unit.
-var state := State.FOLLOWING :
+var state := State.IDLE :
     set(new_state):
-        _on_state_exit(state)
+        var old_state = state
+        state = new_state
+        _on_state_exit(old_state)
         _on_state_enter(new_state)
 
 ## The current target of the unit.
@@ -26,6 +28,11 @@ var target : Entity
 
 ## A cached path to the unit's target.
 var path : Array
+
+## A flag representing if the unit is idle.
+var idle : bool :
+    get: return state == State.IDLE
+
 
 ## A flag representing if the unit is in limbo (ie: not in the field).
 var in_limbo : bool :
@@ -103,6 +110,21 @@ func move_towards(tile: Tile) -> bool:
     return false
 
 
+func throw_to(tile: Tile) -> void:
+    move_to(tile)
+    go_idle()
+
+
+func go_idle() -> void:
+    state = State.IDLE
+    GameState.player.remove_unit(self)
+
+
+func join_squad() -> void:
+    state = State.FOLLOWING
+    GameState.player.add_unit(self)
+
+
 func update_time(world_time: int) -> bool:
     var old_time := time
     time = world_time
@@ -124,15 +146,18 @@ func do_action() -> bool:
             var tether := player.unit_tether
             var dest := tether.tail.current_tile
 
-            if (_in_range_of_tether() and
-                _can_see_tether()):
-                    return move_towards(dest)
+            if not _in_range_of_tether():
+                go_idle()
+                return false
+            
+            if _can_see_tether():
+                return move_towards(dest)
         
     return false
 
 
 func _in_range_of_tether() -> bool:
-    var limit := 32
+    var limit := Globals.UNIT_SIGHT_RANGE
     var dest := GameState.player.unit_tether.tail.grid_position
     return Util.chebyshev_distance(grid_position, dest) <= limit
 
@@ -187,23 +212,36 @@ func _check_tile_at(pos: Vector2i) -> Type.Tile:
 func _update_glyph() -> void:
     match type:
         Type.Unit.RED:
-            if upgraded: set_glyph(Vector2(), Glyph.UNIT_RED_LARGE)
+            if upgraded:
+                if idle: set_glyph(Vector2(), Glyph.UNIT_RED_LARGE_IDLE)
+                else: set_glyph(Vector2(), Glyph.UNIT_RED_LARGE)
+            elif idle: set_glyph(Vector2(), Glyph.UNIT_RED_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_RED_SMALL)
         Type.Unit.YELLOW:
-            if upgraded: set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE)
+            if upgraded:
+                if idle: set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE_IDLE)
+                else: set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE)
+            elif idle: set_glyph(Vector2(), Glyph.UNIT_YELLOW_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_YELLOW_SMALL)
         Type.Unit.BLUE:
-            if upgraded: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE)
+            if upgraded:
+                if idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE_IDLE)
+                else: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE)
+            elif idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL)
 
 
 func _on_state_enter(_state: State) -> void:
     match _state:
+        State.IDLE:
+            _update_glyph()
         State.FOLLOWING:
             GameState.player.add_unit(self)
         
 
 func _on_state_exit(_state: State) -> void:
     match _state:
+        State.IDLE:
+            _update_glyph()
         State.FOLLOWING:
             GameState.player.remove_unit(self)
