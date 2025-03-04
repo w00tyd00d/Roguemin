@@ -1,10 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://12ynotjnohm3"]
+[gd_scene load_steps=4 format=3 uid="uid://12ynotjnohm3"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_rkls3"]
 [ext_resource type="Script" path="res://scripts/world/world.gd" id="2_yge30"]
+[ext_resource type="PackedScene" uid="uid://borrl1q1erb2s" path="res://prefabs/whistle.tscn" id="3_7d70t"]
 
 [node name="World" instance=ExtResource("1_rkls3")]
 z_index = -1
 script = ExtResource("2_yge30")
 
 [node name="TEST" parent="." index="1" instance=ExtResource("1_rkls3")]
+
+[node name="Whistle" parent="." index="2" instance=ExtResource("3_7d70t")]

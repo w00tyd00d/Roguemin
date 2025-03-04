@@ -10,7 +10,17 @@ var _units := {
     Type.Unit.BLUE: {},
 }
 
+# var whistle_size : int :
+#     set(size):
+#         size = clampi(size, 1, 5)
+
+# var swarm_size : int :
+#     set(size):
+#         size = clampi(size, 1, 5)
+
+
 @onready var camera := $Camera2D as Camera2D
+
 
 @onready var test_layer : DualMapLayer
 
@@ -33,7 +43,7 @@ func move_to(dest: Tile) -> void:
     unit_tether.update()
 
     # DEBUG
-    _draw_tether()
+    # _draw_tether()
 
 
 func add_unit(unit: Unit) -> void:
@@ -50,6 +60,5 @@ func _draw_tether() -> void:
         test_layer.set_glyph(pos, Glyph.NONE)
 
     var tail := unit_tether.tail
-    #for link in unit_tether.links:
     test_layer.set_background(tail.grid_position, Glyph.BLACK)
     test_layer.set_glyph(tail.grid_position, Glyph.TEST)

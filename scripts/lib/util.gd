@@ -1,4 +1,4 @@
-class_name Util extends RefCounted
+extends Node
 
 ## Assortment of utility functions.
 
@@ -48,3 +48,14 @@ func get_square_around_pos(pos: Vector2i, length: int, filled := false) -> Array
     
     return res
 
+
+func chebyshev_distance(vec1: Vector2i, vec2: Vector2i) -> int:
+    var dx := absi(vec1.x - vec2.x)
+    var dy := absi(vec1.y - vec2.y)
+    return maxi(dx, dy)
+
+
+func manhattan_distance(vec1: Vector2i, vec2: Vector2i) -> int:
+    var dx := absi(vec1.x - vec2.x)
+    var dy := absi(vec1.y - vec2.y)
+    return dx + dy

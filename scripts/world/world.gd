@@ -25,6 +25,9 @@ var unit_container : UnitContainer # injected upon World creation
 ## The number of [Unit] objects currently out on the field.
 var unit_count := 0
 
+## The [Whistle] object.
+@onready var whistle := $Whistle as Whistle
+
 
 static func create() -> World:
     return preload("res://prefabs/world.tscn").instantiate()
@@ -72,22 +75,6 @@ func query_tile(tile: Tile) -> Type.Tile:
 
 func query_tile_at(pos: Vector2i) -> Type.Tile:
     return query_tile(get_tile(pos))
-
-
-func chebyshev_distance(tile: Tile, dest: Tile) -> int:
-    var vec1 := tile.grid_position
-    var vec2 := dest.grid_position
-    var dx := absi(vec1.x - vec2.x)
-    var dy := absi(vec1.y - vec2.y)
-    return maxi(dx, dy)
-
-
-func manhattan_distance(tile: Tile, dest: Tile) -> int:
-    var vec1 := tile.grid_position
-    var vec2 := dest.grid_position
-    var dx := absi(vec1.x - vec2.x)
-    var dy := absi(vec1.y - vec2.y)
-    return dx + dy
 
 
 func move_entity(ent: Entity, dest: Tile) -> void:

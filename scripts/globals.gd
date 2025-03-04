@@ -47,3 +47,12 @@ const ACTION_INPUTS := [
     &"c_escape",
     &"c_cancel"
 ]
+
+## The minimum size of the whistle
+const WHISTLE_MIN_SIZE := 1
+
+## The maximum size of the whistle
+const WHISTLE_MAX_SIZE := 8
+
+## The range at which the player can reach the center point of the whistle
+const WHISTLE_MAX_RANGE := 15

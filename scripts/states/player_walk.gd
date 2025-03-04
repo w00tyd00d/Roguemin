@@ -11,10 +11,10 @@ func update(inp: StringName) -> Array:
     if just_pressed:
         ## Add matching buttons to switch to different states
         match inp:
-            # &"c_use_key":
-            #     print("USING KEY")
-            #     state_changed.emit("unlock")
-            #     return [false]
+            &"c_whistle":
+                print("WHISTLE STATE!")
+                state_changed.emit("whistle")
+                return [false]
             &"c_wait":
                 print("WE'RE WAITING")
                 return [true, 4]

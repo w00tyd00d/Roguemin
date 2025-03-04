@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Globals="*res://scripts/globals.gd"
+Util="*res://scripts/lib/util.gd"
 GameState="*res://scripts/game_state.gd"
 InputManager="*res://scripts/input_manager.gd"
 TurnManager="*res://scripts/turn_manager.gd"

@@ -97,10 +97,6 @@ func move_towards(tile: Tile) -> bool:
         if grid_position + _dir.vector == last_position: continue
         if _check_tile_at(grid_position + _dir.vector) == Type.Tile.GRASS:
             var dest = world.get_tile(grid_position + _dir.vector)
-            # var dist1 = world.manhattan_distance(current_tile, dest)
-            # var dist2 = world.manhattan_distance(current_tile, tile)
-            
-            # if dist1 != dist2:
             move_to(dest)
             return true
     
@@ -137,9 +133,8 @@ func do_action() -> bool:
 
 func _in_range_of_tether() -> bool:
     var limit := 32
-    var world := GameState.world
-    var dest := GameState.player.unit_tether.tail.current_tile
-    return world.chebyshev_distance(current_tile, dest) <= limit
+    var dest := GameState.player.unit_tether.tail.grid_position
+    return Util.chebyshev_distance(grid_position, dest) <= limit
 
 
 func _can_see_tether() -> bool:
