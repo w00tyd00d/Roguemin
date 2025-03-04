@@ -2,19 +2,23 @@ class_name Tile extends RefCounted
 
 ## The base class for any tile found within the [World].
 
-enum Type { VOID, WALL, GRASS, WATER }
+
 
 ## The world object this tile is attached to.
 var world : World
 
 ## The grid position of the tile.
-var grid_position : Vector2i 
+var grid_position : Vector2i
 
 ## The type of tile.
-var type : Type
+var type : Type.Tile
 
 ## Cached indication whether the tile is inhabited by the player
 var has_player := false
+
+## Flag that returns whether the cell has Units in it
+var has_units : bool :
+    get: return not _units.is_empty()
 
 ## The dictionary of (Pikmin) units within the tile.
 var _units := {}

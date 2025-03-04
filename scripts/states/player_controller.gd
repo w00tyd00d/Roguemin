@@ -40,5 +40,5 @@ func _input_handler() -> void:
     
 func _update_state(inp: StringName) -> void:
     var res := current_state.update(inp)
-    if res[0]: GameState.player.finish_turn(res[1])
+    if res[0]: TurnManager.process_turns(res[1])
 

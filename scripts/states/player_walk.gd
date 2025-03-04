@@ -10,15 +10,14 @@ func update(inp: StringName) -> Array:
     
     if just_pressed:
         ## Add matching buttons to switch to different states
-        pass
-        # match inp:
+        match inp:
             # &"c_use_key":
             #     print("USING KEY")
             #     state_changed.emit("unlock")
             #     return [false]
-            # &"c_wait":
-            #     print("WE'RE WAITING")
-            #     return [true, 1]
+            &"c_wait":
+                print("WE'RE WAITING")
+                return [true, 4]
             # &"c_interact":
             #     print("INTERACTING")
             #     state_changed.emit("interact")
@@ -47,7 +46,7 @@ func update(inp: StringName) -> Array:
     var res := world.query_tile(dest)
     
     match res:
-        Tile.Type.GRASS: player.move_to(dest)
+        Type.Tile.GRASS: player.move_to(dest)
         _: return [false]
     
     # match res:

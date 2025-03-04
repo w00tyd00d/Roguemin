@@ -72,6 +72,6 @@ func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void
         world.set_glyph(dpos, glyph)
         
         if glyph.matches(Glyph.GRASS):
-            world.set_tile_type(dpos, Tile.Type.GRASS)
+            world.set_tile_type(dpos, Type.Tile.GRASS)
         elif glyph.matches(Glyph.WALL):
-            world.set_tile_type(dpos, Tile.Type.WALL)
+            world.set_tile_type(dpos, Type.Tile.WALL)

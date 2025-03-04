@@ -8,6 +8,9 @@ class_name UnitTether extends RefCounted
 var player : Player
 var links : Array[Link] = []
 
+var tail : Link :
+    get: return links[-1] if not links.is_empty() else null
+
 
 func _init(_player: Player, count: int) -> void:
     player = _player
@@ -36,6 +39,9 @@ func update() -> void:
 class Link:
     var grid_position : Vector2i
     var next_link : Link
+
+    var current_tile : Tile :
+        get: return GameState.world.get_tile(grid_position)
 
     func update(pos: Vector2i):
         if next_link and pos.distance_to(next_link.grid_position) >= 2:

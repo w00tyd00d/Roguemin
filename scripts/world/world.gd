@@ -3,6 +3,9 @@ class_name World extends DualMapLayer
 ## The game world object. Contains individual tile information as well as
 ## renders the environment.
 
+## The built in [AStarGrid2D] pathfinder to the world.
+var astar := AStar.new(self)
+
 ## The size of the world, in nodes.
 var size : Vector2i
 
@@ -11,6 +14,10 @@ var tiles : Array[Array]
 
 ## The two-dimensional array of chunks making up the world.
 var chunks : Array[Array]
+
+## The amount of time_units that have been accumulated so far.[br]
+## 4 units == 1 second
+var time := 0
 
 ## The container node of all of the unit objects in-game
 var unit_container : UnitContainer # injected upon World creation
@@ -40,26 +47,39 @@ func get_chunk(vec: Vector2i) -> Chunk:
 
 ## Returns a tile object from a given location, returns null if non-existant.
 func get_tile(pos: Vector2i) -> Tile:
-    if not _in_bounds(pos):
+    if not in_bounds(pos):
         return null
     return tiles[pos.y][pos.x]
 
 
-func set_tile_type(pos: Vector2i, type: Tile.Type) -> void:
-    if not _in_bounds(pos): return
+func set_tile_type(pos: Vector2i, type: Type.Tile) -> void:
+    if not in_bounds(pos): return
     tiles[pos.y][pos.x].type = type
 
 
-func query_tile(tile: Tile) -> Tile.Type:
-    if not tile: return Tile.Type.VOID
+func query_tile(tile: Tile) -> Type.Tile:
+    if not tile: return Type.Tile.VOID
 
     # BAD SYSTEM, SHOULD REPLACE WITH DATA DRIVEN APPROACH
     var glyph := get_glyph(tile.grid_position)
 
-    if glyph.matches(Glyph.WALL): return Tile.Type.WALL
-    if glyph.matches(Glyph.GRASS): return Tile.Type.GRASS
+    if tile.has_units: return Type.Tile.UNIT
+    if glyph.matches(Glyph.WALL): return Type.Tile.WALL
+    if glyph.matches(Glyph.GRASS): return Type.Tile.GRASS
 
-    return Tile.Type.VOID
+    return Type.Tile.VOID
+
+
+func query_tile_at(pos: Vector2i) -> Type.Tile:
+    return query_tile(get_tile(pos))
+
+
+func chebyshev_distance(tile: Tile, dest: Tile) -> int:
+    var vec1 := tile.grid_position
+    var vec2 := dest.grid_position
+    var dx := absi(vec1.x - vec2.x)
+    var dy := absi(vec1.y - vec2.y)
+    return maxi(dx, dy)
 
 
 func move_entity(ent: Entity, dest: Tile) -> void:
@@ -81,14 +101,13 @@ func spawn_entity(cls, pos: Vector2i) -> void:
 
 
 func spawn_unit(pos: Vector2i) -> void:
-    var type : Unit.Type = [Unit.Type.RED, Unit.Type.YELLOW, Unit.Type.BLUE].pick_random()
+    var type : Type.Unit = [Type.Unit.RED, Type.Unit.YELLOW, Type.Unit.BLUE].pick_random()
     var unit : Unit = unit_container.get_available_unit()
     unit.spawn(pos, type, [true,false].pick_random())
+    get_tile(pos).add_unit(unit)
 
 
-
-
-func _in_bounds(vec: Vector2i) -> bool:
+func in_bounds(vec: Vector2i) -> bool:
     var x_end := size.x * Globals.CHUNK_SIZE.x
     var y_end := size.y * Globals.CHUNK_SIZE.y
     return vec.x >= 0 and vec.y >= 0 and vec.x < x_end and vec.y < y_end

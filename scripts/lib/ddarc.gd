@@ -11,8 +11,8 @@ class_name DDARC extends Object
 ## tracked by the ray.[br][br]
 ##
 ## When the callback function returns a truthy value of any kind, the raycast
-## will register that as a signal to end. If you want to return a source of 
-## collision that may have caused the ray to end, you can do so using the 
+## will register that as a signal to end. If you want to return a source of
+## collision that may have caused the ray to end, you can do so using the
 ## [method collider] method (see below).
 ##
 ## An example callback function may look something like this:
@@ -31,10 +31,10 @@ class_name DDARC extends Object
 ## to suit any particular data structure. Things like distance limiting already
 ## comes built into the functions used below so the [param length] argument is
 ## more just for debugging purposes, but it can also be helpful to have for
-## other contextual reasons such as tracking damage fall off per tile, 
+## other contextual reasons such as tracking damage fall off per tile,
 ## explosion intensity per tile, etc.
 #endregion
-   
+
 
 ## Abstraction for setting the collider of a raycast.[br][br]Its main use is to
 ## be used within the callback function as a means of returning a resulting
@@ -46,7 +46,7 @@ class_name DDARC extends Object
 ## [codeblock]
 ## func example_callback(pos: Vector2i, cell_path: Array[Vector2i], length: float):
 ##     var cell := world.get_cell(pos)
-##   
+##
 ##     if cell.entity:
 ##         return [cell.entity] # Without abstraction
 ##     elif cell.wall:
@@ -65,7 +65,7 @@ static func by_vector(
         direction: Vector2,
         callback: Callable,
         distance := INF) -> Context:
-    
+
     return DDARC._dda_raycast(start, direction, callback, distance)
 
 
@@ -76,14 +76,14 @@ static func to_grid_position(
         start: Vector2,
         end: Vector2,
         callback: Callable) -> Context:
-    
+
     var tstart := start.floor()
     var tend := end.floor()
-    
+
     var direction := tstart.direction_to(tend)
     var distance := tstart.distance_to(tend)
     return DDARC._dda_raycast(start, direction, callback, distance)
-    
+
 
 static func _dda_raycast(
         start: Vector2,
@@ -101,31 +101,31 @@ static func _dda_raycast(
     var x_slope := direction.x / direction.y
     var y_slope := direction.y / direction.x
     var step_size := Vector2( sqrt(1 + y_slope * y_slope), sqrt(1 + x_slope * x_slope) )
-    
+
     # The current grid position of the scan.
     var grid_position := Vector2i(start)
-    
+
     # The starting offset of the ray.
     var offset := start - Vector2(grid_position)
-    
+
     # How long the current length of each slope currently is.
     var slope_length := Vector2()
-    
+
     # Which direction do we step to the next cell.
     var step_direction := Vector2i()
-    
+
     # Assign the step direction and starting slope length based on the
     # direction vector and starting normalized offset within the cell.
     if direction.x < 0:
         step_direction.x = -1
-        slope_length.x = offset.x * step_size.x
+        slope_length.x = (1 - offset.x) * step_size.x
     else:
         step_direction.x = 1
         slope_length.x = (1 - offset.x) * step_size.x
-    
+
     if direction.y < 0:
         step_direction.y = -1
-        slope_length.y = offset.y * step_size.y
+        slope_length.y = (1 - offset.y) * step_size.y
     else:
         step_direction.y = 1
         slope_length.y = (1 - offset.y) * step_size.y
@@ -139,7 +139,7 @@ static func _dda_raycast(
 
     while true:
         var current_length : float
-        
+
         # Check each axis' slope length to see which is currently the
         # smallest and choose that axis as the next to walk along.
         # Cache the slope's length prior to incrementing it by its step_size
@@ -158,23 +158,23 @@ static func _dda_raycast(
             grid_position.y += step_direction.y
             current_length = slope_length.y
             slope_length.y += step_size.y
-        
+
         # Store the current cell in the cell_path array
         cell_path.append(grid_position)
-        
+
         # We run the passed callback function to check for collisions. If it
         # returns true, it will count as a collision and the raycast will end.
         var collided = callback.call(ctx._update_path(cell_path, current_length))
         if collided:
             ctx.collider = collided[0] if typeof(collided) == TYPE_ARRAY else null
             return ctx._update_path(cell_path, current_length)
-    
+
     return ctx._update_path(cell_path, distance)
 
 
 ## The container of data about a [DDARC] raycast.
 class Context:
-    
+
     ## The exact starting position of the ray in grid units.
     var start_position : Vector2
     ## The normalized direction of the ray.
@@ -190,17 +190,16 @@ class Context:
     ## The grid position of the head of the ray.
     var grid_position : Vector2i :
         get: return cell_path[-1]
-    
+
     ## The exact position of the head of the ray in grid units.
     var exact_position : Vector2 :
         get: return start_position + direction * length
-    
+
     func _init(start: Vector2, dir: Vector2) -> void:
         start_position = start
         direction = dir
-    
+
     func _update_path(path: Array[Vector2i], _length: float) -> Context:
         cell_path = path
         length = _length
         return self
-
