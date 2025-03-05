@@ -2,7 +2,9 @@ extends Node
 
 # General
 
-## The blink threshold of a blinking icon (0 - 1000ms)
+
+
+## The blink threshold of a blinking icon. (0 - 1000ms)
 const GLYPH_BLINK_THRESHOLD := 750
 
 # Geometery

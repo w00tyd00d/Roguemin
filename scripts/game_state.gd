@@ -19,6 +19,9 @@ signal update_field_count(count: int)
 signal update_total_count(count: int)
 
 
+## Global RNG object.
+var RNG := RandomNumberGenerator.new()
+
 ## Global reference to the current world object
 var world : World
 

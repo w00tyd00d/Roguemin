@@ -29,7 +29,7 @@ class_name WorldFactory extends RefCounted
 #
 # 8. Begin placement of enemies and salvageables
 
-const WORLD_SIZE := Vector2i(3,2)
+const WORLD_SIZE := Vector2i(20,20)
 
 func create_new_world() -> World:
     var world := World.create()
@@ -43,8 +43,7 @@ func setup_world(world: World) -> World:
 
 
 func _generate_rooms(world: World) -> void:
-    # Just place the test room at Chunk 0,0 for now
-    _place_room(world, Vector2i(), Rooms.TEST)
+    _place_room(world, Vector2i(0,0), Rooms.HOME_BASE)
 
 
 func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void:
@@ -53,25 +52,29 @@ func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void
         for dx in room.size.x:
             var delta := Vector2i(dx, dy)
             var chunk := world.get_chunk(chunk_pos + delta)
-            
-            if dx != 0: 
-                chunk.add_edge(Direction.west, World.Chunk.EdgeType.ROOM)
-            if dy != 0:
-                chunk.add_edge(Direction.north, World.Chunk.EdgeType.ROOM)
 
-            if dx != room.size.x-1:
-                chunk.add_edge(Direction.east, World.Chunk.EdgeType.ROOM)
-            if dy != room.size.y-1:
-                chunk.add_edge(Direction.south, World.Chunk.EdgeType.ROOM)
-    
+            if dx != 0: chunk.add_edge(Direction.west, Type.ChunkEdge.ROOM)
+            if dy != 0: chunk.add_edge(Direction.north, Type.ChunkEdge.ROOM)
+            if dx != room.size.x-1: chunk.add_edge(Direction.east, Type.ChunkEdge.ROOM)
+            if dy != room.size.y-1: chunk.add_edge(Direction.south, Type.ChunkEdge.ROOM)
+
     # Place down the room tile by tile
     var start := world.get_chunk(chunk_pos).start
     for pos: Vector2i in room.tile_data:
         var glyph : Glyph = room.tile_data[pos]
         var dpos := start + pos
-        world.set_glyph(dpos, glyph)
-        
+
         if glyph.matches(Glyph.GRASS):
+            var choices := [Glyph.GRASS, Glyph.SHRUB]
+            var weights := PackedFloat32Array([1, .01])
+            var idx := GameState.RNG.rand_weighted(weights)
+
+            glyph = choices[idx]
             world.set_tile_type(dpos, Type.Tile.GRASS)
+            
         elif glyph.matches(Glyph.WALL):
             world.set_tile_type(dpos, Type.Tile.WALL)
+
+        world.set_glyph(dpos, glyph)
+
+    room.run_context_procedures(world, start)

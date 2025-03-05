@@ -11,7 +11,10 @@ var world : World
 var grid_position : Vector2i
 
 ## The type of tile.
-var type : Type.Tile
+var type := Type.Tile.VOID
+
+## Cached indication if this tile is naturally walkable
+var walkable := true
 
 ## Cached indication whether the tile is inhabited by the player
 var has_player := false
@@ -96,3 +99,5 @@ func whistled() -> void:
         if player.unit_toggle[_type]:
             for unit: Unit in _units[_type]:
                 unit.join_squad()
+
+    

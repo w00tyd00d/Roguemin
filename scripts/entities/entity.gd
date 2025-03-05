@@ -58,7 +58,7 @@ func move_towards(target: Tile) -> bool:
             var dest = world.get_tile(grid_position + _dir.vector)
             move_to(dest)
             return true
-    
+
     return false
 
 
@@ -69,7 +69,7 @@ func update_time(world_time: int) -> bool:
     var time_units := time - old_time
     if add_and_check_energy(time_units):
         return do_action()
-    
+
     return false
 
 

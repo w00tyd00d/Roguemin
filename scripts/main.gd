@@ -36,5 +36,5 @@ func _ready() -> void:
 
     player.test_layer = world.get_node("TEST")
 
-    player.move_to(world.get_tile(Vector2i(15, 15)))
+    player.move_to(world.get_tile(world.start_position))
     player.unit_tether.reset()

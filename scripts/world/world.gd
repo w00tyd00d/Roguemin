@@ -16,7 +16,6 @@ var tiles : Array[Array]
 var chunks : Array[Array]
 
 ## The amount of time_units that have been accumulated so far.[br]
-## 4 units == 1 second
 var time := 0 :
     set(n):
         time = n
@@ -30,6 +29,19 @@ var unit_count := 0 :
     set(n):
         unit_count = n
         GameState.update_field_count.emit(n)
+
+## The starting position for the player.
+var start_position : Vector2i :
+    set(vec):
+        start_position = vec
+        start_tile = get_tile(vec)
+
+## The starting tile for the player.
+var start_tile : Tile
+
+## The positions from which the player can summon/store units.
+var unit_summon_targets : Array
+
 
 ## The [Whistle] object.
 @onready var whistle := $Whistle as Whistle
@@ -67,25 +79,25 @@ func get_tile(pos: Vector2i) -> Tile:
 func get_closest_empty_tile(pos: Vector2i) -> Tile:
     var start := get_tile(pos)
     if start.is_empty: return start
-    
+
     var _tiles : Array[Tile] = start.get_all_neighbors()
     var hist := {start: true}
-    
+
     while true:
         var new_tiles : Array[Tile] = []
         for tile in _tiles:
             if hist.has(tile): continue
-            
+
             if tile.is_empty:
                 return tile
 
             hist[tile] = true
             new_tiles.append_array(tile.get_all_neighbors())
-        
+
         _tiles = new_tiles
-    
+
     return null
-        
+
 
 func set_tile_type(pos: Vector2i, type: Type.Tile) -> void:
     if not in_bounds(pos): return
@@ -95,14 +107,10 @@ func set_tile_type(pos: Vector2i, type: Type.Tile) -> void:
 func query_tile(tile: Tile) -> Type.Tile:
     if not tile: return Type.Tile.VOID
 
-    # BAD SYSTEM, SHOULD REPLACE WITH DATA DRIVEN APPROACH
-    var glyph := get_glyph(tile.grid_position)
-
-    if tile.has_units or tile.has_player: return Type.Tile.ENTITY
-    if glyph.matches(Glyph.WALL): return Type.Tile.WALL
-    if glyph.matches(Glyph.GRASS): return Type.Tile.GRASS
-
-    return Type.Tile.VOID
+    if tile.has_units or tile.has_player:
+        return Type.Tile.ENTITY
+    
+    return tile.type
 
 
 func query_tile_at(pos: Vector2i) -> Type.Tile:
@@ -132,7 +140,7 @@ func spawn_unit(pos: Vector2i) -> void:
     var unit : Unit = unit_container.get_available_unit()
     var tile := get_tile(pos)
     if not unit or not tile: return
-    
+
     unit.spawn(pos, type, [true,false].pick_random())
     tile.add_unit(unit)
     unit_count += 1
@@ -168,8 +176,6 @@ func _create_chunks() -> Array[Array]:
 
 ## Represents a point on the chunk grid.
 class Chunk:
-    enum EdgeType { NONE, PATH, EXIT, WALL, ROOM }
-
     ## A reference to the world the chunk exists in.
     var world : World
     ## The position of the chunk on the chunk grid.
@@ -194,8 +200,8 @@ class Chunk:
         center = start + half
         end = (_pos + Vector2i.ONE) * size - Vector2i.ONE
 
-    func add_edge(dir: Direction, type: EdgeType) -> void:
+    func add_edge(dir: Direction, type: Type.ChunkEdge) -> void:
         _edges[dir] = type
 
-    func get_edge(dir: Direction) -> EdgeType:
-        return _edges.get(dir, EdgeType.NONE)
+    func get_edge(dir: Direction) -> Type.ChunkEdge:
+        return _edges.get(dir, Type.ChunkEdge.NONE)

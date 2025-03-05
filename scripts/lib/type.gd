@@ -5,6 +5,9 @@ class_name Type extends Object
 ## The types of tiles found within the world.
 enum Tile { VOID, WALL, GRASS, WATER, ENTITY }
 
+## The types of edges to chunks.
+enum ChunkEdge { NONE, PATH, EXIT, WALL, ROOM }
+
 ## The types of helper units.
 enum Unit { RED, YELLOW, BLUE, NONE }
 

@@ -15,6 +15,8 @@ class_name RoomBlueprint extends TileMapLayer
 ## The dictionary of tile positions and their respective glyph information.
 var tile_data := {}
 
+var context_positions := {}
+
 
 func _init() -> void:
     _scan()
@@ -42,7 +44,17 @@ func _draw() -> void:
     draw_rect(rect2, Color.GREEN, false, BORDER_THICKNESS)
 
 
+func run_context_procedures(world: World, start: Vector2i) -> void:
+    pass
+
+
 func _scan() -> void:
     for vec in get_used_cells():
-        tile_data[vec] = Glyph.get_from(self, vec)
+        var glyph := Glyph.get_from(self, vec)
+        var ctx_id := glyph.get_context_id()
+        if ctx_id > -1:
+            context_positions.get_or_add(ctx_id, []).append(vec)
+            tile_data[vec] = Glyph.GRASS
+        else:
+            tile_data[vec] = glyph
 
