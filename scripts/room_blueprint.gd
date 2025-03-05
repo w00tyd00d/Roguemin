@@ -44,7 +44,7 @@ func _draw() -> void:
     draw_rect(rect2, Color.GREEN, false, BORDER_THICKNESS)
 
 
-func run_context_procedures(world: World, start: Vector2i) -> void:
+func _run_context_procedures(_world: World, _start: Vector2i) -> void:
     pass
 
 
@@ -57,4 +57,3 @@ func _scan() -> void:
             tile_data[vec] = Glyph.GRASS
         else:
             tile_data[vec] = glyph
-

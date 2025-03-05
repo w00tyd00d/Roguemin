@@ -18,7 +18,7 @@ const CHUNK_SIZE := Vector2i(23,23)
 # Time
 
 ## The amount of time units that make up one second.
-const TIME_VALUE := 20
+const TIME_VALUE := 40
 
 ## The amount of time units within a single day.
 const TIME_LIMIT := (13 * 60 + 30) * TIME_VALUE # 13 min 30 sec
@@ -51,7 +51,7 @@ const ACTION_INPUTS := [
     &"c_toggle_red",
     &"c_toggle_blue",
     &"c_toggle_yellow",
-    &"c_escape",
+    &"k_escape",
     &"c_cancel"
 ]
 
@@ -70,4 +70,4 @@ const PLAYER_MAX_RANGE := 16
 const WHISTLE_MIN_SIZE := 1
 
 ## The maximum size of the whistle
-const WHISTLE_MAX_SIZE := 8
+const WHISTLE_MAX_SIZE := 4

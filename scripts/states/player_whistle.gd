@@ -49,9 +49,21 @@ func update(inp: StringName) -> Array:
     var dir := Direction.by_pattern(inp)
     if not dir: return [false]
 
-    var pos := grid_position + dir.vector
-    if _in_range(pos):
-        grid_position = pos
+    var loops := 3 if Input.is_action_pressed(&"k_shift") else 1
+    for _n in loops:    
+        var pos := grid_position + dir.vector
+        if _in_range(pos):
+            grid_position = pos
+            continue
+        elif dir.is_diagonal:
+            var valid := false
+            for adir in dir.adjacent:
+                var apos := grid_position + adir.vector
+                if _in_range(apos):
+                    grid_position = apos
+                    valid = true
+                    break
+            if not valid: break
     
     return [false]
 
@@ -66,5 +78,4 @@ func _update_preview() -> void:
 
 
 func _get_whistle_area() -> Array[Vector2i]:
-    var length := (whistle_level-1) * 2 + 1
-    return Util.get_square_around_pos(grid_position, length, true)
+    return GameState.world.whistle.get_area(whistle_level)

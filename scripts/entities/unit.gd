@@ -6,7 +6,8 @@ enum State {
     IDLE,
     FOLLOWING,
     ATTACKING,
-    CARRYING
+    CARRYING,
+    RETURN_HOME
 }
 
 ## The current type of the unit.
@@ -61,13 +62,16 @@ func reset() -> void:
     energy_points = 0
     posture_points = 0
 
+    var world := GameState.world
     GameState.player.remove_unit(self)
+    current_tile.remove_unit(self)
 
+    state = State.IDLE
     grid_position = Vector2()
 
-    if GameState.world:
-        var count := GameState.world.unit_count
-        GameState.world.unit_count = maxi(count-1, 0)
+    if world:
+        var count := world.unit_count
+        world.unit_count = maxi(count-1, 0)
 
 
 func spawn(pos: Vector2i, _type: Type.Unit, _upgraded := false) -> void:
@@ -109,16 +113,25 @@ func move_towards(tile: Tile) -> bool:
     else: vec = delta.sign()
 
     var dir := Direction.by_pattern(vec)
+    var res := _check_tile_at(grid_position + dir.vector)
+    var dest := world.get_tile(grid_position + dir.vector)
 
-    if _check_tile_at(grid_position + dir.vector) == Type.Tile.GRASS:
-        var dest = world.get_tile(grid_position + dir.vector)
+    if res == Type.Tile.WALL:
+        if state == State.RETURN_HOME and Tag.has(dest, Tags.UNIT_SHIP):
+            reset()
+            return true
+        elif current_tile.type == Type.Tile.VOID:
+            move_to(dest)
+            return true
+        
+    elif res != Type.Tile.WALL and res != Type.Tile.ENTITY:
         move_to(dest)
         return true
 
-    for _dir in dir.adjacent:
-        if grid_position + _dir.vector == last_position: continue
-        if _check_tile_at(grid_position + _dir.vector) == Type.Tile.GRASS:
-            var dest = world.get_tile(grid_position + _dir.vector)
+    for adj_dir in dir.adjacent:
+        if grid_position + adj_dir.vector == last_position: continue
+        if _check_tile_at(grid_position + adj_dir.vector) == Type.Tile.GRASS:
+            dest = world.get_tile(grid_position + adj_dir.vector)
             move_to(dest)
             return true
     
@@ -138,6 +151,10 @@ func go_idle() -> void:
 func join_squad() -> void:
     state = State.FOLLOWING
     GameState.player.add_unit(self)
+
+
+func go_home() -> void:
+    state = State.RETURN_HOME
 
 
 func update_time(world_time: int) -> bool:
@@ -168,6 +185,9 @@ func do_action() -> bool:
             if _can_see_tether():
                 return move_towards(dest)
         
+        State.RETURN_HOME:
+            move_towards(GameState.world.unit_ship_tile)
+        
     return false
 
 
@@ -184,7 +204,8 @@ func _can_see_tether() -> bool:
     var callback := func(ctx: DDARC.Context):
         var pos := ctx.grid_position
         if (not world.in_bounds(pos) or
-            world.query_tile_at(pos) == Type.Tile.WALL):
+            world.query_tile_at(pos) == Type.Tile.WALL and not 
+            current_tile.type == Type.Tile.VOID):
                 return true
 
     var raycast := DDARC.to_grid_position(
@@ -208,18 +229,6 @@ func _check_tile_at(pos: Vector2i) -> Type.Tile:
                 any = true
         if any:
             return _check_tile_at(pos)
-        
-    
-    # match world.query_tile(tile):
-    #     Type.Tile.ENTITY:
-    #         for unit in tile.get_all_units():
-    #             if unit.time < GameState.world.time:
-    #                 unit.update_time(world_time)
-
-    #     Type.Tile.GRASS:
-    #         var dest = world.get_tile(pos)
-    #         move_to(dest)
-    #         return true
 
     return res
 
@@ -252,11 +261,13 @@ func _on_state_enter(_state: State) -> void:
             _update_glyph()
         State.FOLLOWING:
             GameState.player.add_unit(self)
+        State.ATTACKING:
+            GameState.player.remove_unit(self)
+        State.CARRYING:
+            GameState.player.remove_unit(self)
         
 
 func _on_state_exit(_state: State) -> void:
     match _state:
         State.IDLE:
             _update_glyph()
-        State.FOLLOWING:
-            GameState.player.remove_unit(self)

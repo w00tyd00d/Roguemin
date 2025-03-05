@@ -1,4 +1,4 @@
-class_name Tag extends Node
+extends Node
 
 ## Object tagging system.
 ##

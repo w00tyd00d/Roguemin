@@ -18,7 +18,10 @@ func update(inp: StringName) -> Array:
                 print("WHISTLE STATE!")
                 state_changed.emit("whistle")
             &"c_throw":
-                if player.unit_count > 0:
+                if world.unit_summon_targets.has(player.grid_position):
+                    for unit in player.get_all_units():
+                        unit.go_home()
+                elif player.unit_count > 0:
                     print("WE'RE THROWING, DUDE")
                     state_changed.emit("throw")
             &"c_dismiss":

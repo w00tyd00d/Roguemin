@@ -8,10 +8,12 @@ var grid_position : Vector2i :
         grid_position = vec
         position = vec * Globals.TILE_SIZE
 
+var _key : Array[int] = [2, 4, 7, 10] # layer number, not idx
+
 # Preview variables
 var _preview_size := 1 :
     set(n):
-        preview_layers[_preview_size-1].hide()
+        preview_layers[_key[_preview_size-1]-1].hide()
         _preview_size = clampi(n, Globals.WHISTLE_MIN_SIZE, Globals.WHISTLE_MAX_SIZE)
 
 # Animation variables
@@ -39,7 +41,9 @@ var _acc := 0.0
     %PreviewLayer5,
     %PreviewLayer6,
     %PreviewLayer7,
-    %PreviewLayer8
+    %PreviewLayer8,
+    %PreviewLayer9,
+    %PreviewLayer10
 ]
 
 @onready var animation_layers : Array[TileMapLayer] = [
@@ -50,13 +54,16 @@ var _acc := 0.0
     $AnimationLayer5,
     $AnimationLayer6,
     $AnimationLayer7,
-    $AnimationLayer8
+    $AnimationLayer8,
+    $AnimationLayer9,
+    $AnimationLayer10
 ]
 
 
 func _process(dt: float) -> void:
     if preview_view.visible:
-        preview_layers[_preview_size-1].visible = not Util.glyph_blinking()
+        var idx := _key[_preview_size-1] - 1
+        preview_layers[idx].visible = not Util.glyph_blinking()
     
     if _anim_target_size > 0:
         _run_anim(dt)
@@ -74,11 +81,16 @@ func activate(level: int) -> void:
     _toggle_preview_off()
     _reset_anim()
     _anim_time_limit = ANIMATION_TIME * (level / float(Globals.WHISTLE_MAX_SIZE))
-    _anim_target_size = level
+    _anim_target_size = _key[level-1]
 
 
 func cancel_preview() -> void:
     _toggle_preview_off()
+
+
+func get_area(level: int) -> Array[Vector2i]:
+    var length := _key[level-1] * 2 - 1
+    return Util.get_square_around_pos(grid_position, length, true)
 
 
 func _toggle_preview_off() -> void:

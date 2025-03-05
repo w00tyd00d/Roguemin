@@ -31,13 +31,18 @@ var unit_count := 0 :
         GameState.update_field_count.emit(n)
 
 ## The starting position for the player.
-var start_position : Vector2i :
-    set(vec):
-        start_position = vec
-        start_tile = get_tile(vec)
+var start_position : Vector2i        
 
 ## The starting tile for the player.
-var start_tile : Tile
+var start_tile : Tile : 
+    get: return get_tile(start_position)
+
+## The position of the units' ship.
+var unit_ship_position : Vector2i
+
+## The tile of the units' ships
+var unit_ship_tile : Tile :
+    get: return get_tile(unit_ship_position)
 
 ## The positions from which the player can summon/store units.
 var unit_summon_targets : Array
@@ -76,9 +81,23 @@ func get_tile(pos: Vector2i) -> Tile:
     return tiles[pos.y][pos.x]
 
 
-func get_closest_empty_tile(pos: Vector2i) -> Tile:
+func get_closest_empty_tile(
+        pos: Vector2i,
+        include_void := true,
+        include_water := true) -> Tile:
+
+    var is_valid := func(tile: Tile):
+        if (not tile or
+            tile.type == Type.Tile.WALL or 
+            not include_void and tile.type == Type.Tile.VOID or
+            not include_water and tile.type == Type.Tile.WATER):
+                return false
+        return tile.is_empty
+    
     var start := get_tile(pos)
-    if start.is_empty: return start
+    if not start: return
+    
+    if is_valid.call(start): return start
 
     var _tiles : Array[Tile] = start.get_all_neighbors()
     var hist := {start: true}
@@ -88,7 +107,7 @@ func get_closest_empty_tile(pos: Vector2i) -> Tile:
         for tile in _tiles:
             if hist.has(tile): continue
 
-            if tile.is_empty:
+            if is_valid.call(tile):
                 return tile
 
             hist[tile] = true

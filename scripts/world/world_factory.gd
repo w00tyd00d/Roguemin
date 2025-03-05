@@ -43,7 +43,7 @@ func setup_world(world: World) -> World:
 
 
 func _generate_rooms(world: World) -> void:
-    _place_room(world, Vector2i(0,0), Rooms.HOME_BASE)
+    _place_room(world, Vector2i(1,1), Rooms.HOME_BASE)
 
 
 func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void:
@@ -60,6 +60,7 @@ func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void
 
     # Place down the room tile by tile
     var start := world.get_chunk(chunk_pos).start
+    
     for pos: Vector2i in room.tile_data:
         var glyph : Glyph = room.tile_data[pos]
         var dpos := start + pos
@@ -72,9 +73,11 @@ func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void
             glyph = choices[idx]
             world.set_tile_type(dpos, Type.Tile.GRASS)
             
-        elif glyph.matches(Glyph.WALL):
+        # ADD WATER TILES
+            
+        else:
             world.set_tile_type(dpos, Type.Tile.WALL)
 
         world.set_glyph(dpos, glyph)
 
-    room.run_context_procedures(world, start)
+    room._run_context_procedures(world, start)
