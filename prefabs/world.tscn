@@ -8,9 +8,11 @@
 
 [node name="World" instance=ExtResource("1_rkls3")]
 z_index = -1
+position = Vector2(0, 0)
 script = ExtResource("2_yge30")
 
 [node name="TEST" parent="." index="1" instance=ExtResource("1_rkls3")]
+position = Vector2(0, 0)
 
 [node name="Whistle" parent="." index="2" instance=ExtResource("3_7d70t")]
 z_index = 2

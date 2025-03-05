@@ -5,11 +5,11 @@
 [ext_resource type="PackedScene" uid="uid://bwl0qh8yr5ome" path="res://prefabs/player_controller.tscn" id="3_l48dn"]
 
 [node name="Player" instance=ExtResource("1_wic5u")]
-tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0)
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("2_delc5")
 
-[node name="GlyphLayer" parent="." index="0"]
-tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0)
+[node name="BackgroundLayer" parent="." index="0"]
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0)
 
 [node name="PlayerController" parent="." index="1" instance=ExtResource("3_l48dn")]
 

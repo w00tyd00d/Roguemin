@@ -16,7 +16,7 @@ const CHUNK_SIZE := Vector2i(23,23)
 # Time
 
 ## The amount of time units that make up one second.
-const TIME_VALUE := 4
+const TIME_VALUE := 20
 
 ## The amount of time units within a single day.
 const TIME_LIMIT := (13 * 60 + 30) * TIME_VALUE # 13 min 30 sec

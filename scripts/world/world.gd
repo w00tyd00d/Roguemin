@@ -17,7 +17,10 @@ var chunks : Array[Array]
 
 ## The amount of time_units that have been accumulated so far.[br]
 ## 4 units == 1 second
-var time := 0
+var time := 0 :
+    set(n):
+        time = n
+        GameState.update_sun_meter.emit(n)
 
 ## The container node of all of the unit objects in-game
 var unit_container : UnitContainer # injected upon World creation

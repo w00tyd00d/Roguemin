@@ -7,5 +7,6 @@
 tile_set = ExtResource("1_x8b3s")
 script = ExtResource("2_c11hl")
 
-[node name="GlyphLayer" type="TileMapLayer" parent="."]
+[node name="BackgroundLayer" type="TileMapLayer" parent="."]
+show_behind_parent = true
 tile_set = ExtResource("1_x8b3s")

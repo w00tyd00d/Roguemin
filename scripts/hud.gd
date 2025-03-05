@@ -2,6 +2,8 @@ extends CanvasLayer
 
 ## The heads up display for the game.
 
+@onready var sun_meter := $SunMeter as DualMapLayer
+
 @onready var player_name := $PlayerName as Label
 @onready var player_health := $PlayerHealth as Label
 @onready var selected_unit := $SelectedUnit as Label

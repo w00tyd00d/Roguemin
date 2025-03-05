@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://dt4m8c03s0j5c"]
+
+[ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_igr6u"]
+[ext_resource type="Script" path="res://scripts/sun_meter.gd" id="2_spt0y"]
+
+[node name="SunMeter" instance=ExtResource("1_igr6u")]
+tile_map_data = PackedByteArray(0, 0, 3, 0, 3, 0, 0, 0, 20, 0, 3, 0, 1, 0)
+script = ExtResource("2_spt0y")
+
+[node name="BackgroundLayer" parent="." index="0"]
+tile_map_data = PackedByteArray(0, 0, 3, 0, 3, 0, 2, 0, 0, 0, 0, 0, 0, 0)

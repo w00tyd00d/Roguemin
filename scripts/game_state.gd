@@ -4,6 +4,11 @@ extends Node
 
 signal force_player_state(state: StringName)
 
+
+# HUD Signals
+
+signal update_sun_meter(time: int)
+
 signal display_unit_toggle(val: bool)
 signal update_unit_toggle(dict: Dictionary)
 
