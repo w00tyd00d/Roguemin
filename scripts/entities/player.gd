@@ -10,8 +10,17 @@ var unit_toggle := {
     Type.Unit.BLUE: true,
 }
 
+var selected_unit := Type.Unit.NONE :
+    set(type):
+        selected_unit = type
+        GameState.update_selected_unit.emit(type)
+
 ## The number of units within the player's squad
-var unit_count := 0
+var unit_count := 0 :
+    set(n):
+        unit_count = n
+        GameState.update_squad_count.emit(unit_count)
+        GameState.update_selected_unit.emit(selected_unit)
 
 # var whistle_size : int :
 #     set(size):
@@ -55,16 +64,41 @@ func move_to(dest: Tile) -> void:
     # _draw_tether()
 
 
-func add_unit(unit: Unit) -> void:
-    if not _units[unit.type].has(unit):
-        _units[unit.type][unit] = true
-        unit_count += 1
+func cycle_selected_unit(left := false) -> void:
+    var strikes := 0
+    var type := selected_unit
+    while strikes < 3:
 
+        if left: type = (4 + type - 1) % 4
+        else: type = (type + 1) % 4
+
+        if type == Type.Unit.NONE: continue
+        if get_unit_count(type) > 0:
+            selected_unit = type
+            return
+
+        strikes += 1
+        
+    selected_unit = Type.Unit.NONE
+
+func add_unit(unit: Unit) -> void:
+    if _units[unit.type].has(unit): return
+    
+    _units[unit.type][unit] = true
+    unit_count += 1
+
+    if selected_unit == Type.Unit.NONE:
+        selected_unit = unit.type
+        
 
 func remove_unit(unit: Unit) -> void:
-    if _units[unit.type].has(unit):
-        _units[unit.type].erase(unit)
-        unit_count -= 1
+    if not _units[unit.type].has(unit): return 
+    
+    _units[unit.type].erase(unit)
+    unit_count -= 1
+
+    if unit_count == 0:
+        selected_unit = Type.Unit.NONE
 
 
 func toggle_unit(type: Type.Unit) -> void:
@@ -75,7 +109,7 @@ func toggle_unit(type: Type.Unit) -> void:
 
 func get_unit_count(type := Type.Unit.NONE) -> int:
     if type == Type.Unit.NONE:
-        return unit_count
+        return 0
     return _units[type].size()    
 
 

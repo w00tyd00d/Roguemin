@@ -23,7 +23,10 @@ var time := 0
 var unit_container : UnitContainer # injected upon World creation
 
 ## The number of [Unit] objects currently out on the field.
-var unit_count := 0
+var unit_count := 0 :
+    set(n):
+        unit_count = n
+        GameState.update_field_count.emit(n)
 
 ## The [Whistle] object.
 @onready var whistle := $Whistle as Whistle
@@ -129,6 +132,7 @@ func spawn_unit(pos: Vector2i) -> void:
     
     unit.spawn(pos, type, [true,false].pick_random())
     tile.add_unit(unit)
+    unit_count += 1
 
 
 func in_bounds(vec: Vector2i) -> bool:

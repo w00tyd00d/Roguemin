@@ -6,7 +6,7 @@ class_name Type extends Object
 enum Tile { VOID, WALL, GRASS, WATER, ENTITY }
 
 ## The types of helper units.
-enum Unit { NONE, RED, YELLOW, BLUE }
+enum Unit { RED, YELLOW, BLUE, NONE }
 
 ## The hazards that will do harm entities.
 enum Hazard { WATER, FIRE }

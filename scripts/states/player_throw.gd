@@ -1,8 +1,6 @@
 class_name PlayerThrow extends PlayerState
 
 
-var selected_type := Type.Unit.RED
-
 var grid_position : Vector2i :
     set(vec):
         grid_position = vec
@@ -26,16 +24,20 @@ func update(inp: StringName) -> Array:
             &"c_cancel":
                 state_changed.emit("walk")
             &"c_cycle_right":
-                pass
+                player.cycle_selected_unit()
+                return [false]
             &"c_cycle_left":
-                pass
+                player.cycle_selected_unit(true)
+                return [false]
             &"c_whistle":
                 state_changed.emit("whistle")
             &"c_throw":
-                if selected_type != Type.Unit.NONE:
+                if player.selected_unit != Type.Unit.NONE:
                     var tile := world.get_closest_empty_tile(grid_position)
-                    var unit := player.grab_unit(selected_type)
+                    var unit := player.grab_unit(player.selected_unit)
                     player.throw_unit(unit, tile)
+                    if player.selected_unit == Type.Unit.NONE:
+                        state_changed.emit("walk")                    
                     return [true, 1]
 
     

@@ -17,15 +17,18 @@ func update(inp: StringName) -> Array:
             &"c_whistle":
                 print("WHISTLE STATE!")
                 state_changed.emit("whistle")
-                return [false]
             &"c_throw":
-                print("WE'RE THROWING")
-                state_changed.emit("throw")
-                return [false]
+                if player.unit_count > 0:
+                    print("WE'RE THROWING, DUDE")
+                    state_changed.emit("throw")
             &"c_dismiss":
                 for unit in player.get_all_units():
                     unit.go_idle()
                 return [true, 4]
+            &"c_cycle_right":
+                player.cycle_selected_unit()
+            &"c_cycle_left":
+                player.cycle_selected_unit(true)
             &"c_wait":
                 print("WE'RE WAITING")
                 return [true, 4]

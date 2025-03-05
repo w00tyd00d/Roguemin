@@ -43,10 +43,25 @@ func _ready() -> void:
     add_to_group(&"units")
 
 
+static func metadata(_type: Type.Unit) -> Dictionary:
+    match _type:
+        Type.Unit.RED: return { name = "Red", color = Color.RED }
+        Type.Unit.YELLOW: return { name = "Yellow", color = Color.YELLOW }
+        Type.Unit.BLUE: return { name = "Blue", color = Color.BLUE }
+        Type.Unit.NONE: return { name = "None", color = Color.DARK_GRAY }
+    return {}
+
+
+func get_metadata() -> Dictionary:
+    return Unit.metadata(type)
+
+
 func reset() -> void:
     hide()
     energy_points = 0
     posture_points = 0
+
+    GameState.player.remove_unit(self)
 
     grid_position = Vector2()
 

@@ -38,7 +38,7 @@ func update(inp: StringName) -> Array:
                 player.toggle_unit(Type.Unit.YELLOW)
             &"c_toggle_blue":
                 player.toggle_unit(Type.Unit.BLUE)
-            &"c_whistle":
+            &"c_whistle", &"c_throw":
                 world.whistle.activate(whistle_level)
                 for pos in _get_whistle_area():
                     world.get_tile(pos).whistled()
