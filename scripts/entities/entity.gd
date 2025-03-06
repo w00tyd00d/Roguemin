@@ -20,8 +20,7 @@ var energy_points := 0
 var posture_points := 0
 
 ## Flag for signaling if the entity can act on this turn.
-var can_act : bool :
-    get: return energy_points >= Globals.ENERGY_CAP
+var can_act : bool : get = _get_can_act
 
 ## Dictionary of immunities the entity has.
 var _immunities := {}
@@ -96,3 +95,7 @@ func remove_immunity(hazard: Type.Hazard) -> void:
 
 func reset_immunities() -> void:
     _immunities = {}
+
+
+func _get_can_act() -> bool:
+    return energy_points >= Globals.ENERGY_CAP

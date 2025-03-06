@@ -27,13 +27,16 @@ var state := State.IDLE :
 ## The current target of the unit.
 var target
 
+## The object the unit is currently holding on to.
+var held_object : MultiTileEntity
+
 ## A cached path to the unit's target.
 var path : Array :
     set(arr):
         path = arr
         if not path.is_empty():
             GameState.ASTAR_TEST.emit(arr)
-        
+
 
 ## A flag representing if the unit is idle.
 var idle : bool :
@@ -71,6 +74,9 @@ func reset() -> void:
     GameState.player.remove_unit(self)
     current_tile.remove_unit(self)
 
+    if held_object:
+        drop_object()
+
     state = State.IDLE
     grid_position = Vector2()
 
@@ -81,7 +87,7 @@ func reset() -> void:
 
 func spawn(pos: Vector2i, _type: Type.Unit, _upgraded := false) -> void:
     type = _type
-    upgraded = _upgraded
+    upgraded = true # No time to implement nectar :(
     _update_glyph()
 
     grid_position = pos
@@ -130,13 +136,14 @@ func move_towards(tile: Tile) -> bool:
         elif current_tile.type == Type.Tile.VOID:
             move_to(dest)
             return true
-        
+
     elif res != Type.Tile.WALL and res != Type.Tile.ENTITY:
         move_to(dest)
         return true
 
-    # var dist := Util.chebyshev_distance(grid_position, tile.grid_position)
     var dist := grid_position.distance_to(tile.grid_position)
+    if dist < 2: return false
+
     var limit := 11
 
     for adj_dir in dir.adjacent:
@@ -156,11 +163,25 @@ func move_towards(tile: Tile) -> bool:
             dest = world.get_tile(grid_position + ort_dir.vector)
             move_to(dest)
             return true
-    
+
     return false
 
 
 func throw_to(tile: Tile) -> void:
+    var world := GameState.world
+    if tile.has_entities:
+        var ent := tile.get_first_entity()
+        if ent:
+            match ent.type:
+                Type.Entity.TREASURE:
+                    var latch := ent.get_open_latch_tile()
+                    if latch:
+                        target_entity(ent)
+                        move_to(latch)
+                        grab_object(ent)
+                        return
+
+    tile = world.get_closest_empty_tile(tile, false)
     move_to(tile)
     go_idle()
 
@@ -179,6 +200,28 @@ func go_home() -> void:
     state = State.RETURN_HOME
 
 
+func target_entity(ent: MultiTileEntity) -> void:
+    target = ent
+    match ent.type:
+        Type.Entity.TREASURE: state = State.CARRYING
+        Type.Entity.ENEMY: state = State.ATTACKING
+
+
+func grab_object(obj: MultiTileEntity) -> bool:
+    if obj.add_carrier(self):
+        held_object = obj
+        return true
+
+    return false
+
+
+func drop_object() -> void:
+    if not held_object: return
+    held_object.remove_carrier(self)
+    held_object = null
+
+
+
 func update_time(world_time: int) -> bool:
     var old_time := time
     time = world_time
@@ -187,7 +230,7 @@ func update_time(world_time: int) -> bool:
         var time_units := time - old_time
         if add_and_check_energy(time_units):
             return do_action()
-    
+
     return false
 
 
@@ -197,32 +240,44 @@ func do_action() -> bool:
 
     match state:
         State.FOLLOWING:
-            if not player: return false
+            return _do_follow_action()
+        State.CARRYING:
+            if not held_object:
+                return move_towards(target.current_tile)
 
-            var tether := player.unit_tether
-            var dest := tether.tail.current_tile
-
-            if not _in_range_of_tether():
-                go_idle()
-                return false
-            
-            if _can_see_tether():
-                return move_towards(dest)
-            else:
-                if (path.is_empty() or
-                    Util.chebyshev_distance(path[-1], target.grid_position) > 5):
-                        path = world.astar.find_path_to(self, dest.grid_position)
-                        _broadcast_path()
-                
-                var dist := Util.chebyshev_distance(current_tile.grid_position, path[0])
-                if dist < 2:
-                    path.pop_front()
-                if not path.is_empty():
-                    return move_towards(world.get_tile(path[0]))
-        
         State.RETURN_HOME:
-            move_towards(GameState.world.unit_ship_tile)
-        
+            return move_towards(GameState.world.unit_ship_tile)
+
+    return false
+
+
+func _do_follow_action() -> bool:
+    var player := GameState.player
+    var world := GameState.world
+
+    if not player: return false
+
+    var tether := player.unit_tether
+    var dest := tether.tail.current_tile
+
+    if not _in_range_of_tether():
+        go_idle()
+        return false
+
+    if _can_see_tether():
+        return move_towards(dest)
+    else:
+        if (path.is_empty() or
+            Util.chebyshev_distance(path[-1], target.grid_position) > 5):
+                path = world.astar.find_path_to(self, dest.grid_position)
+                _broadcast_path()
+
+        var dist := Util.chebyshev_distance(current_tile.grid_position, path[0])
+        if dist < 2:
+            path.pop_front()
+        if not path.is_empty():
+            return move_towards(world.get_tile(path[0]))
+
     return false
 
 
@@ -239,7 +294,7 @@ func _can_see_tether() -> bool:
     var callback := func(ctx: DDARC.Context):
         var pos := ctx.grid_position
         if (not world.in_bounds(pos) or
-            world.query_tile_at(pos) == Type.Tile.WALL and not 
+            world.query_tile_at(pos) == Type.Tile.WALL and not
             current_tile.type == Type.Tile.VOID):
                 return true
 
@@ -255,7 +310,7 @@ func _check_tile_at(pos: Vector2i) -> Type.Tile:
     var world := GameState.world
     var tile := world.get_tile(pos)
     var res := world.query_tile(tile)
-    
+
     # Cascade forward to see if we can resolve movement
     if res == Type.Tile.ENTITY:
         var any := false
@@ -289,7 +344,7 @@ func _receive_path(_path: Array[Vector2i]) -> void:
     while not _path.is_empty():
         var dist1 := Util.chebyshev_distance(_path[0], _path[-1])
         var dist2 := Util.chebyshev_distance(grid_position, _path[-1])
-        if dist1 < dist2: 
+        if dist1 < dist2:
             path = _path
             return
         _path.pop_front()
@@ -319,7 +374,7 @@ func _update_glyph() -> void:
 
 func _on_state_enter(_state: State) -> void:
     var player := GameState.player
-    
+
     match _state:
         State.IDLE:
             _update_glyph()
@@ -330,12 +385,11 @@ func _on_state_enter(_state: State) -> void:
             player.remove_unit(self)
         State.CARRYING:
             player.remove_unit(self)
-        
+
 
 func _on_state_exit(_state: State) -> void:
     match _state:
         State.IDLE:
             _update_glyph()
-        State.FOLLOWING:
-            pass
-            # path = []
+        State.CARRYING:
+            drop_object()

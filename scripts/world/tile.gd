@@ -67,9 +67,9 @@ func get_neighbor(dir: Direction) -> Tile:
 
 func get_all_neighbors() -> Array[Tile]:
     var res : Array[Tile] = []
-    var arr := Direction.ALL_VECTORS.duplicate()
+    var arr : Array[Vector2i] = Direction.ALL_VECTORS.duplicate()
     arr.shuffle()
-    for vec in Direction.ALL_VECTORS:
+    for vec in arr:
         var npos := grid_position + vec
         var tile := world.get_tile(npos)
         if tile: res.append(tile)
@@ -90,6 +90,13 @@ func remove_entity(ent: Entity) -> void:
 
 func has_entity(ent) -> bool:
     return _entities.has(ent)
+
+
+func get_first_entity() -> MultiTileEntity:
+    for ent in _entities:
+        if ent is Player: continue
+        return ent
+    return null
 
 
 func add_unit(unit: Unit) -> void:
@@ -120,10 +127,17 @@ func whistled() -> void:
                 unit.join_squad()
 
 
+func get_flow_field_vector(wall_distance := 0, include_water := true) -> Vector2i:
+    if _flow_field_vector and wall_distance == 0 and include_water == true:
+        return _flow_field_vector
+    
+    return _get_best_flow_field_vector(wall_distance, include_water)
+
+
 func _get_best_flow_field_vector(wall_distance := 0, include_water := true) -> Vector2i:
     var vec : Vector2i
+    var best := _flow_field_value
     for nbr in get_all_neighbors():
-        var best := _flow_field_value
         if (nbr._flow_field_value < best and
             nbr._distance_from_wall >= wall_distance and
             (include_water or not include_water and

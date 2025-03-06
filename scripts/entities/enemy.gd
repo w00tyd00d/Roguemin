@@ -15,4 +15,6 @@ var target_tile : Tile
 @onready var attack_indicator := $AttackIndicator as DualMapLayer
 
 func _ready() -> void:
+    type = Type.Entity.TREASURE
+
     attack_indicator.show_behind_parent = true

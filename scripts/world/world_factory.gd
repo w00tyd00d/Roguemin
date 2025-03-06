@@ -146,7 +146,7 @@ func _generate_enemies(world: World) -> void:
     # Place Spotty Red enemy at specific location for now
     var pos := world.get_chunk(Vector2i(2,1)).center
     
-    world.spawn_entity(SpottyRed, pos)
+    world.spawn_entity(SmallTreasure, pos)
 
 
 

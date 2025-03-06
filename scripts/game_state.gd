@@ -20,6 +20,8 @@ signal update_squad_count(count: int)
 signal update_field_count(count: int)
 signal update_total_count(count: int)
 
+signal update_money_value(amount: int)
+
 
 ## Global RNG object.
 var RNG := RandomNumberGenerator.new()
@@ -29,3 +31,10 @@ var world : World
 
 ## Global reference to the player object
 var player : Player
+
+
+## The current money value the player has accumulated
+var money := 0 :
+    set(n):
+        money = n
+        update_money_value.emit(money)

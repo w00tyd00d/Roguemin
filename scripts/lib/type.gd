@@ -11,5 +11,8 @@ enum ChunkEdge { NONE, PATH, EXIT, WALL, ROOM }
 ## The types of helper units.
 enum Unit { RED, YELLOW, BLUE, NONE }
 
+## The types of entities.
+enum Entity { TREASURE, ENEMY }
+
 ## The hazards that will do harm entities.
 enum Hazard { WATER, FIRE }

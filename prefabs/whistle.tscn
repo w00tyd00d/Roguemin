@@ -1,15 +1,18 @@
-[gd_scene load_steps=3 format=4 uid="uid://borrl1q1erb2s"]
+[gd_scene load_steps=4 format=4 uid="uid://borrl1q1erb2s"]
 
 [ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="1_7at1u"]
 [ext_resource type="Script" path="res://scripts/whistle.gd" id="1_l5ucs"]
+[ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="2_ssxi0"]
 
 [node name="Whistle" type="Node2D"]
 script = ExtResource("1_l5ucs")
 
-[node name="Cursor" type="TileMapLayer" parent="."]
+[node name="Cursor" parent="." instance=ExtResource("2_ssxi0")]
 visible = false
 tile_map_data = PackedByteArray("AAAAAAAAAAAYAAEAAQA=")
-tile_set = ExtResource("1_7at1u")
+
+[node name="BackgroundLayer" parent="Cursor" index="0"]
+tile_map_data = PackedByteArray("AAAAAAAAAgAAAAAAAAA=")
 
 [node name="PreviewView" type="Node2D" parent="."]
 visible = false
@@ -123,3 +126,5 @@ tile_set = ExtResource("1_7at1u")
 visible = false
 tile_map_data = PackedByteArray("AAD3//f/AQAAAAAAAAD3//j/AQAAAAEAAAD3//n/AQAAAAIAAAD3//r/AQAAAAMAAAD3//v/AQAAAAQAAAD3//z/AQAAAAUAAAD3//3/AQAAAAYAAAD3//7/AQAAAAcAAAD3////AQAAAAgAAAD3/wAAAQAAAAkAAAD3/wEAAQAAAAAAAAD3/wIAAQAAAAEAAAD3/wMAAQAAAAIAAAD3/wQAAQAAAAMAAAD3/wUAAQAAAAQAAAD3/wYAAQAAAAUAAAD3/wcAAQAAAAYAAAD3/wgAAQAAAAcAAAD3/wkAAQAAAAgAAAD4/wkAAQAAAAkAAAD5/wkAAQAAAAAAAAD6/wkAAQAAAAEAAAD7/wkAAQAAAAIAAAD8/wkAAQAAAAMAAAD9/wkAAQAAAAQAAAD+/wkAAQAAAAUAAAD//wkAAQAAAAYAAAAAAAkAAQAAAAcAAAABAAkAAQAAAAgAAAACAAkAAQAAAAkAAAADAAkAAQAAAAAAAAAEAAkAAQAAAAEAAAAFAAkAAQAAAAIAAAAGAAkAAQAAAAMAAAAHAAkAAQAAAAQAAAAIAAkAAQAAAAUAAAAJAAkAAQAAAAYAAAAJAAgAAQAAAAcAAAAJAAcAAQAAAAgAAAAJAAYAAQAAAAkAAAAJAAUAAQAAAAAAAAAJAAQAAQAAAAEAAAAJAAMAAQAAAAIAAAAJAAIAAQAAAAMAAAAJAAEAAQAAAAQAAAAJAAAAAQAAAAUAAAAJAP//AQAAAAYAAAAJAP7/AQAAAAcAAAAJAP3/AQAAAAgAAAAJAPz/AQAAAAkAAAAJAPv/AQAAAAAAAAAJAPr/AQAAAAEAAAAJAPn/AQAAAAIAAAAJAPj/AQAAAAMAAAAJAPf/AQAAAAQAAAAIAPf/AQAAAAUAAAAHAPf/AQAAAAYAAAAGAPf/AQAAAAcAAAAFAPf/AQAAAAgAAAAEAPf/AQAAAAkAAAADAPf/AQAAAAAAAAACAPf/AQAAAAEAAAABAPf/AQAAAAIAAAAAAPf/AQAAAAMAAAD///f/AQAAAAQAAAD+//f/AQAAAAUAAAD9//f/AQAAAAYAAAD8//f/AQAAAAcAAAD7//f/AQAAAAgAAAD6//f/AQAAAAkAAAD5//f/AQAAAAAAAAD4//f/AQAAAAEAAAA=")
 tile_set = ExtResource("1_7at1u")
+
+[editable path="Cursor"]

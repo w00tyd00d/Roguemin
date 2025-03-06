@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=4 uid="uid://623fckoivhv6"]
 
-[ext_resource type="PackedScene" uid="uid://bge48j21udel3" path="res://prefabs/entities/enemy.tscn" id="1_py6cd"]
+[ext_resource type="PackedScene" uid="uid://bge48j21udel3" path="res://prefabs/enemy.tscn" id="1_py6cd"]
 [ext_resource type="Script" path="res://scripts/entities/spotty_red.gd" id="2_ua3uv"]
 
 [node name="SpottyRed" instance=ExtResource("1_py6cd")]

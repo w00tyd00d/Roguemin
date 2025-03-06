@@ -37,8 +37,11 @@ func update(inp: StringName) -> Array:
                 if player.selected_unit == Type.Unit.NONE:
                     return [false]
                     
-                var tile := world.get_closest_empty_tile(grid_position)
                 var unit := player.grab_unit(player.selected_unit)
+                var tile := world.get_tile(grid_position)
+
+                if not tile.has_entities:
+                    tile = world.get_closest_empty_tile(tile)
                 
                 if tile.type == Type.Tile.VOID and unit.type != Type.Unit.YELLOW:
                     var start := player.grid_position
@@ -49,7 +52,7 @@ func update(inp: StringName) -> Array:
                             return true
                         
                     var raycast := DDARC.to_grid_position(start, end, cb)
-                    tile = world.get_closest_empty_tile(raycast.cell_path[-2], false)
+                    tile = world.get_closest_empty_tile_at(raycast.cell_path[-2], false)
                     
                 
                 player.throw_unit(unit, tile)

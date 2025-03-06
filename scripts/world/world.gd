@@ -94,7 +94,7 @@ func get_tile(pos: Vector2i) -> Tile:
     return tiles[pos.y][pos.x]
 
 
-func get_closest_empty_tile(
+func get_closest_empty_tile_at(
         pos: Vector2i,
         include_void := true,
         include_water := true) -> Tile:
@@ -129,6 +129,14 @@ func get_closest_empty_tile(
         _tiles = new_tiles
 
     return null
+
+
+func get_closest_empty_tile(
+        tile: Tile,
+        include_void := true,
+        include_water := true) -> Tile:
+    
+    return get_closest_empty_tile_at(tile.grid_position, include_void, include_water)
 
 
 func set_tile_type(pos: Vector2i, type: Type.Tile) -> void:
