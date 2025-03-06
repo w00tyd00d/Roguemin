@@ -44,6 +44,7 @@ func setup_world(world: World) -> World:
     _generate_rooms(world)
     _generate_flow_field(world)
     _generate_wall_dijkstra_map(world)
+    _generate_enemies(world)
     return world
 
 
@@ -139,3 +140,13 @@ func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void
         world.set_glyph(dpos, glyph)
 
     room._run_context_procedures(world, start)
+
+
+func _generate_enemies(world: World) -> void:
+    # Place Spotty Red enemy at specific location for now
+    var pos := world.get_chunk(Vector2i(2,1)).center
+    
+    world.spawn_entity(SpottyRed, pos)
+
+
+

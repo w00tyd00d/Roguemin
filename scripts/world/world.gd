@@ -15,6 +15,9 @@ var tiles : Array[Array]
 ## The two-dimensional array of chunks making up the world.
 var chunks : Array[Array]
 
+## The dictionary of chunks that are currently occupied.
+var used_chunks := {}
+
 ## The amount of time_units that have been accumulated so far.[br]
 var time := 0 :
     set(n):
@@ -136,7 +139,7 @@ func set_tile_type(pos: Vector2i, type: Type.Tile) -> void:
 func query_tile(tile: Tile) -> Type.Tile:
     if not tile: return Type.Tile.VOID
 
-    if tile.has_units or tile.has_player:
+    if not tile.is_empty:
         return Type.Tile.ENTITY
 
     return tile.type
@@ -160,12 +163,16 @@ func move_unit(unit: Unit, dest: Tile) -> void:
 
 func spawn_entity(cls, pos: Vector2i) -> void:
     var entity : Entity = cls.create()
+    entity.grid_position = pos
 
     if entity is MultiTileEntity:
         entity.spawn_position = pos
 
+    for delta in entity.area_positions:
+        var tile := get_tile(pos + delta)
+        tile.add_entity(entity)
+    
     add_child(entity)
-    entity.grid_position = pos
 
 
 func spawn_unit(pos: Vector2i) -> void:
@@ -201,7 +208,7 @@ func _create_chunks() -> Array[Array]:
     for y in size.y:
         var row := []
         for x in size.x:
-            row.append(Chunk.new(Vector2i(x, y)))
+            row.append(Chunk.new(self, Vector2i(x, y)))
         res.append(row)
 
     return res
@@ -224,7 +231,8 @@ class Chunk:
     ## The dictionary of edges connected with the chunk.
     var _edges := {}
 
-    func _init(_pos: Vector2i) -> void:
+    func _init(_world: World, _pos: Vector2i) -> void:
+        world = _world
         chunk_position = _pos
 
         var size := Globals.CHUNK_SIZE
@@ -235,6 +243,7 @@ class Chunk:
 
     func add_edge(dir: Direction, type: Type.ChunkEdge) -> void:
         _edges[dir] = type
+        world.used_chunks[self] = true
 
     func get_edge(dir: Direction) -> Type.ChunkEdge:
         return _edges.get(dir, Type.ChunkEdge.NONE)
