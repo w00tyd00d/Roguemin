@@ -2,7 +2,7 @@ class_name Player extends Entity
 
 ## The player object.
 
-var unit_tether := UnitTether.new(self, 3)
+var unit_tether := UnitTether.new(self, 4)
 
 var unit_toggle := {
     Type.Unit.RED: true,
@@ -78,22 +78,22 @@ func cycle_selected_unit(left := false) -> void:
             return
 
         strikes += 1
-        
+
     selected_unit = Type.Unit.NONE
 
 func add_unit(unit: Unit) -> void:
     if _units[unit.type].has(unit): return
-    
+
     _units[unit.type][unit] = true
     unit_count += 1
 
     if selected_unit == Type.Unit.NONE:
         selected_unit = unit.type
-        
+
 
 func remove_unit(unit: Unit) -> void:
-    if not _units[unit.type].has(unit): return 
-    
+    if not _units[unit.type].has(unit): return
+
     _units[unit.type].erase(unit)
     unit_count -= 1
 
@@ -110,7 +110,7 @@ func toggle_unit(type: Type.Unit) -> void:
 func get_unit_count(type := Type.Unit.NONE) -> int:
     if type == Type.Unit.NONE:
         return 0
-    return _units[type].size()    
+    return _units[type].size()
 
 
 func grab_unit(type: Type.Unit) -> Unit:

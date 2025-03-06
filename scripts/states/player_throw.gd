@@ -49,7 +49,6 @@ func update(inp: StringName) -> Array:
                             return true
                         
                     var raycast := DDARC.to_grid_position(start, end, cb)
-                    print(raycast.cell_path)
                     tile = world.get_closest_empty_tile(raycast.cell_path[-2], false)
                     
                 

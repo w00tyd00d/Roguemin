@@ -29,7 +29,10 @@ class_name WorldFactory extends RefCounted
 #
 # 8. Begin placement of enemies and salvageables
 
-const WORLD_SIZE := Vector2i(20,20)
+const WORLD_SIZE := Vector2i(17,17)
+
+var _wall_tiles : Array[Tile] = []
+
 
 func create_new_world() -> World:
     var world := World.create()
@@ -39,11 +42,65 @@ func create_new_world() -> World:
 
 func setup_world(world: World) -> World:
     _generate_rooms(world)
+    _generate_flow_field(world)
+    _generate_wall_dijkstra_map(world)
     return world
 
 
 func _generate_rooms(world: World) -> void:
     _place_room(world, Vector2i(1,1), Rooms.HOME_BASE)
+
+
+func _generate_flow_field(world: World) -> void:
+    var start := world.salvage_return_tile
+
+    start._flow_field_value = 0
+
+    var hist := {}
+    var tiles : Array[Tile] = [start]
+
+    while not tiles.is_empty():
+        var new_tiles : Array[Tile] = []
+
+        for tile in tiles:
+            hist[tile] = true
+            for nbr in tile.get_all_neighbors():
+                if hist.has(nbr) or nbr.type == Type.Tile.VOID:
+                    continue
+
+                if tile.type == Type.Tile.WALL:
+                    _wall_tiles.append(tile)
+                    continue
+
+                var dir := Direction.by_delta(tile.grid_position, nbr.grid_position)
+                var cost := 7 if dir.is_diagonal else 5
+                var val := tile._flow_field_value + cost
+
+                if nbr._flow_field_value > val:
+                    nbr._flow_field_value = val
+                    nbr._flow_field_vector = nbr._get_best_flow_field_vector()
+                    new_tiles.append(nbr)
+
+        tiles = new_tiles
+
+
+func _generate_wall_dijkstra_map(_world: World) -> void:
+    var hist := {}
+    var tiles := _wall_tiles
+    var step := 1
+
+    while not tiles.is_empty() and step < 7:
+        var new_tiles : Array[Tile] = []
+        for tile in tiles:
+            for nbr in tile.get_all_neighbors():
+                if hist.has(nbr) or nbr.type == Type.Tile.VOID:
+                    continue
+                nbr._distance_from_wall = step
+                new_tiles.append(nbr)
+                hist[nbr] = true
+
+        tiles = new_tiles
+        step += 1
 
 
 func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void:
@@ -60,7 +117,7 @@ func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void
 
     # Place down the room tile by tile
     var start := world.get_chunk(chunk_pos).start
-    
+
     for pos: Vector2i in room.tile_data:
         var glyph : Glyph = room.tile_data[pos]
         var dpos := start + pos
@@ -72,11 +129,12 @@ func _place_room(world: World, chunk_pos: Vector2i, room: RoomBlueprint) -> void
 
             glyph = choices[idx]
             world.set_tile_type(dpos, Type.Tile.GRASS)
-            
+
         # ADD WATER TILES
-            
+
         else:
             world.set_tile_type(dpos, Type.Tile.WALL)
+            world.astar.set_point_solid(dpos, true)
 
         world.set_glyph(dpos, glyph)
 

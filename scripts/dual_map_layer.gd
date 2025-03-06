@@ -3,10 +3,7 @@ class_name DualMapLayer extends TileMapLayer
 ## Base texture object for anything that exists within the world in-game.
 
 ## The current grid position of the object.
-var grid_position : Vector2i :
-    set(vec):
-        grid_position = vec
-        position = vec * Globals.TILE_SIZE
+var grid_position : Vector2i : set = _set_grid_position
 
 ## The glyph layer of the sprite. The base layer represents the background of
 ## the front layer (due to draw order).
@@ -31,6 +28,11 @@ func set_background(pos: Vector2i, glyph: Glyph):
 
 func get_background(pos: Vector2i):
     return _get_tile(background_layer, pos)
+
+
+func _set_grid_position(pos: Vector2i) -> void:
+    grid_position = pos
+    position = pos * Globals.TILE_SIZE
 
 
 func _set_tile(layer: TileMapLayer, pos: Vector2i, glyph: Glyph) -> void:

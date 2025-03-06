@@ -27,6 +27,6 @@ func _compute_cost(from_id: Vector2i, to_id: Vector2i) -> float:
     return from_id.distance_to(to_id)
 
 
-func get_path_to(ent: Entity, pos: Vector2i) -> Array[Vector2i]:
+func find_path_to(ent: Entity, pos: Vector2i) -> Array[Vector2i]:
     _entity = ent
     return get_id_path(ent.grid_position, pos)

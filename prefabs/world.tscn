@@ -1,18 +1,19 @@
-[gd_scene load_steps=6 format=3 uid="uid://12ynotjnohm3"]
+[gd_scene load_steps=7 format=3 uid="uid://12ynotjnohm3"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_rkls3"]
 [ext_resource type="Script" path="res://scripts/world/world.gd" id="2_yge30"]
 [ext_resource type="PackedScene" uid="uid://borrl1q1erb2s" path="res://prefabs/whistle.tscn" id="3_7d70t"]
+[ext_resource type="Script" path="res://scripts/test_layer.gd" id="3_48kwt"]
 [ext_resource type="Script" path="res://scripts/throw_cursor.gd" id="4_m47ix"]
 [ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="5_dtpqa"]
 
 [node name="World" instance=ExtResource("1_rkls3")]
 z_index = -1
-position = Vector2(0, 0)
 script = ExtResource("2_yge30")
 
 [node name="TEST" parent="." index="1" instance=ExtResource("1_rkls3")]
-position = Vector2(0, 0)
+z_index = 3
+script = ExtResource("3_48kwt")
 
 [node name="Whistle" parent="." index="2" instance=ExtResource("3_7d70t")]
 z_index = 2

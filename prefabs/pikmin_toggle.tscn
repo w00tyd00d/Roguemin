@@ -10,6 +10,7 @@ color = Color(0, 0, 0, 1)
 script = ExtResource("1_m5gai")
 
 [node name="ToggleLabel" type="Label" parent="."]
+layout_mode = 0
 offset_left = 112.0
 offset_top = 8.0
 offset_right = 176.0
@@ -29,6 +30,7 @@ text = "1:■ Red"
 
 [node name="YellowLabel" type="Label" parent="."]
 self_modulate = Color(1, 1, 0, 1)
+layout_mode = 0
 offset_left = 264.0
 offset_top = 8.0
 offset_right = 344.0
@@ -38,6 +40,7 @@ text = "2:■ Yellow"
 
 [node name="BlueLabel" type="Label" parent="."]
 self_modulate = Color(0, 0, 1, 1)
+layout_mode = 0
 offset_left = 368.0
 offset_top = 8.0
 offset_right = 432.0

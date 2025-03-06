@@ -29,7 +29,7 @@ var is_diagonal : bool
 var adjacent : Array[Direction] :
     get:
         if not adjacent:
-            var left := ALL_VECTORS[_index-1]
+            var left := ALL_VECTORS[(_index-1 + 8) % 8]
             var right := ALL_VECTORS[(_index+1) % 8]
             adjacent = [Direction.by_pattern(left), Direction.by_pattern(right)]
         return adjacent
@@ -37,7 +37,7 @@ var adjacent : Array[Direction] :
 var orthagonal : Array[Direction] :
     get:
         if not orthagonal:
-            var left := ALL_VECTORS[_index-2]
+            var left := ALL_VECTORS[(_index-2 + 8) % 8]
             var right := ALL_VECTORS[(_index+2) % 8]
             orthagonal = [Direction.by_pattern(left), Direction.by_pattern(right)]
         return orthagonal
@@ -45,7 +45,7 @@ var orthagonal : Array[Direction] :
 var opposite : Direction :
     get:
         if not opposite:
-            opposite = Direction.by_pattern(ALL_VECTORS[(_index-2) % 8])
+            opposite = Direction.by_pattern(ALL_VECTORS[(_index+4) % 8])
         return opposite
 
 var _index : int
@@ -62,6 +62,10 @@ static func by_pattern(pattern: Variant) -> Direction:
         &"c_downleft", Vector2i(-1,1): return Direction.southwest
         &"c_downright", Vector2i(1,1): return Direction.southeast
         _: return null
+    
+
+static func by_delta(pos1: Vector2i, pos2: Vector2i) -> Direction:
+    return Direction.by_pattern(Vector2i(pos2 - pos1).sign())
 
 
 func _init(vec: Vector2i, _diagonal := false) -> void:

@@ -31,10 +31,10 @@ var unit_count := 0 :
         GameState.update_field_count.emit(n)
 
 ## The starting position for the player.
-var start_position : Vector2i        
+var start_position : Vector2i
 
 ## The starting tile for the player.
-var start_tile : Tile : 
+var start_tile : Tile :
     get: return get_tile(start_position)
 
 ## The position of the units' ship.
@@ -46,6 +46,13 @@ var unit_ship_tile : Tile :
 
 ## The positions from which the player can summon/store units.
 var unit_summon_targets : Array
+
+## The position where units will bring salvage back to.
+var salvage_return_position : Vector2i
+
+## The position where units will bring salvage back to.
+var salvage_return_tile : Tile : 
+    get: return get_tile(salvage_return_position)
 
 
 ## The [Whistle] object.
@@ -64,6 +71,9 @@ func setup(_size: Vector2i) -> World:
 
     tiles = _create_tiles()
     chunks = _create_chunks()
+
+    astar.region = Rect2i(Vector2i(), size * Globals.CHUNK_SIZE)
+    astar.update()
 
     return self
 
@@ -88,15 +98,15 @@ func get_closest_empty_tile(
 
     var is_valid := func(tile: Tile):
         if (not tile or
-            tile.type == Type.Tile.WALL or 
+            tile.type == Type.Tile.WALL or
             not include_void and tile.type == Type.Tile.VOID or
             not include_water and tile.type == Type.Tile.WATER):
                 return false
         return tile.is_empty
-    
+
     var start := get_tile(pos)
     if not start: return
-    
+
     if is_valid.call(start): return start
 
     var _tiles : Array[Tile] = start.get_all_neighbors()
@@ -128,7 +138,7 @@ func query_tile(tile: Tile) -> Type.Tile:
 
     if tile.has_units or tile.has_player:
         return Type.Tile.ENTITY
-    
+
     return tile.type
 
 
@@ -150,6 +160,10 @@ func move_unit(unit: Unit, dest: Tile) -> void:
 
 func spawn_entity(cls, pos: Vector2i) -> void:
     var entity : Entity = cls.create()
+
+    if entity is MultiTileEntity:
+        entity.spawn_position = pos
+
     add_child(entity)
     entity.grid_position = pos
 

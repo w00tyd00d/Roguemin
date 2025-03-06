@@ -4,6 +4,8 @@ extends Node
 
 signal force_player_state(state: StringName)
 
+signal ASTAR_TEST(arr: Array[Vector2i])
+
 
 # HUD Signals
 

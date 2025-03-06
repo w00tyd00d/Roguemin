@@ -11,12 +11,17 @@ extends CanvasLayer
 @onready var field_count := $FieldCount as Label
 @onready var total_count := $TotalCount as Label
 
+@onready var debug_time := %DebugTime as Label
 
 func _ready() -> void:
     GameState.update_selected_unit.connect(_update_selected_unit)
     GameState.update_squad_count.connect(_update_squad_count)
     GameState.update_field_count.connect(_update_field_count)
     GameState.update_total_count.connect(_update_total_count)
+
+    TurnManager.update_debug_time.connect(func(time: int):
+        debug_time.text = "Proc: {0}ms".format([time])
+    )
 
 
 func _update_selected_unit(type: Type.Unit) -> void:

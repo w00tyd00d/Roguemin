@@ -8,18 +8,7 @@ var world_factory := WorldFactory.new()
 func _ready() -> void:
     # Set the default background color to black at runtime
     RenderingServer.set_default_clear_color(Color.BLACK)
-
-    ##### DEBUG ######
-    #var cb := func(ctx: DDARC.Context): print(ctx.length)
-    #var res := DDARC.to_grid_position(Vector2i(5,5), Vector2i(10,13), cb)
-    #print(res.grid_position)
-    #print(res.exact_position)
-    #print(res.cell_path)
-    #print(res.length)
-#
-    #return
-    ##################
-
+    
     # Immediately create new world for now
     var world := world_factory.create_new_world()
     game_viewport.add_child(world)

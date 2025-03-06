@@ -21,9 +21,13 @@ var has_player := false
 
 ## Flag that returns if the cell is currently occupied.
 var is_empty : bool :
-    get: return (not has_player and
+    get: return (not has_player and # Player is an entity, but we cache with a bool anyway
                 not has_units and
-                _entities.is_empty())
+                not has_entities)
+
+## Flag that returns whether the cell has (non-unit) Entities in it
+var has_entities : bool :
+    get: return not _entities.is_empty()
 
 ## Flag that returns whether the cell has Units in it
 var has_units : bool :
@@ -41,6 +45,15 @@ var _units := {
 ## The dictionary of multi-tile entities currently occupying the tile
 var _entities := {}
 
+## The value of the tile on the world's flow field.
+var _flow_field_value := INF
+
+## The cached direction vector of the most optimal route on the flow field.
+var _flow_field_vector : Vector2i
+
+## The cached distance the tile is from any given wall tile._acc
+var _distance_from_wall := 2**31-1
+
 
 func _init(_world: World, grid_pos: Vector2i) -> void:
     world = _world
@@ -54,12 +67,14 @@ func get_neighbor(dir: Direction) -> Tile:
 
 func get_all_neighbors() -> Array[Tile]:
     var res : Array[Tile] = []
+    var arr := Direction.ALL_VECTORS.duplicate()
+    arr.shuffle()
     for vec in Direction.ALL_VECTORS:
         var npos := grid_position + vec
         var tile := world.get_tile(npos)
         if tile: res.append(tile)
     return res
-    
+
 
 func add_entity(ent: Entity) -> void:
     _entities[ent] = true
@@ -71,6 +86,10 @@ func remove_entity(ent: Entity) -> void:
     _entities.erase(ent)
     if ent is Player:
         has_player = false
+
+
+func has_entity(ent) -> bool:
+    return _entities.has(ent)
 
 
 func add_unit(unit: Unit) -> void:
@@ -94,10 +113,22 @@ func get_all_units() -> Array[Unit]:
 
 func whistled() -> void:
     var player := GameState.player
-    
+
     for _type in player.unit_toggle:
         if player.unit_toggle[_type]:
             for unit: Unit in _units[_type]:
                 unit.join_squad()
 
-    
+
+func _get_best_flow_field_vector(wall_distance := 0, include_water := true) -> Vector2i:
+    var vec : Vector2i
+    for nbr in get_all_neighbors():
+        var best := _flow_field_value
+        if (nbr._flow_field_value < best and
+            nbr._distance_from_wall >= wall_distance and
+            (include_water or not include_water and
+            nbr.type != Type.Tile.WATER)):
+                var dir := Direction.by_delta(grid_position, nbr.grid_position)
+                vec = dir.vector
+                best = nbr._flow_field_value
+    return vec
