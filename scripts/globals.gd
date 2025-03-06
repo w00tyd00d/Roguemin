@@ -27,6 +27,7 @@ const TIME_LIMIT := (13 * 60 + 30) * TIME_VALUE # 13 min 30 sec
 
 ## List of all the directional input commands.
 const DIRECTIONAL_INPUTS := [
+    &"c_wait",
     &"c_up",
     &"c_down",
     &"c_left",
@@ -34,12 +35,11 @@ const DIRECTIONAL_INPUTS := [
     &"c_upleft",
     &"c_upright",
     &"c_downleft",
-    &"c_downright"
+    &"c_downright",
 ]
 
 ## List of all the action input commands.
 const ACTION_INPUTS := [
-    &"c_wait",
     &"c_whistle",
     &"c_throw",
     &"c_dismiss",
@@ -54,6 +54,12 @@ const ACTION_INPUTS := [
     &"k_escape",
     &"c_cancel"
 ]
+
+## Initial hold time to fire the direction off constantly. (in ms)
+const MOVE_HOLD_INITIAL := 0.3
+
+## The time in between subsequent directional calls if the button is held.
+const MOVE_HOLD_SUBSEQUENT := 0.12
 
 # Gameplay
 

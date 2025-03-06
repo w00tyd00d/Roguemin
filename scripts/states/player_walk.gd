@@ -31,10 +31,10 @@ func update(inp: StringName) -> Array:
                 player.cycle_selected_unit()
             &"c_cycle_left":
                 player.cycle_selected_unit(true)
-            &"c_wait":
-                print("WE'RE WAITING")
-                return [true, 4]
 
+    if inp == &"c_wait":
+        print("WE'RE WAITING")
+        return [true, 4]
     
     var dir := Direction.by_pattern(inp)
     if not dir: return [false]

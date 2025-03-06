@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bge48j21udel3"]
+
+[ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_d4hxp"]
+
+[node name="Enemy" instance=ExtResource("1_d4hxp")]
+
+[node name="AttackIndicator" parent="." index="1" instance=ExtResource("1_d4hxp")]
+show_behind_parent = true
+
+[editable path="AttackIndicator"]

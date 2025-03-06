@@ -3,6 +3,9 @@ class_name PlayerController extends Node
 var states : Dictionary = {}
 var current_state : PlayerState
 
+var direction_held : StringName
+var time_held := 0.0
+
 
 func _ready() -> void:
     for child: PlayerState in get_children():
@@ -32,10 +35,27 @@ func change_state(state_name: String) -> void:
     current_state = new_state
 
 
-func _input_handler() -> void:
-    for inp in Globals.DIRECTIONAL_INPUTS + Globals.ACTION_INPUTS:
+func _input_handler(dt: float) -> void:
+    for inp in Globals.ACTION_INPUTS:
         if Input.is_action_just_pressed(inp):
             _update_state(inp)
+
+    if direction_held and Input.is_action_pressed(direction_held):
+        time_held += dt
+        if time_held > Globals.MOVE_HOLD_SUBSEQUENT:
+            _update_state(direction_held)
+            time_held = 0.0
+            return
+    else:
+        direction_held = ""
+        time_held = 0
+
+    for inp in Globals.DIRECTIONAL_INPUTS:
+        if Input.is_action_just_pressed(inp):
+            direction_held = inp
+            _update_state(inp)
+    
+    
 
     
 func _update_state(inp: StringName) -> void:

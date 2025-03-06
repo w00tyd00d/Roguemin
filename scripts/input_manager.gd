@@ -6,10 +6,10 @@ extends Node
 var _domain_stack : Array[Callable] = []
 
 
-func _process(_dt: float) -> void:
+func _process(dt: float) -> void:
     if _domain_stack.is_empty():
         return
-    _domain_stack[-1].call()
+    _domain_stack[-1].call(dt)
 
 
 ## Add an input handler callback to the domain stack
