@@ -94,10 +94,11 @@ func get_tile(pos: Vector2i) -> Tile:
     return tiles[pos.y][pos.x]
 
 
-func get_closest_empty_tile_at(
+func get_closest_empty_tiles_at(
         pos: Vector2i,
+        count: int,
         include_void := true,
-        include_water := true) -> Tile:
+        include_water := true) -> Array[Tile]:
 
     var is_valid := func(tile: Tile):
         if (not tile or
@@ -108,9 +109,11 @@ func get_closest_empty_tile_at(
         return tile.is_empty
 
     var start := get_tile(pos)
-    if not start: return
+    if not start: return []
 
-    if is_valid.call(start): return start
+    var res : Array[Tile] = []
+    if is_valid.call(start) and count == 1:
+        return [start]
 
     var _tiles : Array[Tile] = start.get_all_neighbors()
     var hist := {start: true}
@@ -121,22 +124,41 @@ func get_closest_empty_tile_at(
             if hist.has(tile): continue
 
             if is_valid.call(tile):
-                return tile
+                res.append(tile)
+                if res.size() == count:
+                    return res
 
             hist[tile] = true
             new_tiles.append_array(tile.get_all_neighbors())
 
         _tiles = new_tiles
 
-    return null
+    return []
+
+
+func get_closest_empty_tiles(
+        tile: Tile,
+        count: int,
+        include_void := false,
+        include_water := true) -> Array[Tile]:
+    
+    return get_closest_empty_tiles_at(tile.grid_position, count, include_void, include_water)
+
+
+func get_closest_empty_tile_at(
+        pos: Vector2i,
+        include_void := false,
+        include_water := true) -> Tile:
+
+    return get_closest_empty_tiles_at(pos, 1, include_void, include_water)[0] 
 
 
 func get_closest_empty_tile(
         tile: Tile,
-        include_void := true,
+        include_void := false,
         include_water := true) -> Tile:
-    
-    return get_closest_empty_tile_at(tile.grid_position, include_void, include_water)
+
+    return get_closest_empty_tiles_at(tile.grid_position, 1, include_void, include_water)[0]    
 
 
 func set_tile_type(pos: Vector2i, type: Type.Tile) -> void:

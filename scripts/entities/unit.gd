@@ -37,15 +37,17 @@ var path : Array :
         if not path.is_empty():
             GameState.ASTAR_TEST.emit(arr)
 
-
 ## A flag representing if the unit is idle.
 var idle : bool :
     get: return state == State.IDLE
 
-
 ## A flag representing if the unit is in limbo (ie: not in the field).
 var in_limbo : bool :
     get: return grid_position == Vector2i()
+
+## The enemy the unit is current on top of, if at all.
+var riding_enemy : Enemy
+
 
 
 func _ready() -> void:
@@ -181,7 +183,7 @@ func throw_to(tile: Tile) -> void:
                         grab_object(ent)
                         return
 
-    tile = world.get_closest_empty_tile(tile, false)
+    tile = world.get_closest_empty_tile(tile)
     move_to(tile)
     go_idle()
 
@@ -198,6 +200,20 @@ func join_squad() -> void:
 
 func go_home() -> void:
     state = State.RETURN_HOME
+
+
+func ride_enemy(enemy: Enemy) -> void:
+    if riding_enemy: return
+    enemy.add_unit(self)
+    riding_enemy = enemy
+
+
+func get_off_enemy() -> void:
+    if not riding_enemy: return
+    riding_enemy.remove_unit(self)
+    
+    move_to(GameState.world.get_closest_empty_tile(riding_enemy.current_tile))
+    riding_enemy = null
 
 
 func target_entity(ent: MultiTileEntity) -> void:
@@ -235,7 +251,6 @@ func update_time(world_time: int) -> bool:
 
 
 func do_action() -> bool:
-    var player := GameState.player
     var world := GameState.world
 
     match state:
@@ -243,8 +258,13 @@ func do_action() -> bool:
             return _do_follow_action()
         State.CARRYING:
             if not held_object:
+                if target.is_latch_position(grid_position):
+                    grab_object(target)
+                    return false
                 return move_towards(target.current_tile)
+        State.ATTACKING:
 
+            pass
         State.RETURN_HOME:
             return move_towards(GameState.world.unit_ship_tile)
 
