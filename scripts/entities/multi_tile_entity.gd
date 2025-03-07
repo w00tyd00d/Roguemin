@@ -25,6 +25,10 @@ var latch_positions := {}
 ## Original spawn position of the entity.
 var spawn_position : Vector2i
 
+## The tile of the entity's spawn position.
+var spawn_tile : Tile :
+    get: return GameState.world.get_tile(spawn_position)
+
 ## A dictionary of any units currently hauling the entity.
 var carriers := {}
 
@@ -65,6 +69,7 @@ func delete() -> void:
     # Don't have time to set up an entity recycler, so just delete
     queue_free()
 
+
 func move_to(dest: Tile) -> void:
     var world := GameState.world
     # We have to run twice since we reference the same entity
@@ -82,6 +87,37 @@ func move_to(dest: Tile) -> void:
     
     last_position = grid_position
     grid_position = dest.grid_position
+
+
+func move_towards(target: Tile) -> bool:
+    var world := GameState.world
+    var delta := target.grid_position - grid_position
+    var ax := absi(delta.x)
+    var ay := absi(delta.y)
+
+    var vec : Vector2i
+
+    if ax >= ay * 2: vec = Vector2i(delta.sign().x, 0)
+    elif ay >= ax * 2: vec = Vector2i(0, delta.sign().y)
+    else: vec = delta.sign()
+
+    var valid := func(tile: Tile):
+        return tile.type == Type.Tile.GRASS and tile._distance_from_wall >= radius
+
+    var dir := Direction.by_pattern(vec)
+    var dest := world.get_tile(grid_position + dir.vector)
+
+    if valid.call(dest):
+        move_to(dest)
+        return true
+
+    for _dir in dir.adjacent:
+        if grid_position + _dir.vector == last_position: continue
+        if valid.call(dest):
+            move_to(dest)
+            return true
+
+    return false
 
 
 func update_time(world_time: int) -> bool:
@@ -138,6 +174,16 @@ func get_open_latch_tile() -> Tile:
     
     var rpos : Vector2i = open.pick_random()
     return world.get_tile(rpos + grid_position)
+
+
+func get_all_latch_tiles() -> Array[Tile]:
+    var world := GameState.world
+    var res : Array[Tile] = []
+
+    for pos in latch_positions.keys():
+        res.append(world.get_tile(pos + grid_position))
+    
+    return res
 
 
 func collect() -> void:

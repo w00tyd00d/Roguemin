@@ -5,8 +5,13 @@
 
 [node name="Enemy" instance=ExtResource("1_d4hxp")]
 script = ExtResource("2_4trjc")
+sight_range = 0
+wander_distance = 0
+attack_range = 0
+attack_damage = 0
 
 [node name="AttackIndicator" parent="." index="0" instance=ExtResource("1_d4hxp")]
 show_behind_parent = true
+z_index = 1
 
 [editable path="AttackIndicator"]

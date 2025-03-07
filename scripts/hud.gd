@@ -21,6 +21,10 @@ extends CanvasLayer
 @onready var debug_time := $DebugTime as Label
 
 func _ready() -> void:
+    GameState.update_player_health.connect(func(val):
+        player_health.text = "{0}%".format([val])
+    )
+    
     GameState.update_selected_unit.connect(_update_selected_unit)
     GameState.update_squad_count.connect(_update_squad_count)
     GameState.update_field_count.connect(_update_field_count)

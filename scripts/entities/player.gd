@@ -2,6 +2,11 @@ class_name Player extends Entity
 
 ## The player object.
 
+var health := 100 :
+    set(n):
+        health = clampi(n, 0, 100)
+        GameState.update_player_health.emit(health)
+
 var unit_tether := UnitTether.new(self, 4)
 
 var unit_toggle := {
@@ -130,6 +135,13 @@ func get_all_units() -> Array[Unit]:
     for dict in _units.values():
         res.append_array((dict.keys()))
     return res
+
+
+func take_damage(dmg: int) -> void:
+    health -= dmg
+    if health <= 0:
+        # ADD GAME OVER
+        pass
 
 
 func _draw_tether() -> void:

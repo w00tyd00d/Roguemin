@@ -127,6 +127,14 @@ func whistled() -> void:
                 unit.join_squad()
 
 
+func attacked(dmg: int) -> void:
+    if has_player:
+        GameState.player.take_damage(dmg)
+
+    for unit in get_all_units():
+        unit.die()
+
+
 func get_flow_field_vector(wall_distance := 0, include_water := true) -> Vector2i:
     if _flow_field_vector and wall_distance == 0 and include_water == true:
         return _flow_field_vector

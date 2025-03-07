@@ -14,6 +14,7 @@ signal update_sun_meter(time: int)
 signal display_unit_toggle(val: bool)
 signal update_unit_toggle(dict: Dictionary)
 
+signal update_player_health(val: int)
 signal update_selected_unit(type: Type.Unit)
 
 signal update_squad_count(count: int)
@@ -38,3 +39,9 @@ var money := 0 :
     set(n):
         money = n
         update_money_value.emit(money)
+
+
+## Returns if a blinking glyph is currently invisible or not.
+func glyph_blinking() -> bool:
+    var msecs := Time.get_ticks_msec() % 1000
+    return msecs > Globals.GLYPH_BLINK_THRESHOLD

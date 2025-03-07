@@ -4,10 +4,10 @@ class_name Unit extends Entity
 
 enum State {
     IDLE,
-    FOLLOWING,
-    ATTACKING,
-    CARRYING,
-    RETURN_HOME
+    FOLLOW,
+    ATTACK,
+    CARRY,
+    RETURN
 }
 
 ## The current type of the unit.
@@ -16,6 +16,7 @@ var type : Type.Unit
 ## Returns if the unit has been upgraded or not.
 var upgraded : bool
 
+
 ## The current state of the unit.
 var state := State.IDLE :
     set(new_state):
@@ -23,7 +24,6 @@ var state := State.IDLE :
         state = new_state
         _on_state_exit(old_state)
         _on_state_enter(new_state)
-
 ## The current target of the unit.
 var target
 
@@ -132,7 +132,7 @@ func move_towards(tile: Tile) -> bool:
     var dest := world.get_tile(grid_position + dir.vector)
 
     if res == Type.Tile.WALL:
-        if state == State.RETURN_HOME and Tag.has(dest, Tags.UNIT_SHIP):
+        if state == State.RETURN and Tag.has(dest, Tags.UNIT_SHIP):
             reset()
             return true
         elif current_tile.type == Type.Tile.VOID:
@@ -194,12 +194,12 @@ func go_idle() -> void:
 
 
 func join_squad() -> void:
-    state = State.FOLLOWING
+    state = State.FOLLOW
     GameState.player.add_unit(self)
 
 
 func go_home() -> void:
-    state = State.RETURN_HOME
+    state = State.RETURN
 
 
 func ride_enemy(enemy: Enemy) -> void:
@@ -219,8 +219,8 @@ func get_off_enemy() -> void:
 func target_entity(ent: MultiTileEntity) -> void:
     target = ent
     match ent.type:
-        Type.Entity.TREASURE: state = State.CARRYING
-        Type.Entity.ENEMY: state = State.ATTACKING
+        Type.Entity.TREASURE: state = State.CARRY
+        Type.Entity.ENEMY: state = State.ATTACK
 
 
 func grab_object(obj: MultiTileEntity) -> bool:
@@ -254,18 +254,18 @@ func do_action() -> bool:
     var world := GameState.world
 
     match state:
-        State.FOLLOWING:
+        State.FOLLOW:
             return _do_follow_action()
-        State.CARRYING:
+        State.CARRY:
             if not held_object:
                 if target.is_latch_position(grid_position):
                     grab_object(target)
                     return false
                 return move_towards(target.current_tile)
-        State.ATTACKING:
+        State.ATTACK:
 
             pass
-        State.RETURN_HOME:
+        State.RETURN:
             return move_towards(GameState.world.unit_ship_tile)
 
     return false
@@ -398,12 +398,12 @@ func _on_state_enter(_state: State) -> void:
     match _state:
         State.IDLE:
             _update_glyph()
-        State.FOLLOWING:
+        State.FOLLOW:
             target = player.unit_tether.tail
             player.add_unit(self)
-        State.ATTACKING:
+        State.ATTACK:
             player.remove_unit(self)
-        State.CARRYING:
+        State.CARRY:
             player.remove_unit(self)
 
 
@@ -411,5 +411,5 @@ func _on_state_exit(_state: State) -> void:
     match _state:
         State.IDLE:
             _update_glyph()
-        State.CARRYING:
+        State.CARRY:
             drop_object()

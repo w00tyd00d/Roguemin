@@ -63,7 +63,7 @@ var _acc := 0.0
 func _process(dt: float) -> void:
     if preview_view.visible:
         var idx := _key[_preview_size-1] - 1
-        preview_layers[idx].visible = not Util.glyph_blinking()
+        preview_layers[idx].visible = not GameState.glyph_blinking()
     
     if _anim_target_size > 0:
         _run_anim(dt)

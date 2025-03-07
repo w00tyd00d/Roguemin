@@ -62,7 +62,3 @@ func manhattan_distance(vec1: Vector2i, vec2: Vector2i) -> int:
     var dy := absi(vec1.y - vec2.y)
     return dx + dy
 
-
-func glyph_blinking() -> bool:
-    var msecs := Time.get_ticks_msec() % 1000
-    return msecs > Globals.GLYPH_BLINK_THRESHOLD
