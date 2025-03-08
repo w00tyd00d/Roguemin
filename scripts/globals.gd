@@ -15,14 +15,17 @@ const TILE_SIZE := Vector2i(8,8)
 ## The size of a chunk in tiles.
 const CHUNK_SIZE := Vector2i(23,23)
 
+## Half the size of a chunk.
+const CHUNK_HALF := Vector2i(floori(CHUNK_SIZE.x / 2.0), floori(CHUNK_SIZE.y / 2.0))
+
 ## The size of the world in chunks. The outide perimeter of chunks are never
 ## used and act like a border.
-const WORLD_SIZE := Vector2i(14,14)
+const WORLD_SIZE := Vector2i(12,12)
 
 # Time
 
 ## The amount of time units that make up one second.
-const TIME_VALUE := 40
+const TIME_VALUE := 20
 
 ## The amount of time units within a single day.
 const TIME_LIMIT := (13 * 60 + 30) * TIME_VALUE # 13 min 30 sec
@@ -55,6 +58,7 @@ const ACTION_INPUTS := [
     &"c_toggle_red",
     &"c_toggle_blue",
     &"c_toggle_yellow",
+    &"c_confirm",
     &"k_escape",
     &"c_cancel"
 ]
@@ -69,7 +73,8 @@ const MOVE_HOLD_SUBSEQUENT := 0.12
 
 ## The amount of energy needed to make a turn.
 const ENERGY_CAP := 4
-
+## The range at which the player can through the fog of war.
+const PLAYER_SIGHT_RANGE := 30
 ## The range the units can see the unit tether
 const UNIT_SIGHT_RANGE := 40
 

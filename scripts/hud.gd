@@ -23,6 +23,10 @@ extends CanvasLayer
 @onready var debug_time := $DebugTime as Label
 
 func _ready() -> void:
+    GameState.toggle_hud.connect(func(val: bool):
+        visible = val
+    )
+    
     GameState.update_player_health.connect(func(val):
         player_health.text = "{0}%".format([val])
     )
@@ -38,9 +42,9 @@ func _ready() -> void:
         money_value.text = str(val)
     )
 
-    TurnManager.update_debug_time.connect(func(time: int):
-        debug_time.text = "Proc: {0}ms".format([time])
-    )
+    # TurnManager.update_debug_time.connect(func(time: int):
+    #     debug_time.text = "Proc: {0}ms".format([time])
+    # )
 
 
 func _update_selected_unit(type: Type.Unit) -> void:

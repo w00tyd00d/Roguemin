@@ -6,7 +6,7 @@ var grid_position : Vector2i :
         var world := GameState.world
         grid_position = vec
         world.throw_cursor.grid_position = grid_position
-        
+
         var tile := world.get_tile(grid_position)
         GameState.update_info_box.emit(tile.get_first_entity())
 
@@ -22,7 +22,7 @@ func update(inp: StringName) -> Array:
     var world := GameState.world
     var player := GameState.player
     var just_pressed := Input.is_action_just_pressed(inp)
-    
+
     if just_pressed:
         match inp:
             &"c_cancel":
@@ -40,13 +40,13 @@ func update(inp: StringName) -> Array:
             &"c_throw":
                 if player.selected_unit == Type.Unit.NONE:
                     return [false]
-                    
+
                 var unit := player.grab_unit(player.selected_unit)
                 var tile := world.get_tile(grid_position)
 
                 if not tile.has_entities:
                     tile = world.get_closest_empty_tile(tile, true)
-                
+
                 if tile.type == Type.Tile.VOID and unit.type != Type.Unit.YELLOW:
                     var start := player.grid_position
                     var end := tile.grid_position
@@ -54,24 +54,24 @@ func update(inp: StringName) -> Array:
                         var res := world.query_tile_at(ctx.grid_position)
                         if res == Type.Tile.WALL or res == Type.Tile.VOID:
                             return true
-                        
+
                     var raycast := DDARC.to_grid_position(start, end, cb)
                     tile = world.get_closest_empty_tile_at(raycast.cell_path[-2])
-                    
-                
+
+
                 player.throw_unit(unit, tile)
-                
+
                 if player.selected_unit == Type.Unit.NONE:
                     state_changed.emit("walk")
-                
+
                 return [true, 1]
 
-    
+
     var dir := Direction.by_pattern(inp)
     if not dir: return [false]
 
     var loops := 3 if Input.is_action_pressed(&"k_shift") else 1
-    for _n in loops:    
+    for _n in loops:
         var pos := grid_position + dir.vector
         if _in_range(pos):
             grid_position = pos
@@ -85,7 +85,7 @@ func update(inp: StringName) -> Array:
                     valid = true
                     break
             if not valid: break
-    
+
     return [false]
 
 
@@ -93,5 +93,3 @@ func exit() -> void:
     GameState.world.throw_cursor.hide()
     GameState.update_info_box.emit(null)
     super()
-
-

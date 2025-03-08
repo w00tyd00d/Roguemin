@@ -43,7 +43,7 @@ var _units := {
 }
 
 @onready var camera := $Camera2D as Camera2D
-
+@onready var controller := $PlayerController as Node
 
 @onready var test_layer : DualMapLayer
 
@@ -64,6 +64,7 @@ func move_to(dest: Tile) -> void:
     super(dest)
     camera.align()
     unit_tether.update()
+    _update_fog_of_war()
 
     # DEBUG
     # _draw_tether()
@@ -152,3 +153,10 @@ func _draw_tether() -> void:
     var tail := unit_tether.tail
     test_layer.set_background(tail.grid_position, Glyph.BLACK)
     test_layer.set_glyph(tail.grid_position, Glyph.TEST)
+
+
+func _update_fog_of_war() -> void:
+    var world := GameState.world
+    var fow := world.fog_of_war
+
+    world.mrpas.compute_field_of_view(fow, grid_position, Globals.PLAYER_SIGHT_RANGE)

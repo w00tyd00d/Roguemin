@@ -6,8 +6,11 @@ signal force_player_state(state: StringName)
 
 signal ASTAR_TEST(arr: Array[Vector2i])
 
+signal new_game
 
 # HUD Signals
+
+signal toggle_hud(val: bool)
 
 signal update_sun_meter(time: int)
 
@@ -45,7 +48,14 @@ var money := 0 :
         update_money_value.emit(money)
 
 
+## Returns if the passed object still exists.
+func is_valid_object(obj) -> bool:
+    if obj == null: return false
+    return is_instance_valid(obj) and not obj.is_queued_for_deletion()
+
+
 ## Returns if a blinking glyph is currently invisible or not.
 func glyph_blinking() -> bool:
     var msecs := Time.get_ticks_msec() % 1000
     return msecs > Globals.GLYPH_BLINK_THRESHOLD
+

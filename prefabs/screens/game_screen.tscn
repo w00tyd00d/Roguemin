@@ -30,6 +30,7 @@ render_target_update_mode = 4
 unique_name_in_owner = true
 
 [node name="HUD" type="CanvasLayer" parent="."]
+visible = false
 script = ExtResource("3_akf2x")
 
 [node name="StaticLayer" parent="HUD" instance=ExtResource("1_d8h6j")]
@@ -46,7 +47,7 @@ offset_top = 328.0
 offset_right = 88.0
 offset_bottom = 336.0
 theme_override_font_sizes/font_size = 8
-text = "Woot"
+text = "Atimar"
 horizontal_alignment = 2
 
 [node name="PlayerHealth" type="Label" parent="HUD"]

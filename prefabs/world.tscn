@@ -1,14 +1,16 @@
-[gd_scene load_steps=6 format=3 uid="uid://12ynotjnohm3"]
+[gd_scene load_steps=7 format=3 uid="uid://12ynotjnohm3"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_rkls3"]
-[ext_resource type="Script" path="res://scripts/world/world.gd" id="2_yge30"]
+[ext_resource type="Script" path="res://scripts/world/world.gd" id="2_a6k5q"]
 [ext_resource type="PackedScene" uid="uid://borrl1q1erb2s" path="res://prefabs/whistle.tscn" id="3_7d70t"]
 [ext_resource type="Script" path="res://scripts/test_layer.gd" id="3_48kwt"]
 [ext_resource type="Script" path="res://scripts/throw_cursor.gd" id="4_m47ix"]
+[ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="6_i4ult"]
 
 [node name="World" instance=ExtResource("1_rkls3")]
 z_index = -1
-script = ExtResource("2_yge30")
+position = Vector2(-1, 0)
+script = ExtResource("2_a6k5q")
 
 [node name="TEST" parent="." index="1" instance=ExtResource("1_rkls3")]
 z_index = 3
@@ -22,9 +24,15 @@ z_index = 2
 script = ExtResource("4_m47ix")
 
 [node name="Cursor" parent="ThrowCursor" index="0" instance=ExtResource("1_rkls3")]
+visible = false
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 1, 0, 2, 0)
 
 [node name="BackgroundLayer" parent="ThrowCursor/Cursor" index="0"]
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0)
+
+[node name="FogOfWar" type="TileMapLayer" parent="." index="4"]
+visible = false
+z_index = 5
+tile_set = ExtResource("6_i4ult")
 
 [editable path="ThrowCursor/Cursor"]

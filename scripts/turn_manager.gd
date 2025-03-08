@@ -24,4 +24,4 @@ func process_turns(time_units: int) -> void:
         if ent.time < GameState.world.time:
             ent.update_time(world_time)
 
-    update_debug_time.emit(Time.get_ticks_msec() - _start_time)
+    # update_debug_time.emit(Time.get_ticks_msec() - _start_time)

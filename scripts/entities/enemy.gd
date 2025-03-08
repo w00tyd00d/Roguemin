@@ -56,7 +56,7 @@ func _process(_dt: float) -> void:
     if not target_tile:
         attack_indicator.hide()
         return
-        
+
     attack_indicator.visible = not GameState.glyph_blinking()
 
 
@@ -70,7 +70,7 @@ func update_time(world_time: int) -> bool:
             posture_points = 0
         elif state == State.ATTACK or state == State.IDLE:
             posture_points += 1
-    
+
     return false
 
 
@@ -90,7 +90,7 @@ func add_unit(unit: Unit) -> void:
 
 func remove_unit(unit: Unit) -> void:
     riding_units.erase(unit)
-    
+
 
 func buck_units() -> void:
     var world := GameState.world
@@ -100,7 +100,7 @@ func buck_units() -> void:
 
     for i in size:
         _units[i].move_to(empty_tiles[i])
-    
+
     riding_units = {}
 
 
@@ -111,7 +111,7 @@ func get_closest_target() -> Entity:
     if not unit:
         var dist := Util.chebyshev_distance(player.grid_position, grid_position)
         return player if dist <= sight_range + radius else null
-    
+
     var pdist := Util.chebyshev_distance(player.grid_position, grid_position)
     var udist := Util.chebyshev_distance(unit.grid_position, grid_position)
 
@@ -126,16 +126,16 @@ func get_closest_target() -> Entity:
 func queue_attack(tile: Tile) -> void:
     target_tile =  tile
     _set_attack_position(tile.grid_position)
-    
+
 
 func attack_target() -> void:
     if not target_tile: return
     for tile in _get_attack_area():
         tile.attacked(attack_damage)
-    
+
     target_tile = null
     target_entity = null
-    
+
 
 func return_home() -> void:
     state = State.RETURN
@@ -153,24 +153,24 @@ func do_action() -> bool:
                     return true
                 return false
             return true
-        
+
         State.ATTACK:
             return _do_attack_action()
-        
+
         State.RETURN:
             if posture_points < 2:
                 return false
-            
+
             var ent := get_closest_target()
             if ent:
                 target_entity = ent
                 state = State.ATTACK
                 return true
-            
+
             if grid_position == spawn_position:
                 state = State.IDLE
                 return true
-                
+
             return move_towards(spawn_tile)
 
     return false
@@ -180,16 +180,16 @@ func _do_attack_action() -> bool:
     if (target_tile and posture_points < 1 or
         not target_tile and posture_points < 2):
         return false
-    
+
     var dist := Util.chebyshev_distance(grid_position, spawn_position)
     if dist >= wander_distance:
         return_home()
         return true
-    
+
     if target_tile:
         attack_target()
         return true
-    
+
     if not target_entity or posture_points > 3:
         var ent := get_closest_target()
         if ent:
@@ -197,16 +197,16 @@ func _do_attack_action() -> bool:
         else:
             return_home()
             return true
-    
+
     if target_entity:
         var tile := target_entity.current_tile
         if _target_in_attack_range():
             queue_attack(tile)
             return true
-        
+
         return move_towards(tile)
 
-    
+
     return false
 
 
@@ -227,7 +227,7 @@ func _get_attack_area() -> Array[Tile]:
         res.append(world.get_tile(pos + apos))
 
     return res
-    
+
 
 func _target_in_attack_range() -> bool:
     if not target_entity: return false
@@ -238,11 +238,11 @@ func _target_in_attack_range() -> bool:
 func _check_next_to() -> bool:
     if riding_units.size() > 1:
         return true
-    
+
     for tile in get_all_latch_tiles():
         if tile.has_player or tile.has_units:
             return true
-    
+
     return false
 
 
@@ -256,4 +256,3 @@ func _on_state_exit(_state: State) -> void:
             target_tile = null
             target_entity = null
             posture_points = 0
-

@@ -7,16 +7,15 @@ class_name World extends DualMapLayer
 var astar := AStar.new(self)
 
 ## The size of the world, in nodes.
-var size : Vector2i
+var size : Vector2i :
+    set(vec):
+        size = vec
 
 ## The dictionary of each [Tile] object populating the world.
 var tiles : Array[Array]
 
 ## The two-dimensional array of chunks making up the world.
 var chunks : Array[Array]
-
-## The dictionary of chunks that are currently occupied.
-var used_chunks := {}
 
 ## The collections of chunks in each room, listed by room id.
 var rooms := {}
@@ -57,9 +56,10 @@ var unit_summon_targets : Array
 var salvage_return_position : Vector2i
 
 ## The position where units will bring salvage back to.
-var salvage_return_tile : Tile : 
+var salvage_return_tile : Tile :
     get: return get_tile(salvage_return_position)
 
+var mrpas : MRPAS
 
 ## The [Whistle] object.
 @onready var whistle := $Whistle as Whistle
@@ -67,9 +67,19 @@ var salvage_return_tile : Tile :
 ## The throwing cursor.
 @onready var throw_cursor := $ThrowCursor as Node2D
 
+@onready var fog_of_war := $FogOfWar as TileMapLayer
+
 
 static func create() -> World:
     return preload("res://prefabs/world.tscn").instantiate()
+
+
+func _ready() -> void:
+    var _tiles := size * Globals.CHUNK_SIZE
+    mrpas = MRPAS.new(_tiles)
+    for y in _tiles.y:
+        for x in _tiles.x:
+            fog_of_war.set_cell(Vector2i(x,y), 2, Vector2())
 
 
 func setup(_size: Vector2i) -> World:
@@ -100,14 +110,14 @@ func get_tile(pos: Vector2i) -> Tile:
 func get_closest_empty_tiles_at(
         pos: Vector2i,
         count: int,
-        include_void := true,
+        include_void := false,
         include_water := true) -> Array[Tile]:
 
     var is_valid := func(tile: Tile):
         if (not tile or
             tile.type == Type.Tile.WALL or
-            not include_void and tile.type == Type.Tile.VOID or
-            not include_water and tile.type == Type.Tile.WATER):
+            (not include_void and tile.type == Type.Tile.VOID) or
+            (not include_water and tile.type == Type.Tile.WATER)):
                 return false
         return tile.is_empty
 
@@ -144,7 +154,7 @@ func get_closest_empty_tiles(
         count: int,
         include_void := false,
         include_water := true) -> Array[Tile]:
-    
+
     return get_closest_empty_tiles_at(tile.grid_position, count, include_void, include_water)
 
 
@@ -153,7 +163,7 @@ func get_closest_empty_tile_at(
         include_void := false,
         include_water := true) -> Tile:
 
-    return get_closest_empty_tiles_at(pos, 1, include_void, include_water)[0] 
+    return get_closest_empty_tiles_at(pos, 1, include_void, include_water)[0]
 
 
 func get_closest_empty_tile(
@@ -161,7 +171,7 @@ func get_closest_empty_tile(
         include_void := false,
         include_water := true) -> Tile:
 
-    return get_closest_empty_tiles_at(tile.grid_position, 1, include_void, include_water)[0]    
+    return get_closest_empty_tiles_at(tile.grid_position, 1, include_void, include_water)[0]
 
 
 func set_tile_type(pos: Vector2i, type: Type.Tile) -> void:
@@ -204,7 +214,7 @@ func spawn_entity(cls, pos: Vector2i) -> void:
     for delta in entity.area_positions:
         var tile := get_tile(pos + delta)
         tile.add_entity(entity)
-    
+
     add_child(entity)
 
 
@@ -265,30 +275,33 @@ class Chunk:
     var end : Vector2i
     ## The room id the chunk is located in, if at all.
     var room : WorldFactory.Room
-    
+
     ## Whether or not the chunk is connected on the path.
     ## Only counts for chunks that are [code]Path[/code] type.
     var connected := false
     ## The dictionary of edges connected with the chunk.
-    var _edges := {}
+    var edges := {}
 
     func _init(_world: World, _pos: Vector2i) -> void:
         world = _world
         chunk_position = _pos
 
         var size := Globals.CHUNK_SIZE
-        var half := Vector2i(floori(size.x / 2.0), floori(size.y / 2.0))
+        var half := Globals.CHUNK_HALF
         start = _pos * size
         center = start + half
         end = (_pos + Vector2i.ONE) * size - Vector2i.ONE
 
     func add_edge(dir: Direction, _type: Type.Chunk) -> void:
-        _edges[dir] = _type
+        edges[dir] = _type
         var nbr := world.get_chunk(chunk_position + dir.vector)
-        nbr._edges[dir.opposite] = _type
-
-        world.used_chunks[self] = true
-        world.used_chunks[nbr] = true
+        nbr.edges[dir.opposite] = _type
 
     func get_edge(dir: Direction) -> Type.Chunk:
-        return _edges.get(dir, Type.Chunk.NONE)
+        return edges.get(dir, Type.Chunk.NONE)
+
+    func has_diagonal_neighbor() -> bool:
+        for dir: Direction in edges:
+            if not dir.is_diagonal and get_edge(dir) == Type.Chunk.DIAGONAL:
+                return true
+        return false

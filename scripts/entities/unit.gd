@@ -72,14 +72,14 @@ func reset() -> void:
     hide()
     modulate.a = 1
     set_background(Vector2(), Glyph.BLACK)
-    
+
     energy_points = 0
     posture_points = 0
 
     var world := GameState.world
     GameState.player.remove_unit(self)
     current_tile.remove_unit(self)
-    
+
     if not state == State.DEAD and world:
         var count := world.unit_count
         world.unit_count = maxi(count-1, 0)
@@ -108,10 +108,10 @@ func upgrade() -> void:
 func die() -> void:
     var world := GameState.world
     state = State.DEAD
-    
+
     GameState.player.remove_unit(self)
     current_tile.remove_unit(self)
-    
+
     var count := world.unit_count
     world.unit_count = maxi(count-1, 0)
 
@@ -120,14 +120,14 @@ func die() -> void:
     z_index += 1
 
     var end_pos := position + Vector2(Direction.north.vector * Globals.TILE_SIZE * 2)
-    
+
     var tween := create_tween()
     tween.tween_property(self, "position", end_pos, 1.5)
     tween.parallel().tween_property(self, "modulate:a", 0, 1.25)
     tween.tween_callback(func():
         z_index -= 1
         reset())
-    
+
 
 
 func move_to(dest: Tile) -> void:
@@ -206,7 +206,7 @@ func throw_to(tile: Tile) -> void:
                         grab_object(ent)
                         return
 
-    tile = world.get_closest_empty_tile(tile)
+        tile = world.get_closest_empty_tile(tile)
     move_to(tile)
     go_idle()
 
@@ -234,7 +234,7 @@ func ride_enemy(enemy: Enemy) -> void:
 func get_off_enemy() -> void:
     if not riding_enemy: return
     riding_enemy.remove_unit(self)
-    
+
     move_to(GameState.world.get_closest_empty_tile(riding_enemy.current_tile))
     riding_enemy = null
 
@@ -367,6 +367,8 @@ func _check_tile_at(pos: Vector2i) -> Type.Tile:
 
 
 func _broadcast_path() -> void:
+    if path.is_empty(): return
+
     var hist := {}
     var tiles := current_tile.get_all_neighbors()
     for _i in 2:
@@ -436,6 +438,3 @@ func _on_state_exit(_state: State) -> void:
             _update_glyph()
         State.CARRY:
             drop_object()
-
-
-    

@@ -23,7 +23,7 @@ class_name RoomBlueprint extends TileMapLayer
 ## The chunk along the right of the room that contains an exit.
 @export var right_exit := -1 :
     set(n): right_exit = clampi(n, -1, size.x-1)
-        
+
 
 ## The dictionary of tile positions and their respective glyph information.
 var tile_data := {}
@@ -34,15 +34,15 @@ var context_positions := {}
 
 func _init() -> void:
     _scan()
-    
+
 
 # DEBUG: Draws a square border in the editor
 func _draw() -> void:
     if not Engine.is_editor_hint(): return
-    
+
     const BORDER_THICKNESS := 1
     const BORDER_HALF_VEC := Vector2(BORDER_THICKNESS / 2.0, BORDER_THICKNESS / 2.0)
-    
+
     const NODE_SIZE_OUTER := Vector2i(23, 23) * Globals.TILE_SIZE
     const NODE_SIZE_INNER := Vector2i(15, 15) * Globals.TILE_SIZE
 

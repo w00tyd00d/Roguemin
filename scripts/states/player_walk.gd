@@ -14,14 +14,12 @@ func update(inp: StringName) -> Array:
     if just_pressed:
         match inp:
             &"c_whistle":
-                print("WHISTLE STATE!")
                 state_changed.emit("whistle")
             &"c_throw":
                 if world.unit_summon_targets.has(player.grid_position):
                     for unit in player.get_all_units():
                         unit.go_home()
                 elif player.unit_count > 0:
-                    print("WE'RE THROWING, DUDE")
                     state_changed.emit("throw")
             &"c_dismiss":
                 for unit in player.get_all_units():
@@ -36,7 +34,6 @@ func update(inp: StringName) -> Array:
                 return [false]
 
     if inp == &"c_wait":
-        print("WE'RE WAITING")
         return [true, 4]
     
     var dir := Direction.by_pattern(inp)

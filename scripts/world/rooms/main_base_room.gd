@@ -1,6 +1,6 @@
 @tool
 
-extends RoomBlueprint
+class_name MainBaseBlueprint extends RoomBlueprint
 
 
 func _run_context_procedures(world: World, start: Vector2i) -> void:

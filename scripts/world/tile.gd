@@ -66,6 +66,7 @@ func get_neighbor(dir: Direction) -> Tile:
 
 
 func get_all_neighbors() -> Array[Tile]:
+    if not GameState.is_valid_object(world): return []
     var res : Array[Tile] = []
     var arr : Array[Vector2i] = Direction.ALL_VECTORS.duplicate()
     arr.shuffle()
@@ -93,7 +94,7 @@ func has_entity(ent) -> bool:
 
 
 func get_first_entity() -> MultiTileEntity:
-    for ent in _entities:
+    for ent in _entities.keys():
         if ent is Player: continue
         return ent
     return null
@@ -138,15 +139,23 @@ func attacked(dmg: int) -> void:
 func get_flow_field_vector(wall_distance := 0, include_water := true) -> Vector2i:
     if _flow_field_vector and wall_distance == 0 and include_water == true:
         return _flow_field_vector
-    
+
     return _get_best_flow_field_vector(wall_distance, include_water)
 
 
 func _get_best_flow_field_vector(wall_distance := 0, include_water := true) -> Vector2i:
     var vec : Vector2i
+    var dist := 0
     var best := _flow_field_value
     for nbr in get_all_neighbors():
-        if (nbr._flow_field_value < best and
+        if dist < wall_distance and nbr._distance_from_wall > dist:
+            var dir := Direction.by_delta(grid_position, nbr.grid_position)
+            vec = dir.vector
+            best = nbr._flow_field_value
+            dist = nbr._distance_from_wall
+            continue
+        
+        elif (nbr._flow_field_value < best and
             nbr._distance_from_wall >= wall_distance and
             (include_water or not include_water and
             nbr.type != Type.Tile.WATER)):

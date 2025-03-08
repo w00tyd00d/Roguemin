@@ -1,9 +1,17 @@
-[gd_scene load_steps=3 format=3 uid="uid://cetsm5aasy0yq"]
+[gd_scene load_steps=5 format=3 uid="uid://cetsm5aasy0yq"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_8yigv"]
 [ext_resource type="PackedScene" uid="uid://dsae24ufyx8er" path="res://prefabs/screens/game_screen.tscn" id="2_350tp"]
+[ext_resource type="PackedScene" uid="uid://bfetmjo7j4h7e" path="res://prefabs/screens/loading_screen.tscn" id="3_3pf5y"]
+[ext_resource type="PackedScene" uid="uid://c55oxq312dd0w" path="res://prefabs/screens/main_screen.tscn" id="3_tpkjm"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_8yigv")
 
+[node name="MainScreen" parent="." instance=ExtResource("3_tpkjm")]
+
+[node name="LoadingScreen" parent="." instance=ExtResource("3_3pf5y")]
+visible = false
+
 [node name="GameScreen" parent="." instance=ExtResource("2_350tp")]
+visible = false

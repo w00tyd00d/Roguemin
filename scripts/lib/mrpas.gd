@@ -42,13 +42,9 @@ extends RefCounted
 #    if mrpas.is_in_view(map_cell_position):
 #        ...
 
-# What type of cell is at the location
-enum CellType { VOID, TRANSPARENT, OPAQUE }
-
 
 # When computing visibility for a quadrant, indicate which axis is major.
 enum _MajorAxis { X_AXIS, Y_AXIS }
-
 
 
 # The size of the map in cells.
@@ -80,12 +76,12 @@ func _init(size: Vector2) -> void:
 # Returns true if a cell is marked as transparent.
 func is_transparent(position: Vector2) -> bool:
     if _in_bounds(position):
-        return _transparent_cells[position.y][position.x] != CellType.OPAQUE
+        return _transparent_cells[position.y][position.x] != Type.Tile.WALL
     return false
 
 
 # Set the transparency of a cell in the map.
-func set_transparent(position: Vector2, _type: CellType) -> void:
+func set_transparent(position: Vector2, _type: Type.Tile) -> void:
     if _in_bounds(position):
         _transparent_cells[position.y][position.x] = _type
 
@@ -112,27 +108,31 @@ func clear_field_of_view() -> void:
 
 # Compute the viewable cells from a particular view position by doing
 # each of the eight octants of the view.
-func compute_field_of_view(view_position: Vector2, max_distance: int) -> void:
-    _compute_octant(_MajorAxis.Y_AXIS, -1, -1, view_position, max_distance)
-    _compute_octant(_MajorAxis.Y_AXIS, -1, 1, view_position, max_distance)
+func compute_field_of_view(layer: TileMapLayer, view_position: Vector2, max_distance: int) -> void:
 
-    _compute_octant(_MajorAxis.Y_AXIS, 1, -1, view_position, max_distance)
-    _compute_octant(_MajorAxis.Y_AXIS, 1, 1, view_position, max_distance)
+    _compute_octant(layer, _MajorAxis.Y_AXIS, -1, -1, view_position, max_distance)
+    _compute_octant(layer, _MajorAxis.Y_AXIS, -1, 1, view_position, max_distance)
 
-    _compute_octant(_MajorAxis.X_AXIS, -1, -1, view_position, max_distance)
-    _compute_octant(_MajorAxis.X_AXIS, -1, 1, view_position, max_distance)
+    _compute_octant(layer, _MajorAxis.Y_AXIS, 1, -1, view_position, max_distance)
+    _compute_octant(layer, _MajorAxis.Y_AXIS, 1, 1, view_position, max_distance)
 
-    _compute_octant(_MajorAxis.X_AXIS, 1, -1, view_position, max_distance)
-    _compute_octant(_MajorAxis.X_AXIS, 1, 1, view_position, max_distance)
+    _compute_octant(layer, _MajorAxis.X_AXIS, -1, -1, view_position, max_distance)
+    _compute_octant(layer, _MajorAxis.X_AXIS, -1, 1, view_position, max_distance)
+
+    _compute_octant(layer, _MajorAxis.X_AXIS, 1, -1, view_position, max_distance)
+    _compute_octant(layer, _MajorAxis.X_AXIS, 1, 1, view_position, max_distance)
 
 
 # Compute all visibile cells for one octant of the viewpoint.
 func _compute_octant(
+        layer: TileMapLayer,
         axis: int,
         major_sign: int,
         minor_sign: int,
         view_position: Vector2,
-        max_distance: int) -> void:
+        max_distance: int) -> Array[Vector2i]:
+
+    var res : Array[Vector2i] = []
 
     # Track occluders previously encountered in this octant.
     var occluders := []
@@ -166,12 +166,11 @@ func _compute_octant(
             var cell_type := _get_cell_type(position)
 
             # Check if occluders found on previous lines block this cell.
-            if cell_type == CellType.VOID or not _is_occluded(occluders, angle, angle_half_step, cell_type != CellType.OPAQUE):
+            if cell_type == Type.Tile.VOID or not _is_occluded(occluders, angle, angle_half_step, cell_type != Type.Tile.WALL):
                 
-                # ADD IN DIRECT CONNECTION TO FOW MAP HERE INSTEAD
-                _set_in_view_no_bounds(position, true)
+                layer.set_cell(Vector2i(position), -1, Vector2i(-1,-1), -1)
                 
-                if cell_type != CellType.OPAQUE:
+                if cell_type != Type.Tile.WALL:
                     any_transparent = true
                 else:
                     # The occluder represents a range of angle values, rather
@@ -189,6 +188,8 @@ func _compute_octant(
         # future lines.
         occluders = occluders + new_occluders
         new_occluders.clear()
+    
+    return res
 
 
 # Clamp the range of iteration to the bounds of the map.  This returns a
@@ -267,7 +268,7 @@ func _in_bounds(position: Vector2) -> bool:
 
 # is_transparent, but without a bounds check for use in the inner loop of
 # visibility computation.
-func _get_cell_type(position: Vector2) -> CellType:
+func _get_cell_type(position: Vector2) -> Type.Tile:
     return _transparent_cells[position.y][position.x]
 
 

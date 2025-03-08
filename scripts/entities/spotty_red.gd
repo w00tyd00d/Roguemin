@@ -7,4 +7,5 @@ static func create() -> SpottyRed:
 
 
 func _ready() -> void:
+    super()
     entity_name = Strings.NAME_SPOTTY_RED

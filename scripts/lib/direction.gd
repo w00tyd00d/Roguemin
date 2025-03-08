@@ -68,12 +68,36 @@ static func by_delta(pos1: Vector2i, pos2: Vector2i) -> Direction:
     return Direction.by_pattern(Vector2i(pos2 - pos1).sign())
 
 
+static func get_all(shuffled := false) -> Array[Direction]:
+    var res : Array[Direction] = [
+        north,
+        south,
+        west,
+        east,
+        northwest,
+        northeast,
+        southwest,
+        southeast,
+    ]
+
+    if shuffled: res.shuffle()
+    return res
+
+
+static func get_cardinal(shuffled := false) -> Array[Direction]:
+    var res : Array[Direction] = [
+        north,
+        south,
+        west,
+        east
+    ]
+
+    if shuffled: res.shuffle()
+    return res
+
+
 func _init(vec: Vector2i, _diagonal := false) -> void:
     vector = vec
     is_diagonal = _diagonal
     _index = ALL_VECTORS.find(vec)
     assert(_index > -1, "Invalid direction given")
-
-
-func from(pos: Vector2i) -> Vector2i:
-    return vector + pos

@@ -19,6 +19,7 @@ theme_override_font_sizes/font_size = 8
 text = "Surveying"
 
 [node name="Accent1" type="Label" parent="."]
+layout_mode = 0
 offset_left = 224.0
 offset_top = 8.0
 offset_right = 336.0
@@ -27,6 +28,7 @@ theme_override_font_sizes/font_size = 8
 text = "<             >"
 
 [node name="Accent2" type="Label" parent="."]
+layout_mode = 0
 offset_left = 216.0
 offset_top = 8.0
 offset_right = 352.0
@@ -36,6 +38,7 @@ text = "<               >"
 
 [node name="Accent3" type="Label" parent="."]
 visible = false
+layout_mode = 0
 offset_left = 208.0
 offset_top = 8.0
 offset_right = 360.0
@@ -45,6 +48,7 @@ text = "<                 >"
 
 [node name="Accent4" type="Label" parent="."]
 visible = false
+layout_mode = 0
 offset_left = 200.0
 offset_top = 8.0
 offset_right = 360.0

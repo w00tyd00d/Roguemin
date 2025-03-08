@@ -27,7 +27,10 @@ var spawn_position : Vector2i
 
 ## The tile of the entity's spawn position.
 var spawn_tile : Tile :
-    get: return GameState.world.get_tile(spawn_position)
+    get:
+        if GameState.world:
+            return GameState.world.get_tile(spawn_position)
+        return null
 
 ## A dictionary of any units currently hauling the entity.
 var carriers := {}
@@ -41,7 +44,6 @@ var carrier_count := 0
 ## A percentage value of energy built up from being carried. A value of
 ## [code]1.0[/code] allows the entity to act (move).
 var carry_energy := 0.0
-
 
 func _init() -> void:
     _scan()
@@ -57,7 +59,7 @@ func delete() -> void:
     for pos in area_positions:
         var tile := world.get_tile(grid_position + pos)
         if tile: tile.remove_entity(self)
-    
+
     for unit: Unit in carriers.keys():
         unit.drop_object()
         var dist := Util.chebyshev_distance(unit.grid_position, player.grid_position)
@@ -65,7 +67,7 @@ func delete() -> void:
             unit.join_squad()
         else:
             unit.go_idle()
-    
+
     # Don't have time to set up an entity recycler, so just delete
     queue_free()
 
@@ -79,12 +81,12 @@ func move_to(dest: Tile) -> void:
     for pos in area_positions:
         var tile := world.get_tile(dest.grid_position + pos)
         tile.add_entity(self)
-    
+
     for carrier: Unit in carriers:
         var pos : Vector2i = carriers[carrier]
         var tile := world.get_tile(dest.grid_position + pos)
         carrier.move_to(tile)
-    
+
     last_position = grid_position
     grid_position = dest.grid_position
 
@@ -127,8 +129,15 @@ func update_time(world_time: int) -> bool:
     var time_units := time - old_time
     if add_and_check_energy(time_units):
         return do_action()
-    
+
     return false
+
+
+func get_area_tiles(from := grid_position) -> Array[Vector2i]:
+    var res : Array[Vector2i] = []
+    for pos in area_positions:
+        res.append(from + pos)
+    return res
 
 
 func within_radius(pos: Vector2i) -> bool:
@@ -153,7 +162,7 @@ func add_carrier(unit: Unit) -> bool:
 
 
 func remove_carrier(unit: Unit) -> void:
-    if not carriers.has(unit): return 
+    if not carriers.has(unit): return
 
     unit.held_object = null
     latch_positions[carriers[unit]] = true
@@ -171,7 +180,7 @@ func get_open_latch_tile() -> Tile:
     var filter := func(key): return latch_positions[key]
     var open := latch_positions.keys().filter(filter)
     if not open: return null
-    
+
     var rpos : Vector2i = open.pick_random()
     return world.get_tile(rpos + grid_position)
 
@@ -182,7 +191,7 @@ func get_all_latch_tiles() -> Array[Tile]:
 
     for pos in latch_positions.keys():
         res.append(world.get_tile(pos + grid_position))
-    
+
     return res
 
 
@@ -202,7 +211,7 @@ func _get_can_act() -> bool:
 func _scan() -> void:
     var size := get_used_rect().size
     radius = ceili(size.x / 2.0)
-        
+
     var cx := 0.0 if size.x % 2 == 0 else 0.5
     var cy := 0.0 if size.y % 2 == 0 else 0.5
     center = Vector2(cx, cy)
