@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=4 uid="uid://dsae24ufyx8er"]
+[gd_scene load_steps=8 format=4 uid="uid://dsae24ufyx8er"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_d8h6j"]
 [ext_resource type="PackedScene" uid="uid://77dxilf67abv" path="res://prefabs/unit_container.tscn" id="1_ina8e"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/hud.gd" id="3_akf2x"]
 [ext_resource type="PackedScene" uid="uid://dt2ovg1fyjgyq" path="res://prefabs/pikmin_toggle.tscn" id="4_3d2ly"]
 [ext_resource type="PackedScene" uid="uid://dt4m8c03s0j5c" path="res://prefabs/sun_meter.tscn" id="5_pcs8q"]
+[ext_resource type="PackedScene" uid="uid://cwvhqo7s352tp" path="res://prefabs/survey_label.tscn" id="7_0ps20"]
 
 [node name="GameScreen" type="Control"]
 layout_mode = 3
@@ -70,45 +71,42 @@ horizontal_alignment = 2
 
 [node name="SquadCount" type="Label" parent="HUD"]
 custom_minimum_size = Vector2(80, 8)
-offset_left = 216.0
+offset_left = 224.0
 offset_top = 328.0
-offset_right = 248.0
+offset_right = 304.0
 offset_bottom = 336.0
 theme_override_font_sizes/font_size = 8
 text = "Squad: 0"
 
 [node name="FieldCount" type="Label" parent="HUD"]
 custom_minimum_size = Vector2(80, 8)
-offset_left = 216.0
+offset_left = 224.0
 offset_top = 336.0
-offset_right = 296.0
+offset_right = 304.0
 offset_bottom = 344.0
 theme_override_font_sizes/font_size = 8
 text = "Field: 0"
 
 [node name="TotalCount" type="Label" parent="HUD"]
 custom_minimum_size = Vector2(96, 8)
-offset_left = 216.0
+offset_left = 224.0
 offset_top = 344.0
-offset_right = 296.0
+offset_right = 320.0
 offset_bottom = 352.0
 theme_override_font_sizes/font_size = 8
 text = "Total: 99999
 "
 
-[node name="GameLog" type="Label" parent="HUD"]
-custom_minimum_size = Vector2(216, 24)
-offset_left = 328.0
+[node name="InfoBox" type="RichTextLabel" parent="HUD"]
+offset_left = 344.0
 offset_top = 328.0
-offset_right = 544.0
+offset_right = 528.0
 offset_bottom = 352.0
-theme_override_constants/line_spacing = 1
-theme_override_font_sizes/font_size = 8
-text = "Lorem ipsum dolor sit amet.
-Lorem ipsum dolor sit amet.
-Lorem ipsum dolor sit amet.
-"
-autowrap_mode = 3
+theme_override_constants/line_separation = 1
+theme_override_font_sizes/normal_font_size = 8
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
 
 [node name="MoneyValue" type="Label" parent="HUD"]
 custom_minimum_size = Vector2(64, 8)
@@ -185,6 +183,9 @@ horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="UnitToggle" parent="HUD" instance=ExtResource("4_3d2ly")]
+visible = false
+
+[node name="SurveyLabel" parent="HUD" instance=ExtResource("7_0ps20")]
 visible = false
 
 [node name="DebugTime" type="Label" parent="HUD"]

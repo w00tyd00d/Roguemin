@@ -18,7 +18,10 @@ var chunks : Array[Array]
 ## The dictionary of chunks that are currently occupied.
 var used_chunks := {}
 
-## The amount of time_units that have been accumulated so far.[br]
+## The collections of chunks in each room, listed by room id.
+var rooms := {}
+
+## The amount of time units that have been accumulated so far.
 var time := 0 :
     set(n):
         time = n
@@ -205,7 +208,7 @@ func spawn_entity(cls, pos: Vector2i) -> void:
     add_child(entity)
 
 
-func spawn_unit(pos: Vector2i) -> void:
+func spawn_unit(pos: Vector2i) -> Unit:
     var type : Type.Unit = [Type.Unit.RED, Type.Unit.YELLOW, Type.Unit.BLUE].pick_random()
     var unit : Unit = unit_container.get_available_unit()
     var tile := get_tile(pos)
@@ -214,6 +217,7 @@ func spawn_unit(pos: Vector2i) -> void:
     unit.spawn(pos, type, [true,false].pick_random())
     tile.add_unit(unit)
     unit_count += 1
+    return unit
 
 
 func in_bounds(vec: Vector2i) -> bool:
@@ -249,15 +253,22 @@ class Chunk:
     ## A reference to the world the chunk exists in.
     var world : World
     ## The position of the chunk on the chunk grid.
-    var chunk_position
+    var chunk_position : Vector2i
 
-    ## The center tile of the chunk
+    ## The assigned type of the chunk.
+    var type := Type.Chunk.NONE
+    ## The center tile of the chunk.
     var center : Vector2i
-    ## The upper left corner of the chunk
+    ## The upper left corner of the chunk.
     var start : Vector2i
-    ## The lower right corner of the chunk
+    ## The lower right corner of the chunk.
     var end : Vector2i
-
+    ## The room id the chunk is located in, if at all.
+    var room : WorldFactory.Room
+    
+    ## Whether or not the chunk is connected on the path.
+    ## Only counts for chunks that are [code]Path[/code] type.
+    var connected := false
     ## The dictionary of edges connected with the chunk.
     var _edges := {}
 
@@ -271,9 +282,13 @@ class Chunk:
         center = start + half
         end = (_pos + Vector2i.ONE) * size - Vector2i.ONE
 
-    func add_edge(dir: Direction, type: Type.ChunkEdge) -> void:
-        _edges[dir] = type
-        world.used_chunks[self] = true
+    func add_edge(dir: Direction, _type: Type.Chunk) -> void:
+        _edges[dir] = _type
+        var nbr := world.get_chunk(chunk_position + dir.vector)
+        nbr._edges[dir.opposite] = _type
 
-    func get_edge(dir: Direction) -> Type.ChunkEdge:
-        return _edges.get(dir, Type.ChunkEdge.NONE)
+        world.used_chunks[self] = true
+        world.used_chunks[nbr] = true
+
+    func get_edge(dir: Direction) -> Type.Chunk:
+        return _edges.get(dir, Type.Chunk.NONE)

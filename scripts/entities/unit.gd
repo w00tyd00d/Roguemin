@@ -7,7 +7,8 @@ enum State {
     FOLLOW,
     ATTACK,
     CARRY,
-    RETURN
+    RETURN,
+    DEAD
 }
 
 ## The current type of the unit.
@@ -18,7 +19,7 @@ var upgraded : bool
 
 
 ## The current state of the unit.
-var state := State.IDLE :
+var state := State.DEAD :
     set(new_state):
         var old_state = state
         state = new_state
@@ -69,12 +70,19 @@ func get_metadata() -> Dictionary:
 
 func reset() -> void:
     hide()
+    modulate.a = 1
+    set_background(Vector2(), Glyph.BLACK)
+    
     energy_points = 0
     posture_points = 0
 
     var world := GameState.world
     GameState.player.remove_unit(self)
     current_tile.remove_unit(self)
+    
+    if not state == State.DEAD and world:
+        var count := world.unit_count
+        world.unit_count = maxi(count-1, 0)
 
     if held_object:
         drop_object()
@@ -82,16 +90,11 @@ func reset() -> void:
     state = State.IDLE
     grid_position = Vector2()
 
-    if world:
-        var count := world.unit_count
-        world.unit_count = maxi(count-1, 0)
-
 
 func spawn(pos: Vector2i, _type: Type.Unit, _upgraded := false) -> void:
     type = _type
     upgraded = true # No time to implement nectar :(
-    _update_glyph()
-
+    state = State.FOLLOW if _in_range_of_tether() else State.IDLE
     grid_position = pos
     show()
 
@@ -103,8 +106,28 @@ func upgrade() -> void:
 
 
 func die() -> void:
-    # SETUP DEATH ANIMATION
-    reset()
+    var world := GameState.world
+    state = State.DEAD
+    
+    GameState.player.remove_unit(self)
+    current_tile.remove_unit(self)
+    
+    var count := world.unit_count
+    world.unit_count = maxi(count-1, 0)
+
+    set_glyph(Vector2(), Glyph.UNIT_GHOST_LARGE)
+    set_background(Vector2(), Glyph.NONE)
+    z_index += 1
+
+    var end_pos := position + Vector2(Direction.north.vector * Globals.TILE_SIZE * 2)
+    
+    var tween := create_tween()
+    tween.tween_property(self, "position", end_pos, 1.5)
+    tween.parallel().tween_property(self, "modulate:a", 0, 1.25)
+    tween.tween_callback(func():
+        z_index -= 1
+        reset())
+    
 
 
 func move_to(dest: Tile) -> void:
@@ -144,7 +167,7 @@ func move_towards(tile: Tile) -> bool:
         return true
 
     var dist := grid_position.distance_to(tile.grid_position)
-    if dist < 2: return false
+    # if dist < 1.5: return false
 
     var limit := 11
 
@@ -413,3 +436,6 @@ func _on_state_exit(_state: State) -> void:
             _update_glyph()
         State.CARRY:
             drop_object()
+
+
+    

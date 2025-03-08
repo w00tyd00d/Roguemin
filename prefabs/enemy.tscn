@@ -9,6 +9,8 @@ sight_range = 0
 wander_distance = 0
 attack_range = 0
 attack_damage = 0
+maximum_health = 0
+current_health = 0
 
 [node name="AttackIndicator" parent="." index="0" instance=ExtResource("1_d4hxp")]
 show_behind_parent = true

@@ -5,7 +5,9 @@ func _gui_input(event: InputEvent) -> void:
         var world := GameState.world
         var grid_pos := Vector2i(world.get_global_mouse_position() / Vector2(Globals.TILE_SIZE))
         for i in 10:
-            world.spawn_unit(grid_pos)
+            var unit := world.spawn_unit(grid_pos)
+            unit.state = Unit.State.IDLE
+
     elif event.is_action_pressed(&"d_right_click"):
         var world := GameState.world
         var grid_pos := Vector2i(world.get_global_mouse_position() / Vector2(Globals.TILE_SIZE))

@@ -10,6 +10,8 @@ sight_range = 8
 wander_distance = 15
 attack_range = 4
 attack_damage = 15
+maximum_health = 1000
+current_health = 1000
 
 [node name="AttackIndicator" parent="." index="0"]
 tile_map_data = PackedByteArray("AAAAAAEAAAAYAAEAAwABAAAAAAAYAAEAAwD//wAAAAAYAAEAAwAAAP//AAAYAAEAAwAAAAAAAAAYAAEAAwA=")

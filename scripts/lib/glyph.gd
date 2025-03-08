@@ -30,6 +30,9 @@ static var UNIT_RED_LARGE_IDLE := Glyph.new(0, Vector2(16,1), 5)
 static var UNIT_YELLOW_LARGE_IDLE := Glyph.new(0, Vector2(16,1), 6)
 static var UNIT_BLUE_LARGE_IDLE := Glyph.new(0, Vector2(16,1), 7)
 
+static var UNIT_GHOST_SMALL := Glyph.new(0, Vector2(17,2), 4)
+static var UNIT_GHOST_LARGE := Glyph.new(0, Vector2(16,1), 4)
+
 var source: int
 var atlas_coordinates: Vector2
 var alternative_tile_id : int

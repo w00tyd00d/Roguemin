@@ -10,11 +10,25 @@ class_name RoomBlueprint extends TileMapLayer
     set(vec):
         size = vec
         queue_redraw()
+
+## The chunk along the top of the room that contains an exit.
+@export var top_exit := -1 :
+    set(n): top_exit = clampi(n, -1, size.x-1)
+## The chunk along the bottom of the room that contains an exit.
+@export var bottom_exit := -1 :
+    set(n): bottom_exit = clampi(n, -1, size.x-1)
+## The chunk along the left of the room that contains an exit.
+@export var left_exit := -1 :
+    set(n): left_exit = clampi(n, -1, size.x-1)
+## The chunk along the right of the room that contains an exit.
+@export var right_exit := -1 :
+    set(n): right_exit = clampi(n, -1, size.x-1)
         
 
 ## The dictionary of tile positions and their respective glyph information.
 var tile_data := {}
 
+## The dictionary of context positions set up within the blueprint.
 var context_positions := {}
 
 

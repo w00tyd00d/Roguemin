@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://bwl0qh8yr5ome"]
+[gd_scene load_steps=6 format=3 uid="uid://bwl0qh8yr5ome"]
 
 [ext_resource type="Script" path="res://scripts/states/player_controller.gd" id="1_e002t"]
 [ext_resource type="Script" path="res://scripts/states/player_walk.gd" id="2_5augn"]
 [ext_resource type="Script" path="res://scripts/states/player_whistle.gd" id="3_oixg1"]
 [ext_resource type="Script" path="res://scripts/states/player_throw.gd" id="4_f6ubk"]
+[ext_resource type="Script" path="res://scripts/states/player_survey.gd" id="5_oq1ud"]
 
 [node name="PlayerController" type="Node"]
 script = ExtResource("1_e002t")
@@ -16,3 +17,6 @@ script = ExtResource("3_oixg1")
 
 [node name="Throw" type="Node" parent="."]
 script = ExtResource("4_f6ubk")
+
+[node name="Survey" type="Node" parent="."]
+script = ExtResource("5_oq1ud")

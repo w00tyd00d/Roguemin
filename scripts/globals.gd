@@ -15,6 +15,10 @@ const TILE_SIZE := Vector2i(8,8)
 ## The size of a chunk in tiles.
 const CHUNK_SIZE := Vector2i(23,23)
 
+## The size of the world in chunks. The outide perimeter of chunks are never
+## used and act like a border.
+const WORLD_SIZE := Vector2i(14,14)
+
 # Time
 
 ## The amount of time units that make up one second.
@@ -44,7 +48,7 @@ const ACTION_INPUTS := [
     &"c_throw",
     &"c_dismiss",
     &"c_attack",
-    &"c_examine",
+    &"c_survey",
     &"c_camera",
     &"c_cycle_right",
     &"c_cycle_left",

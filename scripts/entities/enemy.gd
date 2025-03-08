@@ -16,6 +16,15 @@ enum State { IDLE, ATTACK, RETURN, DEAD }
 ## The amount of attack_damage the enemy will do to the player.
 @export var attack_damage : int
 
+## The amount of max health the enemy.
+@export var maximum_health : int :
+    set(n):
+        maximum_health = n
+        current_health = n
+
+## The amount of health the enemy currently has.
+@export var current_health : int
+
 ## The current state of the unit.
 var state := State.IDLE :
     set(new_state):
@@ -63,6 +72,10 @@ func update_time(world_time: int) -> bool:
             posture_points += 1
     
     return false
+
+
+func get_health_percent() -> float:
+    return current_health / float(maximum_health)
 
 
 func die() -> void:

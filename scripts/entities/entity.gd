@@ -10,6 +10,9 @@ var current_tile : Tile :
 ## The cached last position of the entity.
 var last_position : Vector2i
 
+## The in-game name of the entity.
+var entity_name := "Unknown Entity"
+
 ## The value of time the entity has been synced up to.
 var time := 0
 

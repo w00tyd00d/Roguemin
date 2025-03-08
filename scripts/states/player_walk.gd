@@ -31,6 +31,9 @@ func update(inp: StringName) -> Array:
                 player.cycle_selected_unit()
             &"c_cycle_left":
                 player.cycle_selected_unit(true)
+            &"c_survey":
+                state_changed.emit("survey")
+                return [false]
 
     if inp == &"c_wait":
         print("WE'RE WAITING")

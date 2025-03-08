@@ -7,3 +7,4 @@ static func create() -> SmallTreasure:
 
 func _ready() -> void:
     super()
+    entity_name = "Small Treasure"
