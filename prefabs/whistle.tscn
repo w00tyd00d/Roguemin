@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=4 uid="uid://borrl1q1erb2s"]
 
 [ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="1_7at1u"]
-[ext_resource type="Script" path="res://scripts/whistle.gd" id="1_l5ucs"]
+[ext_resource type="Script" uid="uid://v0bxo1hvqknk" path="res://scripts/whistle.gd" id="1_l5ucs"]
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="2_ssxi0"]
 
 [node name="Whistle" type="Node2D"]

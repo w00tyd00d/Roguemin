@@ -14,7 +14,7 @@ config/name="Roguemin"
 config/description="Pikmin re-imagined as a traditional arcade roguelike."
 config/version="ALPHA 0.1"
 run/main_scene="res://prefabs/main.tscn"
-config/features=PackedStringArray("4.3", "GL Compatibility")
+config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]

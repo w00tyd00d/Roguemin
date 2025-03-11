@@ -2,8 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_d8h6j"]
 [ext_resource type="PackedScene" uid="uid://77dxilf67abv" path="res://prefabs/unit_container.tscn" id="1_ina8e"]
-[ext_resource type="Script" path="res://scripts/debug_viewport.gd" id="1_piihe"]
-[ext_resource type="Script" path="res://scripts/hud.gd" id="3_akf2x"]
+[ext_resource type="Script" uid="uid://bkjf8ldo8wnj" path="res://scripts/world/debug_viewport.gd" id="1_piihe"]
+[ext_resource type="Script" uid="uid://b23rg4qcuqcu3" path="res://scripts/hud.gd" id="3_akf2x"]
 [ext_resource type="PackedScene" uid="uid://dt2ovg1fyjgyq" path="res://prefabs/pikmin_toggle.tscn" id="4_3d2ly"]
 [ext_resource type="PackedScene" uid="uid://dt4m8c03s0j5c" path="res://prefabs/sun_meter.tscn" id="5_pcs8q"]
 [ext_resource type="PackedScene" uid="uid://cwvhqo7s352tp" path="res://prefabs/survey_label.tscn" id="7_0ps20"]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=4 uid="uid://d33l7t766au5j"]
 
-[ext_resource type="Script" path="res://scripts/room_blueprint.gd" id="1_jm0be"]
+[ext_resource type="Script" uid="uid://ecfkj6vso855" path="res://scripts/room_blueprint.gd" id="1_jm0be"]
 [ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="1_l3qt2"]
 
 [node name="RoomBlueprint" type="TileMapLayer"]

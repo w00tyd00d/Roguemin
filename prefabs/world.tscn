@@ -1,10 +1,10 @@
 [gd_scene load_steps=7 format=3 uid="uid://12ynotjnohm3"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_rkls3"]
-[ext_resource type="Script" path="res://scripts/world/world.gd" id="2_a6k5q"]
+[ext_resource type="Script" uid="uid://bbrkxonsr7g30" path="res://scripts/world/world.gd" id="2_a6k5q"]
 [ext_resource type="PackedScene" uid="uid://borrl1q1erb2s" path="res://prefabs/whistle.tscn" id="3_7d70t"]
-[ext_resource type="Script" path="res://scripts/test_layer.gd" id="3_48kwt"]
-[ext_resource type="Script" path="res://scripts/throw_cursor.gd" id="4_m47ix"]
+[ext_resource type="Script" uid="uid://cmb6opbq1b2ow" path="res://scripts/test_layer.gd" id="3_48kwt"]
+[ext_resource type="Script" uid="uid://dlrxav462qrlt" path="res://scripts/throw_cursor.gd" id="4_m47ix"]
 [ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="6_i4ult"]
 
 [node name="World" instance=ExtResource("1_rkls3")]

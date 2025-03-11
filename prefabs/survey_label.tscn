@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cwvhqo7s352tp"]
 
-[ext_resource type="Script" path="res://scripts/survey_label.gd" id="1_o3ucm"]
+[ext_resource type="Script" uid="uid://bghkidgo2fc1u" path="res://scripts/survey_label.gd" id="1_o3ucm"]
 
 [node name="SurveyLabel" type="ColorRect"]
 offset_top = 304.0

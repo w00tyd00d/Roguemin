@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dt2ovg1fyjgyq"]
 
-[ext_resource type="Script" path="res://scripts/unit_toggle.gd" id="1_m5gai"]
+[ext_resource type="Script" uid="uid://b8uy67x24jmcb" path="res://scripts/unit_toggle.gd" id="1_m5gai"]
 
 [node name="UnitToggle" type="ColorRect"]
 offset_top = 304.0

@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=4 uid="uid://jqye7wwbbisb"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_tjl11"]
-[ext_resource type="Script" path="res://scripts/entities/small_treasure.gd" id="2_g0cav"]
+[ext_resource type="Script" uid="uid://dly83tle1rla0" path="res://scripts/entities/small_treasure.gd" id="2_g0cav"]
 
 [node name="SmallTreasure" instance=ExtResource("1_tjl11")]
 tile_map_data = PackedByteArray("AAD/////AAADAAAAAQD//wAAAAADAAAAAQAAAP//AAADAAAAAQAAAAAAAAADAAAAAQD//wEAAAAEAAAAAQAAAAEAAAAEAAAAAQABAAAAAAAEAAAAAQABAP//AAAEAAAAAQAAAP7/AAAEAAAAAQD///7/AAAEAAAAAQD+////AAAEAAAAAQD+/wAAAAAEAAAAAQA=")

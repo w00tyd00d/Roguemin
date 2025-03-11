@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bge48j21udel3"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_d4hxp"]
-[ext_resource type="Script" path="res://scripts/entities/enemy.gd" id="2_4trjc"]
+[ext_resource type="Script" uid="uid://dxoxtpt6pls20" path="res://scripts/entities/enemy.gd" id="2_4trjc"]
 
 [node name="Enemy" instance=ExtResource("1_d4hxp")]
 script = ExtResource("2_4trjc")
