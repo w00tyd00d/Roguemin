@@ -36,14 +36,14 @@ var has_units : bool :
                 not _units[Type.Unit.BLUE].is_empty())
 
 ## The dictionary of (Pikmin) units within the tile.
-var _units := {
+var _units : Dictionary[Type.Unit, Dictionary] = {
     Type.Unit.RED: {},
     Type.Unit.YELLOW: {},
     Type.Unit.BLUE: {},
 }
 
 ## The dictionary of multi-tile entities currently occupying the tile
-var _entities := {}
+var _entities : Dictionary[Entity, bool] = {}
 
 ## The value of the tile on the world's flow field.
 var _flow_field_value := INF

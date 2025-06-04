@@ -18,7 +18,7 @@ var tiles : Array[Array]
 var chunks : Array[Array]
 
 ## The collections of chunks in each room, listed by room id.
-var rooms := {}
+var rooms : Dictionary[int, WorldFactory.Room] = {}
 
 ## The amount of time units that have been accumulated so far.
 var time := 0 :

@@ -16,11 +16,11 @@ var is_even : bool :
     get: return center == Vector2()
 
 ## The local positions of the entity relative to its center.
-var area_positions := []
+var area_positions : Array[Vector2i] = []
 
 ## The latch points around the entity the units can attach to.
 ## In local coordinates from the center of the entity.
-var latch_positions := {}
+var latch_positions : Dictionary[Vector2i, bool] = {}
 
 ## Original spawn position of the entity.
 var spawn_position : Vector2i
@@ -33,7 +33,7 @@ var spawn_tile : Tile :
         return null
 
 ## A dictionary of any units currently hauling the entity.
-var carriers := {}
+var carriers : Dictionary[Unit, Vector2i] = {}
 
 ## A cached value of the total amount of latch points around the entity.
 var latch_point_count : int

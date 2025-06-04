@@ -14,7 +14,7 @@ layout_mode = 0
 offset_left = 112.0
 offset_top = 8.0
 offset_right = 176.0
-offset_bottom = 17.0
+offset_bottom = 16.0
 theme_override_font_sizes/font_size = 8
 text = "Toggle:"
 
@@ -24,7 +24,7 @@ layout_mode = 0
 offset_left = 184.0
 offset_top = 8.0
 offset_right = 248.0
-offset_bottom = 17.0
+offset_bottom = 16.0
 theme_override_font_sizes/font_size = 8
 text = "1:■ Red"
 
@@ -34,7 +34,7 @@ layout_mode = 0
 offset_left = 264.0
 offset_top = 8.0
 offset_right = 344.0
-offset_bottom = 17.0
+offset_bottom = 16.0
 theme_override_font_sizes/font_size = 8
 text = "2:■ Yellow"
 
@@ -44,6 +44,6 @@ layout_mode = 0
 offset_left = 368.0
 offset_top = 8.0
 offset_right = 432.0
-offset_bottom = 17.0
+offset_bottom = 16.0
 theme_override_font_sizes/font_size = 8
 text = "3:■ Blue"

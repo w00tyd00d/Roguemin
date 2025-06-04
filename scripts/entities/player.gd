@@ -9,7 +9,7 @@ var health := 100 :
 
 var unit_tether := UnitTether.new(self, 4)
 
-var unit_toggle := {
+var unit_toggle : Dictionary[Type.Unit, bool] = {
     Type.Unit.RED: true,
     Type.Unit.YELLOW: true,
     Type.Unit.BLUE: true,
@@ -36,7 +36,7 @@ var unit_count := 0 :
 #         size = clampi(size, 1, 5)
 
 
-var _units := {
+var _units : Dictionary[Type.Unit, Dictionary] = {
     Type.Unit.RED: {},
     Type.Unit.YELLOW: {},
     Type.Unit.BLUE: {},

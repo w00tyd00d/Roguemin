@@ -50,7 +50,7 @@ func _place_room(
         blueprint: RoomBlueprint) -> void:
 
     var chunks: Array[World.Chunk] = []
-    var room := Room.new(blueprint.size, chunk_pos, chunks)
+    var room := Room.new(blueprint, chunk_pos, chunks)
 
     # Link the chunks
     for dy in blueprint.size.y:
@@ -147,9 +147,10 @@ func _check_for_room_collision(world: World, pos: Vector2i, room: RoomBlueprint)
 func _generate_exits(world: World) -> void:
     for room: Room in world.rooms.values():
         var exit_count := RNG.randi_range(1,4)
-        var sides_left : Array[Direction] = Direction.get_all(true)#CARDINALS.duplicate()
-        sides_left.shuffle()
+        var sides_left : Array[Direction] = Direction.get_cardinal(true)
+        
 
+        
         while exit_count > 0 and sides_left.size() > 0:
             var dir := sides_left[-1]
 
@@ -184,7 +185,7 @@ func _establish_exit(world: World, room: Room, dir: Direction) -> bool:
 
     match dir:
         Direction.north, Direction.south:
-            var oy := 0 if Direction.north else room.size.y-1
+            var oy := 0 if Direction.north else room.size.y
             var rx := RNG.randi_range(0, room.size.x-1)
             var dvec := Vector2i(rx, dir.vector.y + oy)
             var nbr := world.get_chunk(pos + dvec)
@@ -201,7 +202,7 @@ func _establish_exit(world: World, room: Room, dir: Direction) -> bool:
             world.get_chunk(pos + Vector2i(rx, oy)).add_edge(dir, Type.Chunk.EXIT)
 
         Direction.west, Direction.east:
-            var ox := 0 if Direction.west else room.size.x-1
+            var ox := 0 if Direction.west else room.size.x
             var ry := RNG.randi_range(0, room.size.y-1)
             var dvec := Vector2i(dir.vector.x + ox, ry)
             var nbr := world.get_chunk(pos + dvec)
@@ -399,6 +400,8 @@ func _check_for_entity_collision(world: World, ent: MultiTileEntity, pos: Vector
 
 
 class Room:
+    var blueprint : RoomBlueprint
+    
     var size : Vector2i
     var chunk_position : Vector2i
     var chunk_area : Array[World.Chunk]
@@ -407,11 +410,12 @@ class Room:
     var open := false
 
     func _init(
-            _size: Vector2i,
+            _blueprint: RoomBlueprint,
             pos: Vector2i,
             area: Array[World.Chunk]) -> void:
 
-        size = _size
+        blueprint = _blueprint
+        size = _blueprint.size
         chunk_position = pos
         chunk_area = area
 
