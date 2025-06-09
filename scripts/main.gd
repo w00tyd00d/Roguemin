@@ -17,13 +17,20 @@ func _ready() -> void:
     InputManager.add(_input_handler)
 
     GameState.new_game.connect(new_game)
+
+    # We keep the unit container as a child to the game screen, but we inject
+    # a reference of it to the factory so that it may inject a reference into
+    # every world instance it creates.
+    world_factory.unit_container = unit_container
     
 
 func initialize_game() -> void:
-    var world := world_factory.create_new_world()
-    game_viewport.add_child(world)
-    world_factory.setup_world(world)
-    world.unit_container = unit_container
+    
+    var world := world_factory.generate_new_world(game_viewport)
+    # var world := world_factory.create_new_world()
+    # game_viewport.add_child(world)
+    # world_factory.setup_world(world)
+    # game_viewport.add_child(world)
 
     GameState.world = world
 
@@ -45,9 +52,12 @@ func new_game() -> void:
     GameState.toggle_hud.emit(false)
     game_screen.hide()
     loading_screen.show()
+    
     await get_tree().create_timer(0.2).timeout
+    
     main_screen.hide()
     initialize_game()
+    
     loading_screen.hide()
     game_screen.show()
     GameState.toggle_hud.emit(true)

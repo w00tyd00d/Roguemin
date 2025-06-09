@@ -18,7 +18,7 @@ var tiles : Array[Array]
 var chunks : Array[Array]
 
 ## The collections of chunks in each room, listed by room id.
-var rooms : Dictionary[int, WorldFactory.Room] = {}
+var rooms : Dictionary[int, Room] = {}
 
 ## The amount of time units that have been accumulated so far.
 var time := 0 :
@@ -274,7 +274,7 @@ class Chunk:
     ## The lower right corner of the chunk.
     var end : Vector2i
     ## The room id the chunk is located in, if at all.
-    var room : WorldFactory.Room
+    var room : Room
 
     ## Whether or not the chunk is connected on the path.
     ## Only counts for chunks that are [code]Path[/code] type.
@@ -305,3 +305,24 @@ class Chunk:
             if not dir.is_diagonal and get_edge(dir) == Type.Chunk.DIAGONAL:
                 return true
         return false
+
+
+class Room:
+    var blueprint : RoomBlueprint
+    
+    var size : Vector2i
+    var chunk_position : Vector2i
+    var chunk_area : Array[World.Chunk]
+
+    var exits := {}
+    var open := false
+
+    func _init(
+            _blueprint: RoomBlueprint,
+            pos: Vector2i,
+            area: Array[World.Chunk]) -> void:
+
+        blueprint = _blueprint
+        size = _blueprint.size
+        chunk_position = pos
+        chunk_area = area

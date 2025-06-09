@@ -62,8 +62,6 @@ func _init() -> void:
 func _draw() -> void:
     if not Engine.is_editor_hint(): return
 
-    print(exit_data)
-
     _draw_border()
     _draw_exits()
 
@@ -89,8 +87,8 @@ func _draw_exits() -> void:
     const CHUNK_SIZE := Globals.CHUNK_SIZE.x
 
     var border := Vector2i(BORDER_THICKNESS, BORDER_THICKNESS)
-    var size_h := Vector2i(15, 4) * Globals.TILE_SIZE + border - Vector2i.ONE
-    var size_v := Vector2i(4, 15) * Globals.TILE_SIZE + border - Vector2i.ONE
+    var size_h := Vector2i(15, 4) * Globals.TILE_SIZE + border - Vector2i(0,1)
+    var size_v := Vector2i(4, 15) * Globals.TILE_SIZE + border - Vector2i(1,0)
 
     for dir in exit_data:
         var val := exit_data[dir]
@@ -107,13 +105,13 @@ func _draw_exits() -> void:
                 pos = Vector2(delta, 0) - BORDER_HALF_VEC
                 dim = size_h
             Vector2i(0,1):
-                pos = Vector2(delta, limit.y) + BORDER_HALF_VEC
+                pos = Vector2(delta, limit.y) - (BORDER_HALF_VEC * Vector2(1, -1))
                 dim = size_h
             Vector2i(-1,0):
                 pos = Vector2(0, delta) - BORDER_HALF_VEC
                 dim = size_v
             Vector2i(1,0):
-                pos = Vector2(limit.x, delta) + BORDER_HALF_VEC
+                pos = Vector2(limit.x, delta) - (BORDER_HALF_VEC * Vector2(-1, 1))
                 dim = size_v
 
         draw_rect(Rect2(pos, dim), Color.YELLOW, false, BORDER_THICKNESS)

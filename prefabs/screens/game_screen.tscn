@@ -30,7 +30,7 @@ render_target_update_mode = 4
 unique_name_in_owner = true
 
 [node name="HUD" type="CanvasLayer" parent="."]
-visible = false
+editor_description = "NOTE: Keep invisible since it's its own canvas layer, it will be toggled on by the base script"
 script = ExtResource("3_akf2x")
 
 [node name="StaticLayer" parent="HUD" instance=ExtResource("1_d8h6j")]
