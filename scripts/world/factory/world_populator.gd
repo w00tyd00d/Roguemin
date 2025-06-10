@@ -5,6 +5,11 @@ class_name WorldPopulator extends RefCounted
 var RNG := GameState.RNG 
 
 
+func run(world: World) -> void:
+    generate_enemies(world)
+    generate_treasure(world)
+
+
 func generate_enemies(world: World) -> void:
     # Place Spotty Red enemy at specific location for now
     var pos := world.get_chunk(Vector2i(2,1)).center

@@ -9,6 +9,13 @@ var RNG := GameState.RNG
 
 var _walkers : Array[Walker] = []
 
+
+func run(world: World) -> void:
+    generate_rooms(world)
+    generate_exits(world)
+    generate_paths(world)
+
+
 func generate_rooms(world: World) -> void:
     
     # Establish the home base room location and four initial exits
@@ -82,7 +89,7 @@ func generate_exits(world: World) -> void:
             if chunk.room.open:
                 break
 
-        var dirs := Direction.get_all() #CARDINALS.duplicate()
+        var dirs := Direction.get_all()
         dirs.shuffle()
 
         for dir in dirs:
@@ -187,7 +194,7 @@ func _establish_exit(world: World, room: World.Room, dir: Direction) -> bool:
             var rx := RNG.randi_range(0, room.size.x-1)
             var dvec := Vector2i(rx, dir.vector.y + oy)
             var nbr := world.get_chunk(pos + dvec)
-            if nbr.type == Type.Chunk.BORDER:
+            if nbr.type == Type.Chunk.VOID:
                 return false
             elif nbr.type == Type.Chunk.ROOM:
                 nbr.room.exits[dir.opposite] = pos + dvec
@@ -204,7 +211,7 @@ func _establish_exit(world: World, room: World.Room, dir: Direction) -> bool:
             var ry := RNG.randi_range(0, room.size.y-1)
             var dvec := Vector2i(dir.vector.x + ox, ry)
             var nbr := world.get_chunk(pos + dvec)
-            if nbr.type == Type.Chunk.BORDER:
+            if nbr.type == Type.Chunk.VOID:
                 return false
             elif nbr.type == Type.Chunk.ROOM:
                 nbr.room.exits[dir.opposite] = pos + dvec
@@ -283,7 +290,7 @@ class Walker:
                 continue
 
             var nbr := world.get_chunk(chunk_position + dir.vector)
-            if nbr.type == Type.Chunk.BORDER or  nbr.has_diagonal_neighbor():
+            if nbr.type == Type.Chunk.VOID:
                 continue
 
             if (nbr.get_edge(dir) != Type.Chunk.NONE and
@@ -291,12 +298,17 @@ class Walker:
                 nbr.get_edge(dir) != Type.Chunk.PATH):
                     continue
 
-            current_chunk.add_edge(dir, Type.Chunk.PATH)
-
             if dir.is_diagonal:
-                var vec := dir.vector
-                world.get_chunk(chunk_position + Vector2i(vec.x, 0)).type = Type.Chunk.DIAGONAL
-                world.get_chunk(chunk_position + Vector2i(0, vec.y)).type = Type.Chunk.DIAGONAL
+                if not nbr.valid_diagonal(dir):
+                    continue
+                
+                var nbr1 := current_chunk.get_neighbor(dir.adjacent[0])
+                var nbr2 := current_chunk.get_neighbor(dir.adjacent[1])
+
+                nbr1.type = Type.Chunk.VOID
+                nbr2.type = Type.Chunk.VOID
+
+            current_chunk.add_edge(dir, Type.Chunk.PATH)
 
             if nbr.connected:
                 return resolve()
@@ -304,8 +316,10 @@ class Walker:
             stack.append(chunk_position)
             chunk_position += dir.vector
             history[current_chunk] = true
+
             if connected:
                 current_chunk.connected = true
+
             return true
 
         return backtrack()

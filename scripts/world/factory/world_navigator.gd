@@ -5,6 +5,11 @@ class_name WorldNavigator extends RefCounted
 var _wall_tiles : Array[Tile] = []
 
 
+func run(world: World) -> void:
+    generate_flow_field(world)
+    generate_wall_dijkstra_map(world)
+
+
 func generate_flow_field(world: World) -> void:
     var start := world.salvage_return_tile
 

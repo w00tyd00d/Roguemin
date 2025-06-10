@@ -18,20 +18,14 @@ func _ready() -> void:
 
     GameState.new_game.connect(new_game)
 
-    # We keep the unit container as a child to the game screen, but we inject
-    # a reference of it to the factory so that it may inject a reference into
-    # every world instance it creates.
+    # We keep these nodes as a children to the game screen, but we inject
+    # references to them to the world factory so that it may utilize them
     world_factory.unit_container = unit_container
+    world_factory.game_viewport = game_viewport
     
 
 func initialize_game() -> void:
-    
-    var world := world_factory.generate_new_world(game_viewport)
-    # var world := world_factory.create_new_world()
-    # game_viewport.add_child(world)
-    # world_factory.setup_world(world)
-    # game_viewport.add_child(world)
-
+    var world := world_factory.generate_new_world()
     GameState.world = world
 
     var player : Player
