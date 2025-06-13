@@ -189,7 +189,7 @@ visible = false
 [node name="SurveyLabel" parent="HUD" instance=ExtResource("7_0ps20")]
 visible = false
 
-[node name="DebugTime" type="Label" parent="HUD"]
+[node name="DebugInfo" type="Label" parent="HUD"]
 offset_left = 1.0
 offset_right = 41.0
 offset_bottom = 8.0

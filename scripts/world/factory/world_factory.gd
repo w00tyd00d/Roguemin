@@ -35,15 +35,5 @@ func generate_new_world() -> World:
 
 func _create_new_world() -> World:
     var world := World.create()
-    world.setup(Globals.WORLD_SIZE)
     world.unit_container = unit_container
-    
-    # Create a border of void chunks to surround the traversible world
-    for _x in world.size.x:
-        world.get_chunk(Vector2i(_x, 0)).type = Type.Chunk.VOID
-        world.get_chunk(Vector2i(_x, world.size.y-1)).type = Type.Chunk.VOID
-    for _y in world.size.y-2:
-        world.get_chunk(Vector2i(0, _y+1)).type = Type.Chunk.VOID
-        world.get_chunk(Vector2i(world.size.x-1, _y+1)).type = Type.Chunk.VOID
-
     return world

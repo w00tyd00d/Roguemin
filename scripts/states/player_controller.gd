@@ -38,6 +38,7 @@ func change_state(state_name: String) -> void:
 func input_handler(dt: float) -> void:
     if Input.is_action_just_pressed(&"d_renew"):
         GameState.new_game.emit()
+        return
     
     for inp in Globals.ACTION_INPUTS:
         if Input.is_action_just_pressed(inp):

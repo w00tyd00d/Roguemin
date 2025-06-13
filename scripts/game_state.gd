@@ -30,6 +30,8 @@ signal update_info_box(ent: Entity)
 
 signal update_money_value(amount: int)
 
+signal update_debug_info(info: String)
+
 
 ## Global RNG object.
 var RNG := RandomNumberGenerator.new()

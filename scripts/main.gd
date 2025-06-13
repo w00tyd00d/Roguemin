@@ -22,6 +22,11 @@ func _ready() -> void:
     # references to them to the world factory so that it may utilize them
     world_factory.unit_container = unit_container
     world_factory.game_viewport = game_viewport
+
+    # FOR DEBUGGING PURPOSES, AUTOMATICALLY GO RIGHT TO GAME
+    game_started = true
+    await new_game()
+    InputManager.add(GameState.player.controller.input_handler)
     
 
 func initialize_game() -> void:
@@ -36,6 +41,7 @@ func initialize_game() -> void:
 
     player = GameState.player
     player.test_layer = world.get_node("TEST")
+    
     player.move_to(world.get_tile(world.start_position))
     player.unit_tether.reset()
 

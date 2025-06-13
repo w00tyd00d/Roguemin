@@ -58,6 +58,13 @@ func _init() -> void:
     _scan()
 
 
+## The method that will be called once the room is placed in the world and the
+## tiles have been constructed. Allows for customized scripting for each room
+## by using the numerical tiles as placeholders.
+func run_context_procedures(_world: World, _start: Vector2i) -> void:
+    pass
+
+
 # DEBUG: Draws a square border in the editor
 func _draw() -> void:
     if not Engine.is_editor_hint(): return
@@ -115,10 +122,6 @@ func _draw_exits() -> void:
                 dim = size_v
 
         draw_rect(Rect2(pos, dim), Color.YELLOW, false, BORDER_THICKNESS)
-
-
-func _run_context_procedures(_world: World, _start: Vector2i) -> void:
-    pass
 
 
 func _scan() -> void:

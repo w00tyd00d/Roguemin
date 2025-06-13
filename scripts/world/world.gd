@@ -236,6 +236,10 @@ func in_bounds(vec: Vector2i) -> bool:
     return vec.x >= 0 and vec.y >= 0 and vec.x < x_end and vec.y < y_end
 
 
+func add_room(room: Room) -> void:
+    rooms[rooms.size()] = room
+
+
 func _create_tiles() -> Array[Array]:
     var res : Array[Array] = []
     for y in size.y * Globals.CHUNK_SIZE.y:
@@ -280,7 +284,13 @@ class Chunk:
     ## Only counts for chunks that are [code]Path[/code] type.
     var connected := false
     ## The dictionary of edges connected with the chunk.
-    var edges := {}
+    var edges : Dictionary[Vector2i, Type.Edge] = {}
+
+    var empty : bool :
+        get: return type == Type.Chunk.NONE or type == Type.Chunk.VOID
+
+    var valid_path : bool :
+        get: return type == Type.Chunk.NONE or type == Type.Chunk.PATH
 
     func _init(_world: World, _pos: Vector2i) -> void:
         world = _world
@@ -292,29 +302,38 @@ class Chunk:
         center = start + half
         end = (_pos + Vector2i.ONE) * size - Vector2i.ONE
 
-    func add_edge(dir: Direction, _type: Type.Chunk) -> void:
-        edges[dir] = _type
-        var nbr := world.get_chunk(chunk_position + dir.vector)
-        nbr.edges[dir.opposite] = _type
+    func add_edge(dir: Direction, _type: Type.Edge) -> void:
+        var nbr := get_neighbor(dir)
+        edges[dir.vector] = _type
+        nbr.edges[dir.opposite.vector] = _type
+    
+    func remove_edge(dir: Direction) -> void:
+        var nbr := get_neighbor(dir)
+        edges.erase(dir)
+        nbr.edges.erase(dir.opposite)
 
-    func get_edge(dir: Direction) -> Type.Chunk:
-        return edges.get(dir, Type.Chunk.NONE)
+    func get_edge(dir: Direction) -> Type.Edge:
+        return edges.get(dir.vector, Type.Edge.NONE)
 
-    func has_diagonal_neighbor() -> bool:
-        for dir: Direction in edges:
-            if not dir.is_diagonal and get_edge(dir) == Type.Chunk.DIAGONAL:
-                return true
-        return false
+    func get_neighbor(dir: Direction) -> World.Chunk:
+        return world.get_chunk(chunk_position + dir.vector)
 
 
 class Room:
     var blueprint : RoomBlueprint
-    
+
     var size : Vector2i
     var chunk_position : Vector2i
-    var chunk_area : Array[World.Chunk]
+    var chunk_area : Array[Chunk]
 
-    var exits := {}
+    ## The room cluster this room exists in (if one exists)
+    var cluster : Cluster
+
+    ## Dictionary of exits inside the room, listed by the direction of the exit
+    ## with chunk the exit stems from as a value
+    var exits : Dictionary[Direction, Chunk] = {}
+
+    ## Used as a flag to ensure the room is connected to a path
     var open := false
 
     func _init(
@@ -326,3 +345,43 @@ class Room:
         size = _blueprint.size
         chunk_position = pos
         chunk_area = area
+
+    func set_exit(dir: Direction, chunk: Chunk) -> void:
+        exits[dir] = chunk
+
+    func get_exit_chunk(dir: Direction) -> Chunk:
+        return exits.get(dir, null)
+
+
+class Cluster:
+    # The representation of adjacent rooms that are directly connected to
+    # each other
+
+    var rooms : Array[Room] = []
+    var open := false
+
+    func _init(_rooms: Array[Room]) -> void:
+        rooms = _rooms
+        for room in _rooms:
+            if room.open:
+                set_open()
+                break
+    
+    func set_open() -> void:
+        open = true
+        for room in rooms:
+            room.open = true
+
+    func add(room: Room) -> void:
+        rooms.append(room)
+        if room.open:
+            set_open()
+
+    func merge(cluster: Cluster) -> void:
+        rooms.append_array(cluster.rooms)
+        if cluster.open:
+            open = true
+
+        for room in rooms:
+            room.cluster = self
+            room.open = open

@@ -24,3 +24,6 @@ static var ALL_ROOMS : Array[RoomBlueprint] = [
     ROOM_4X2,
     ROOM_4X3
 ]
+
+static func pick_random() -> RoomBlueprint:
+    return ALL_ROOMS.pick_random()
