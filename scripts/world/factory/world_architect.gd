@@ -9,7 +9,7 @@ var RNG := GameState.RNG
 
 # Marked chunks to spawn walkers at when ready to make paths (outside of room)
 # The bool represents if the walker is connected to the main path or not
-var _marked_chunks : Dictionary[World.Chunk, bool] = {}
+var _marked_for_walker : Dictionary[World.Chunk, bool] = {}
 
 
 func run(world: World) -> void:
@@ -22,7 +22,7 @@ func run(world: World) -> void:
 func generate_infrastructure(world: World) -> void:
     # Creates tiles, chunks, and astar map
     world.setup(Globals.WORLD_SIZE)
-    
+
     # Create a border of void chunks to surround the traversible world
     for _x in world.size.x:
         world.get_chunk(Vector2i(_x, 0)).type = Type.Chunk.VOID
@@ -38,7 +38,8 @@ func generate_rooms(world: World) -> void:
     var base_y := RNG.randi_range(2, world.size.y-4)
 
     _place_room(world, Vector2i(base_x, base_y), Rooms.HOME_BASE)
-    world.rooms[0].open = true
+    var base_room := world.rooms[0]
+    base_room.open = true
 
     # HARD CODED EXITS FOR NOW, MAY CHANGE IN THE FUTURE
     var top := world.get_chunk(Vector2i(base_x+1, base_y))
@@ -46,16 +47,16 @@ func generate_rooms(world: World) -> void:
     var bot := world.get_chunk(Vector2i(base_x+1, base_y+1))
     var rgt := world.get_chunk(Vector2i(base_x+2, base_y+1))
 
-    top.add_edge(Direction.north, Type.Edge.PATH)
-    lft.add_edge(Direction.west, Type.Edge.PATH)
-    bot.add_edge(Direction.south, Type.Edge.PATH)
-    rgt.add_edge(Direction.east, Type.Edge.PATH)
+    base_room.set_exit(Direction.north, top)
+    base_room.set_exit(Direction.west, lft)
+    base_room.set_exit(Direction.south, bot)
+    base_room.set_exit(Direction.east, rgt)
 
-    _marked_chunks[top.get_neighbor(Direction.north)] = true
-    _marked_chunks[lft.get_neighbor(Direction.west)] = true
-    _marked_chunks[bot.get_neighbor(Direction.south)] = true
-    _marked_chunks[rgt.get_neighbor(Direction.east)] = true
-   
+    _marked_for_walker[top.get_neighbor(Direction.north)] = true
+    _marked_for_walker[lft.get_neighbor(Direction.west)] = true
+    _marked_for_walker[bot.get_neighbor(Direction.south)] = true
+    _marked_for_walker[rgt.get_neighbor(Direction.east)] = true
+
     var home_chunk := world.get_chunk(Vector2i(base_x, base_y))
     Rooms.HOME_BASE.run_context_procedures(world, home_chunk.start)
 
@@ -63,7 +64,7 @@ func generate_rooms(world: World) -> void:
     var room_total := RNG.randi_range(4,5)
     var room_count := 1
     var loops := 0
-    
+
     while room_count < room_total and loops <= room_total * 2:
         var blueprint := Rooms.pick_random()
         var attempts := 0
@@ -82,7 +83,7 @@ func generate_rooms(world: World) -> void:
 
         if _place_room(world, room_pos, blueprint):
             room_count += 1
-        
+
         loops += 1
 
 
@@ -96,7 +97,9 @@ func generate_exits(world: World) -> void:
         while exit_count > 0 and sides_left.size() > 0:
             var dir := sides_left[-1]
 
-            if room.exits.has(dir):
+            assert(not dir.is_diagonal)
+
+            if room.has_exit(dir):
                 sides_left.pop_back()
                 exit_count -= 1
                 continue
@@ -115,8 +118,8 @@ func generate_exits(world: World) -> void:
             if chunk.room.open:
                 break
 
-        var dirs := Direction.get_all()
-        dirs.shuffle()
+        #var dirs := Direction.get_all()
+        var dirs := Direction.get_cardinal(true)
 
         for dir in dirs:
             if dir in room.exits: continue
@@ -125,25 +128,28 @@ func generate_exits(world: World) -> void:
 
 func generate_paths(world: World) -> void:
     var walkers : Array[Walker] = []
-    
+
     # Add path edges to declared exits within each room
     for id in world.rooms:
         var room := world.rooms[id]
-        for dir in room.exits:
+        for vec in room.exits:
+            var dir := Direction.by_pattern(vec)
             var chunk := room.get_exit_chunk(dir)
             chunk.add_edge(dir, Type.Edge.PATH)
-    
+
     # Spawn the walkers at each of the marked chunks
-    for chunk in _marked_chunks:
-        var connected := _marked_chunks[chunk]
+    for chunk in _marked_for_walker:
+        var connected := _marked_for_walker[chunk]
         walkers.append(Walker.new(world, chunk, connected))
-    
+
     # Let each walker generate paths
     while not walkers.is_empty():
         var alive_walkers : Array[Walker] = []
         for walker in walkers:
             if walker.walk():
                 alive_walkers.append(walker)
+            else:
+                walker.active = false
         walkers = alive_walkers
         print(walkers.size(), " walkers left alive!")
 
@@ -187,12 +193,12 @@ func _place_room(
             # IF PROCGEN ROOM, SYNC EXIT CHUNK WITH NEIGHBOR IF ONE EXISTS
 
             # For now, we treat all rooms as procgen rooms
-            if _marked_chunks.has(chunk):
+            if _marked_for_walker.has(chunk):
                 var vec : Vector2i = chunk.edges.keys()[0]
                 var dir := Direction.by_pattern(vec)
                 var nbr := chunk.get_neighbor(dir)
                 room.set_exit(dir, chunk)
-                
+
                 if nbr.room.cluster:
                     nbr.room.cluster.add(room)
                 else:
@@ -200,8 +206,8 @@ func _place_room(
                     room.cluster = cluster
                     nbr.room.cluster = cluster
 
-                _marked_chunks.erase(chunk)
-            
+                _marked_for_walker.erase(chunk)
+
             chunk.type = Type.Chunk.ROOM
             chunk.room = room
 
@@ -214,7 +220,7 @@ func _place_room(
     # Run the room's contextual procedures based on its blueprint
     var start := world.get_chunk(chunk_pos).start
     blueprint.run_context_procedures(world, start)
-    
+
     return true
 
 
@@ -262,38 +268,39 @@ func _establish_exit(world: World, room: World.Room, dir: Direction) -> bool:
             x = RNG.randi_range(0, room.size.x-1)
             y = 0 if dir == Direction.north else room.size.y-1
             dpos = Vector2i(x, dir.vector.y + y)
-        
+
         Direction.west, Direction.east:
             x = 0 if dir == Direction.west else room.size.x-1
             y = RNG.randi_range(0, room.size.y-1)
             dpos = Vector2i(dir.vector.x + x, y)
-    
+
     var pos := room.chunk_position
     var nbr := world.get_chunk(pos + dpos)
 
     match nbr.type:
         Type.Chunk.VOID: return false
-        
+
         Type.Chunk.ROOM:
-            if nbr.room.exits.has(dir.opposite):
+            if nbr.room.has_exit(dir.opposite):
                 return false
             nbr.room.set_exit(dir.opposite, nbr)
-        
+
         _:
             nbr.type = Type.Chunk.PATH
-            
-            if not _marked_chunks.has(nbr):
-                _marked_chunks[nbr] = false
-            
+
+            if not _marked_for_walker.has(nbr):
+                _marked_for_walker[nbr] = false
+
             if room.cluster:
                 room.cluster.set_open()
             else:
                 room.open = true
-    
+
+    assert(not dir.is_diagonal)
+
     var exit_chunk = world.get_chunk(pos + Vector2i(x, y))
     room.set_exit(dir, exit_chunk)
-    exit_chunk.add_edge(dir, Type.Edge.PATH)
-    
+
     return true
 
 
@@ -347,15 +354,28 @@ class Walker:
     var stack : Array[Vector2i] = []
     var history := {}
 
-    func _init(_world: World, chunk: World.Chunk, _connected := false) -> void:
+    var marked_chunks : Dictionary[World.Chunk, WeakRef]
+    var active := true
+
+    func _init(
+            _world: World,
+            chunk: World.Chunk,
+            _connected := false,
+            _marked_chunks : Dictionary[World.Chunk, WeakRef] = {}) -> void:
+
         world = _world
         connected = _connected
+        marked_chunks = _marked_chunks
+
         chunk_position = chunk.chunk_position
         history[current_chunk] = true
+
         if connected:
             current_chunk.connected = true
 
     func walk() -> bool:
+        marked_chunks[current_chunk] = weakref(self)
+
         # for dir in Direction.get_all(true):
         for dir in Direction.get_cardinal(true):
             if current_chunk.get_edge(dir) != Type.Edge.NONE:
@@ -363,7 +383,7 @@ class Walker:
 
             var nbr := current_chunk.get_neighbor(dir)
 
-            if not nbr.valid_path:
+            if not nbr.valid_path_chunk:
                 continue
 
             print(self, ": ", "Neighbor type is: ", nbr.type)
@@ -378,19 +398,19 @@ class Walker:
                 adj1.type = Type.Chunk.VOID
                 adj2.type = Type.Chunk.VOID
 
+            assert(nbr.type != Type.Chunk.ROOM)
             current_chunk.add_edge(dir, Type.Edge.PATH)
             nbr.type = Type.Chunk.PATH
 
-            if nbr.connected:
+            if nbr.connected or _path_collided(nbr):
                 return resolve()
-
 
             stack.append(chunk_position)
             chunk_position += dir.vector
             history[current_chunk] = true
 
             print(self, ": ", "We're walking to ", chunk_position)
-            
+
             if connected:
                 current_chunk.connected = true
 
@@ -417,5 +437,9 @@ class Walker:
             chunk.connected = true
         return false
 
+    func _path_collided(chunk: World.Chunk) -> bool:
+        if not marked_chunks.has(chunk):
+            return false
 
-
+        var walker := marked_chunks[chunk].get_ref() as Walker
+        return walker != null and walker != self and walker.active

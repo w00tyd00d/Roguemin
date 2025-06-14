@@ -237,7 +237,8 @@ func in_bounds(vec: Vector2i) -> bool:
 
 
 func add_room(room: Room) -> void:
-    rooms[rooms.size()] = room
+    room.id = rooms.size()
+    rooms[room.id] = room
 
 
 func _create_tiles() -> Array[Array]:
@@ -289,7 +290,7 @@ class Chunk:
     var empty : bool :
         get: return type == Type.Chunk.NONE or type == Type.Chunk.VOID
 
-    var valid_path : bool :
+    var valid_path_chunk : bool :
         get: return type == Type.Chunk.NONE or type == Type.Chunk.PATH
 
     func _init(_world: World, _pos: Vector2i) -> void:
@@ -306,7 +307,7 @@ class Chunk:
         var nbr := get_neighbor(dir)
         edges[dir.vector] = _type
         nbr.edges[dir.opposite.vector] = _type
-    
+
     func remove_edge(dir: Direction) -> void:
         var nbr := get_neighbor(dir)
         edges.erase(dir)
@@ -322,6 +323,7 @@ class Chunk:
 class Room:
     var blueprint : RoomBlueprint
 
+    var id : int
     var size : Vector2i
     var chunk_position : Vector2i
     var chunk_area : Array[Chunk]
@@ -331,7 +333,7 @@ class Room:
 
     ## Dictionary of exits inside the room, listed by the direction of the exit
     ## with chunk the exit stems from as a value
-    var exits : Dictionary[Direction, Chunk] = {}
+    var exits : Dictionary[Vector2i, Chunk] = {}
 
     ## Used as a flag to ensure the room is connected to a path
     var open := false
@@ -347,10 +349,14 @@ class Room:
         chunk_area = area
 
     func set_exit(dir: Direction, chunk: Chunk) -> void:
-        exits[dir] = chunk
+        exits[dir.vector] = chunk
+        chunk.add_edge(dir, Type.Edge.PATH)
+
+    func has_exit(dir: Direction) -> bool:
+        return exits.has(dir.vector)
 
     func get_exit_chunk(dir: Direction) -> Chunk:
-        return exits.get(dir, null)
+        return exits.get(dir.vector, null)
 
 
 class Cluster:
@@ -366,7 +372,7 @@ class Cluster:
             if room.open:
                 set_open()
                 break
-    
+
     func set_open() -> void:
         open = true
         for room in rooms:
