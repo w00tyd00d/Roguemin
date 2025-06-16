@@ -22,7 +22,7 @@ var game_viewport : SubViewport
 func generate_new_world() -> World:
     var world := _create_new_world()
     
-    # We add the world as a child first so that we can reference its children
+    # We add the world as a child first so we can reference its children
     # when running it through the factory
     game_viewport.add_child(world)
 

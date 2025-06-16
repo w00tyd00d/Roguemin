@@ -2,10 +2,8 @@ class_name Tile extends RefCounted
 
 ## The base class for any tile found within the [World].
 
-
-
-## The world object this tile is attached to.
-var world : World
+## The weakref of the world object this tile is attached to.
+var world : WeakRef
 
 ## The grid position of the tile.
 var grid_position : Vector2i
@@ -56,23 +54,29 @@ var _distance_from_wall := 2**31-1
 
 
 func _init(_world: World, grid_pos: Vector2i) -> void:
-    world = _world
+    world = weakref(_world)
     grid_position = grid_pos
+
+
+func get_world() -> World:
+    return world.get_ref()
 
 
 func get_neighbor(dir: Direction) -> Tile:
     var npos := grid_position + dir.vector
-    return world.get_tile(npos)
+    return get_world().get_tile(npos)
 
 
 func get_all_neighbors() -> Array[Tile]:
-    if not GameState.is_valid_object(world): return []
+    if not GameState.is_valid_object(get_world()):
+        return []
+    
     var res : Array[Tile] = []
-    var arr : Array[Vector2i] = Direction.ALL_VECTORS.duplicate()
-    arr.shuffle()
-    for vec in arr:
-        var npos := grid_position + vec
-        var tile := world.get_tile(npos)
+    var arr := Direction.get_all(true)
+    
+    for dir in arr:
+        var npos := grid_position + dir.vector
+        var tile := get_world().get_tile(npos)
         if tile: res.append(tile)
     return res
 

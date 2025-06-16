@@ -6,7 +6,10 @@ var grid_position : Vector2i :
         position = vec * Globals.TILE_SIZE
 
 var current_tile : Tile :
-    get: return GameState.world.get_tile(grid_position)
+    get: 
+        if GameState.world:
+            return GameState.world.get_tile(grid_position)
+        return null
 
 @onready var layer := $Cursor as TileMapLayer
 

@@ -7,6 +7,9 @@ const ROOM_PLACE_ATTEMPTS := 10
 
 var RNG := GameState.RNG
 
+# The astar grid to navigate the chunks
+var astar : AStarChunks
+
 # Marked chunks to spawn walkers at when ready to make paths (outside of room)
 # The bool represents if the walker is connected to the main path or not
 var _marked_for_walker : Dictionary[World.Chunk, bool] = {}
@@ -22,8 +25,9 @@ func run(world: World) -> void:
 func generate_infrastructure(world: World) -> void:
     # Creates tiles, chunks, and astar map
     world.setup(Globals.WORLD_SIZE)
+    astar = AStarChunks.new(world)
 
-    # Create a border of void chunks to surround the traversible world
+    # Create a border of void chunks to surround the traversable world
     for _x in world.size.x:
         world.get_chunk(Vector2i(_x, 0)).type = Type.Chunk.VOID
         world.get_chunk(Vector2i(_x, world.size.y-1)).type = Type.Chunk.VOID
@@ -33,58 +37,8 @@ func generate_infrastructure(world: World) -> void:
 
 
 func generate_rooms(world: World) -> void:
-    # Establish the home base room location and four initial exits
-    var base_x := RNG.randi_range(2, world.size.x-5)
-    var base_y := RNG.randi_range(2, world.size.y-4)
-
-    _place_room(world, Vector2i(base_x, base_y), Rooms.HOME_BASE)
-    var base_room := world.rooms[0]
-    base_room.open = true
-
-    # HARD CODED EXITS FOR NOW, MAY CHANGE IN THE FUTURE
-    var top := world.get_chunk(Vector2i(base_x+1, base_y))
-    var lft := world.get_chunk(Vector2i(base_x, base_y+1))
-    var bot := world.get_chunk(Vector2i(base_x+1, base_y+1))
-    var rgt := world.get_chunk(Vector2i(base_x+2, base_y+1))
-
-    base_room.set_exit(Direction.north, top)
-    base_room.set_exit(Direction.west, lft)
-    base_room.set_exit(Direction.south, bot)
-    base_room.set_exit(Direction.east, rgt)
-
-    _marked_for_walker[top.get_neighbor(Direction.north)] = true
-    _marked_for_walker[lft.get_neighbor(Direction.west)] = true
-    _marked_for_walker[bot.get_neighbor(Direction.south)] = true
-    _marked_for_walker[rgt.get_neighbor(Direction.east)] = true
-
-    var home_chunk := world.get_chunk(Vector2i(base_x, base_y))
-    Rooms.HOME_BASE.run_context_procedures(world, home_chunk.start)
-
-    # Begin populating the world with other rooms
-    var room_total := RNG.randi_range(4,5)
-    var room_count := 1
-    var loops := 0
-
-    while room_count < room_total and loops <= room_total * 2:
-        var blueprint := Rooms.pick_random()
-        var attempts := 0
-        var room_pos := Vector2i()
-
-        while room_pos == Vector2i() and attempts < ROOM_PLACE_ATTEMPTS:
-            var rx := RNG.randi_range(1, world.size.x-1)
-            var ry := RNG.randi_range(1, world.size.y-1)
-            if _check_for_room_collision(world, Vector2i(rx, ry), blueprint):
-                attempts += 1
-                continue
-            room_pos = Vector2i(rx, ry)
-
-        if room_pos == Vector2i():
-            continue
-
-        if _place_room(world, room_pos, blueprint):
-            room_count += 1
-
-        loops += 1
+    _place_home_base(world)
+    _place_world_rooms(world)
 
 
 func generate_exits(world: World) -> void:
@@ -118,7 +72,6 @@ func generate_exits(world: World) -> void:
             if chunk.room.open:
                 break
 
-        #var dirs := Direction.get_all()
         var dirs := Direction.get_cardinal(true)
 
         for dir in dirs:
@@ -173,21 +126,82 @@ func generate_paths(world: World) -> void:
                     _draw_path(world, chunk, nbr)
 
 
+func _place_home_base(world: World) -> void:
+    # Establish the home base room location and four initial exits
+    var base_x := RNG.randi_range(2, world.size.x-5)
+    var base_y := RNG.randi_range(2, world.size.y-4)
+
+    _place_room(world, Vector2i(base_x, base_y), Rooms.HOME_BASE)
+    var base_room := world.rooms[0]
+    base_room.open = true
+
+    # HARD CODED EXITS FOR NOW, MAY CHANGE IN THE FUTURE
+    var top := world.get_chunk(Vector2i(base_x+1, base_y))
+    var lft := world.get_chunk(Vector2i(base_x, base_y+1))
+    var bot := world.get_chunk(Vector2i(base_x+1, base_y+1))
+    var rgt := world.get_chunk(Vector2i(base_x+2, base_y+1))
+
+    base_room.set_exit(Direction.north, top)
+    base_room.set_exit(Direction.west, lft)
+    base_room.set_exit(Direction.south, bot)
+    base_room.set_exit(Direction.east, rgt)
+
+    _marked_for_walker[top.get_neighbor(Direction.north)] = true
+    _marked_for_walker[lft.get_neighbor(Direction.west)] = true
+    _marked_for_walker[bot.get_neighbor(Direction.south)] = true
+    _marked_for_walker[rgt.get_neighbor(Direction.east)] = true
+
+
+func _place_world_rooms(world: World) -> void:
+    var room_total := RNG.randi_range(4,5)
+    var room_count := 1 # Home base is already created
+    var loops := 0
+
+    while room_count < room_total and loops <= room_total * 2:
+        var blueprint := Rooms.pick_random()
+        var attempts := 0
+        var room_pos := Vector2i()
+
+        while room_pos == Vector2i() and attempts < ROOM_PLACE_ATTEMPTS:
+            var rx := RNG.randi_range(1, world.size.x-1)
+            var ry := RNG.randi_range(1, world.size.y-1)
+            if _check_for_room_collision(world, Vector2i(rx, ry), blueprint):
+                attempts += 1
+                continue
+            room_pos = Vector2i(rx, ry)
+
+        if room_pos == Vector2i():
+            continue
+
+        if _place_room(world, room_pos, blueprint):
+            room_count += 1
+
+        loops += 1
+
+
 func _place_room(
         world: World,
         chunk_pos: Vector2i,
         blueprint: RoomBlueprint) -> bool:
 
-    var chunks: Array[World.Chunk] = []
-    var room := World.Room.new(blueprint, chunk_pos, chunks)
+    var room := _create_room(world, chunk_pos, blueprint)
+    _construct_room(world, chunk_pos, blueprint)
 
+    world.add_room(room)
+    room.run_context_procedures()
+
+    return true
+
+
+func _create_room(world: World, chunk_pos: Vector2i, blueprint: RoomBlueprint) -> World.Room:
+    var chunks: Array[World.Chunk] = []
+    var room := World.Room.new(world, blueprint, chunk_pos, chunks)
+    
     # Assign the chunks
     for dy in blueprint.size.y:
         for dx in blueprint.size.x:
             var delta := Vector2i(dx, dy)
             var chunk := world.get_chunk(chunk_pos + delta)
-
-            # LEFT OFF HERE, FIGURE OUT HOW TO SYNC EXITS BETWEEN ROOMS!
 
             # IF PREFAB ROOM, ATTEMPT TO ALIGN EXIT IF ONE EXISTS
             # IF PROCGEN ROOM, SYNC EXIT CHUNK WITH NEIGHBOR IF ONE EXISTS
@@ -200,7 +214,10 @@ func _place_room(
                 room.set_exit(dir, chunk)
 
                 if nbr.room.cluster:
-                    nbr.room.cluster.add(room)
+                    if room.cluster:
+                        nbr.room.cluster.merge(room.cluster)
+                    else:
+                        nbr.room.cluster.add(room)
                 else:
                     var cluster := World.Cluster.new([nbr.room, room])
                     room.cluster = cluster
@@ -212,16 +229,11 @@ func _place_room(
             chunk.room = room
 
             chunks.append(chunk)
-
-    # Add the room to the world room dictionary and build it
-    world.add_room(room)
-    _construct_room(world, chunk_pos, blueprint)
-
-    # Run the room's contextual procedures based on its blueprint
-    var start := world.get_chunk(chunk_pos).start
-    blueprint.run_context_procedures(world, start)
-
-    return true
+    
+    # Update the astar grid
+    astar.fill_solid_region(Rect2i(chunk_pos, blueprint.size), true)
+        
+    return room
 
 
 func _check_for_room_collision(world: World, pos: Vector2i, room: RoomBlueprint) -> bool:
@@ -312,7 +324,8 @@ func _draw_path(
     # var path_pattern := world.tile_set.get_pattern(1)
     # var path_offset := Vector2i(4,4)
 
-    var path := Util.get_bresenham_line(chunk1.start, chunk2.start)
+    # var path := Util.get_bresenham_line(chunk1.start, chunk2.start)
+    var path := Geometry2D.bresenham_line(chunk1.start, chunk2.start)
     var size := path.size()
 
     var half := Globals.CHUNK_HALF
@@ -374,33 +387,42 @@ class Walker:
             current_chunk.connected = true
 
     func walk() -> bool:
-        marked_chunks[current_chunk] = weakref(self)
+        # assert(not marked_chunks.has(current_chunk))
+        if not marked_chunks.has(current_chunk):
+            marked_chunks[current_chunk] = weakref(self)
 
-        # for dir in Direction.get_all(true):
-        for dir in Direction.get_cardinal(true):
+        for dir in Direction.get_all(true):
+        # for dir in Direction.get_cardinal(true):
             if current_chunk.get_edge(dir) != Type.Edge.NONE:
                 continue
 
             var nbr := current_chunk.get_neighbor(dir)
+            var mark : Walker = marked_chunks.get(nbr, weakref(null)).get_ref()
 
-            if not nbr.valid_path_chunk:
+            if (not nbr.valid_path_chunk or mark == self):
                 continue
+
+            # if mark:
+            #     print("We found a mark, but it wasn't ours!")
 
             print(self, ": ", "Neighbor type is: ", nbr.type)
 
+            var adj1 := current_chunk.get_neighbor(dir.adjacent[0])
+            var adj2 := current_chunk.get_neighbor(dir.adjacent[1])
+
+            if not (adj1.empty and adj2.empty):
+                continue
+
             if dir.is_diagonal:
-                var adj1 := current_chunk.get_neighbor(dir.adjacent[0])
-                var adj2 := current_chunk.get_neighbor(dir.adjacent[1])
-
-                if not (adj1.empty and adj2.empty):
-                    continue
-
                 adj1.type = Type.Chunk.VOID
                 adj2.type = Type.Chunk.VOID
 
             assert(nbr.type != Type.Chunk.ROOM)
             current_chunk.add_edge(dir, Type.Edge.PATH)
             nbr.type = Type.Chunk.PATH
+
+            if current_chunk.edges.size() == 4:
+                print("Ruh roh Raggy!")
 
             if nbr.connected or _path_collided(nbr):
                 return resolve()

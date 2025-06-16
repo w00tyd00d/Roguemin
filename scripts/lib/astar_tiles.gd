@@ -1,6 +1,6 @@
-class_name AStar extends AStarGrid2D
+class_name AStarTiles extends AStarGrid2D
 
-## Customized [AStarGrid2D] node to work specifically for Roguemin.
+## Customized [AStarGrid2D] node to navigate the tiles of the [World].
 
 ## The world this object is attached to.
 var world : World

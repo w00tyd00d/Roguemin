@@ -4,7 +4,7 @@ class_name World extends DualMapLayer
 ## renders the environment.
 
 ## The built in [AStarGrid2D] pathfinder to the world.
-var astar := AStar.new(self)
+var astar := AStarTiles.new(self)
 
 ## The size of the world, in nodes.
 var size : Vector2i :
@@ -321,6 +321,7 @@ class Chunk:
 
 
 class Room:
+    var world : WeakRef
     var blueprint : RoomBlueprint
 
     var id : int
@@ -339,10 +340,12 @@ class Room:
     var open := false
 
     func _init(
+            _world: World,
             _blueprint: RoomBlueprint,
             pos: Vector2i,
             area: Array[World.Chunk]) -> void:
 
+        world = weakref(_world)
         blueprint = _blueprint
         size = _blueprint.size
         chunk_position = pos
@@ -357,6 +360,12 @@ class Room:
 
     func get_exit_chunk(dir: Direction) -> Chunk:
         return exits.get(dir.vector, null)
+    
+    func run_context_procedures() -> void:
+        var _world := world.get_ref() as World
+        var start := chunk_area[0].start
+        blueprint.run_context_procedures(_world, start)
+
 
 
 class Cluster:
