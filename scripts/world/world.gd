@@ -307,6 +307,7 @@ class Chunk:
         var nbr := get_neighbor(dir)
         edges[dir.vector] = _type
         nbr.edges[dir.opposite.vector] = _type
+        print("Adding edge between ", chunk_position, " and ", nbr.chunk_position)
 
     func remove_edge(dir: Direction) -> void:
         var nbr := get_neighbor(dir)
@@ -360,7 +361,7 @@ class Room:
 
     func get_exit_chunk(dir: Direction) -> Chunk:
         return exits.get(dir.vector, null)
-    
+
     func run_context_procedures() -> void:
         var _world := world.get_ref() as World
         var start := chunk_area[0].start

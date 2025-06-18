@@ -4,7 +4,8 @@ func _gui_input(event: InputEvent) -> void:
     var world := GameState.world
     var grid_pos := Vector2i(world.get_global_mouse_position() / Vector2(Globals.TILE_SIZE))
     var chunk_pos := grid_pos / Globals.CHUNK_SIZE
-    var room := world.get_chunk(chunk_pos).room
+    var chunk := world.get_chunk(chunk_pos)
+    var room := chunk.room if chunk else null
     var debug_str := "({0},{1})".format([chunk_pos.x, chunk_pos.y])
     if room:
         debug_str += "\nRoom {0}".format([room.id])

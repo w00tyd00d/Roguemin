@@ -12,7 +12,7 @@ var astar : AStarChunks
 
 # Marked chunks to spawn walkers at when ready to make paths (outside of room)
 # The bool represents if the walker is connected to the main path or not
-var _marked_for_walker : Dictionary[World.Chunk, bool] = {}
+var _marked_exit_chunks : Dictionary[World.Chunk, bool] = {}
 
 
 func run(world: World) -> void:
@@ -26,6 +26,9 @@ func generate_infrastructure(world: World) -> void:
     # Creates tiles, chunks, and astar map
     world.setup(Globals.WORLD_SIZE)
     astar = AStarChunks.new(world)
+
+    # Reset marked chunks
+    _marked_exit_chunks = {}
 
     # Create a border of void chunks to surround the traversable world
     for _x in world.size.x:
@@ -80,31 +83,80 @@ func generate_exits(world: World) -> void:
 
 
 func generate_paths(world: World) -> void:
-    var walkers : Array[Walker] = []
+    # var walkers : Array[Walker] = []
 
     # Add path edges to declared exits within each room
-    for id in world.rooms:
-        var room := world.rooms[id]
-        for vec in room.exits:
-            var dir := Direction.by_pattern(vec)
-            var chunk := room.get_exit_chunk(dir)
-            chunk.add_edge(dir, Type.Edge.PATH)
+    # for id in world.rooms:
+    #     var room := world.rooms[id]
+    #     for vec in room.exits:
+    #         var dir := Direction.by_pattern(vec)
+    #         var chunk := room.get_exit_chunk(dir)
+    #         chunk.add_edge(dir, Type.Edge.PATH)
 
-    # Spawn the walkers at each of the marked chunks
-    for chunk in _marked_for_walker:
-        var connected := _marked_for_walker[chunk]
-        walkers.append(Walker.new(world, chunk, connected))
+    # LEFT OFF HERE, THINK HOW TO IMPLEMENT MST USING THE EXITS AS NODES
 
-    # Let each walker generate paths
-    while not walkers.is_empty():
-        var alive_walkers : Array[Walker] = []
-        for walker in walkers:
-            if walker.walk():
-                alive_walkers.append(walker)
-            else:
-                walker.active = false
-        walkers = alive_walkers
-        print(walkers.size(), " walkers left alive!")
+    # Create list of astar paths from every exit to each other
+    var paths : Array[Array] = []
+    var size := _marked_exit_chunks.size()
+    var chunks : Array[World.Chunk] = _marked_exit_chunks.keys()
+
+    for i in range(size-1):
+        for j in range(1, size-i):
+            # DEBUG
+            # var chunk_pos1 := chunks[i].chunk_position
+            # var chunk_pos2 := chunks[i+j].chunk_position
+
+            var path := astar.get_full_path(chunks[i],  chunks[i+j])
+            if not path.is_empty():
+                paths.append(path)
+
+    # Sort the lists of paths by their length, putting the shortest first
+    paths.sort_custom(func(a: Array, b: Array) -> bool:
+        return a.size() < b.size()
+    )
+
+    # Iterate through the paths in sorted order to assign edges, ignoring
+    # connections to paths that have both points already connected
+    var known_nodes : Dictionary[Vector2i, bool] = {}
+
+    for path: Array[Vector2i] in paths:
+        var start := path[0]
+        var end := path[-1]
+
+        if known_nodes.has(start) and known_nodes.has(end):
+            continue
+
+        known_nodes[start] = true
+        known_nodes[end] = true
+
+        print("Path is ", path)
+
+        for i in path.size()-1:
+            var chunk1 := world.get_chunk(path[i])
+            var chunk2 := world.get_chunk(path[i+1])
+            var dir := Direction.by_delta(path[i], path[i+1])
+
+            chunk1.add_edge(dir, Type.Edge.PATH)
+
+            chunk1.type = Type.Chunk.PATH
+            chunk2.type = Type.Chunk.PATH
+
+
+    # # Spawn the walkers at each of the marked chunks
+    # for chunk in _marked_exit_chunks:
+    #     var connected := _marked_exit_chunks[chunk]
+    #     walkers.append(Walker.new(world, chunk, connected))
+
+    # # Let each walker generate paths
+    # while not walkers.is_empty():
+    #     var alive_walkers : Array[Walker] = []
+    #     for walker in walkers:
+    #         if walker.walk():
+    #             alive_walkers.append(walker)
+    #         else:
+    #             walker.active = false
+    #     walkers = alive_walkers
+    #     print(walkers.size(), " walkers left alive!")
 
     # Do a scan of the entire field and begin drawing each path each walker
     # have defined
@@ -146,14 +198,14 @@ func _place_home_base(world: World) -> void:
     base_room.set_exit(Direction.south, bot)
     base_room.set_exit(Direction.east, rgt)
 
-    _marked_for_walker[top.get_neighbor(Direction.north)] = true
-    _marked_for_walker[lft.get_neighbor(Direction.west)] = true
-    _marked_for_walker[bot.get_neighbor(Direction.south)] = true
-    _marked_for_walker[rgt.get_neighbor(Direction.east)] = true
+    _marked_exit_chunks[top.get_neighbor(Direction.north)] = true
+    _marked_exit_chunks[lft.get_neighbor(Direction.west)] = true
+    _marked_exit_chunks[bot.get_neighbor(Direction.south)] = true
+    _marked_exit_chunks[rgt.get_neighbor(Direction.east)] = true
 
 
 func _place_world_rooms(world: World) -> void:
-    var room_total := RNG.randi_range(4,5)
+    var room_total := RNG.randi_range(5,6)
     var room_count := 1 # Home base is already created
     var loops := 0
 
@@ -196,7 +248,7 @@ func _place_room(
 func _create_room(world: World, chunk_pos: Vector2i, blueprint: RoomBlueprint) -> World.Room:
     var chunks: Array[World.Chunk] = []
     var room := World.Room.new(world, blueprint, chunk_pos, chunks)
-    
+
     # Assign the chunks
     for dy in blueprint.size.y:
         for dx in blueprint.size.x:
@@ -207,7 +259,7 @@ func _create_room(world: World, chunk_pos: Vector2i, blueprint: RoomBlueprint) -
             # IF PROCGEN ROOM, SYNC EXIT CHUNK WITH NEIGHBOR IF ONE EXISTS
 
             # For now, we treat all rooms as procgen rooms
-            if _marked_for_walker.has(chunk):
+            if _marked_exit_chunks.has(chunk):
                 var vec : Vector2i = chunk.edges.keys()[0]
                 var dir := Direction.by_pattern(vec)
                 var nbr := chunk.get_neighbor(dir)
@@ -223,16 +275,16 @@ func _create_room(world: World, chunk_pos: Vector2i, blueprint: RoomBlueprint) -
                     room.cluster = cluster
                     nbr.room.cluster = cluster
 
-                _marked_for_walker.erase(chunk)
+                _marked_exit_chunks.erase(chunk)
 
             chunk.type = Type.Chunk.ROOM
             chunk.room = room
 
             chunks.append(chunk)
-    
+
     # Update the astar grid
     astar.fill_solid_region(Rect2i(chunk_pos, blueprint.size), true)
-        
+
     return room
 
 
@@ -300,8 +352,8 @@ func _establish_exit(world: World, room: World.Room, dir: Direction) -> bool:
         _:
             nbr.type = Type.Chunk.PATH
 
-            if not _marked_for_walker.has(nbr):
-                _marked_for_walker[nbr] = false
+            if not _marked_exit_chunks.has(nbr):
+                _marked_exit_chunks[nbr] = false
 
             if room.cluster:
                 room.cluster.set_open()
@@ -327,7 +379,6 @@ func _draw_path(
     # var path := Util.get_bresenham_line(chunk1.start, chunk2.start)
     var path := Geometry2D.bresenham_line(chunk1.start, chunk2.start)
     var size := path.size()
-
     var half := Globals.CHUNK_HALF
 
     for i in size+2:
