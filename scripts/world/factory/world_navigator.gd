@@ -2,15 +2,17 @@ class_name WorldNavigator extends RefCounted
 
 ## The class responsible for pre-baking navigation information into the world.
 
-var _wall_tiles : Array[Tile] = []
+const WALL_STEP_LIMIT := 7
+
+var _wall_tiles : Dictionary[Tile, int] = {}
 
 
 func run(world: World) -> void:
-    generate_flow_field(world)
-    generate_wall_dijkstra_map(world)
+    _wall_tiles = {}
+    generate_navigation_fields(world)
 
 
-func generate_flow_field(world: World) -> void:
+func generate_navigation_fields(world: World) -> void:
     var start := world.salvage_return_tile
 
     start._flow_field_value = 0
@@ -28,7 +30,7 @@ func generate_flow_field(world: World) -> void:
                     continue
 
                 if tile.type == Type.Tile.WALL:
-                    _wall_tiles.append(tile)
+                    _wall_tiles[tile] = 0
                     continue
 
                 var dir := Direction.by_delta(tile.grid_position, nbr.grid_position)
@@ -42,21 +44,22 @@ func generate_flow_field(world: World) -> void:
 
         tiles = new_tiles
 
+        # Run an iteration of the wall dijkstra map generation
+        _iterate_wall_dijkstra_map(world)
+        
+        # Wait until the next frame to run another iteration
+        await GameState.get_tree().process_frame
 
-func generate_wall_dijkstra_map(_world: World) -> void:
-    var hist := {}
-    var tiles := _wall_tiles
-    var step := 1
 
-    while not tiles.is_empty() and step < 7:
-        var new_tiles : Array[Tile] = []
-        for tile in tiles:
-            for nbr in tile.get_all_neighbors():
-                if hist.has(nbr) or nbr.type == Type.Tile.VOID:
-                    continue
-                nbr._distance_from_wall = step
-                new_tiles.append(nbr)
-                hist[nbr] = true
+func _iterate_wall_dijkstra_map(_world: World) -> void:
+    var new_tiles : Dictionary[Tile, int] = {}
 
-        tiles = new_tiles
-        step += 1
+    for tile in _wall_tiles:
+        var step := _wall_tiles[tile]
+        if step >= WALL_STEP_LIMIT: continue
+        for nbr in tile.get_all_neighbors():
+            if nbr.type == Type.Tile.VOID: continue
+            if nbr.set_distance_from_wall(step + 1):
+                new_tiles[nbr] = step + 1
+
+    _wall_tiles = new_tiles

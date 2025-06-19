@@ -50,7 +50,8 @@ var _flow_field_value := INF
 var _flow_field_vector : Vector2i
 
 ## The cached distance the tile is from any given wall tile._acc
-var _distance_from_wall := 2**31-1
+var _distance_from_wall := 2**31-1 :
+    set(num): _distance_from_wall = mini(_distance_from_wall, num)
 
 
 func _init(_world: World, grid_pos: Vector2i) -> void:
@@ -80,6 +81,13 @@ func get_all_neighbors() -> Array[Tile]:
         if tile: res.append(tile)
     return res
 
+
+func set_distance_from_wall(num: int) -> bool:
+    if num >= _distance_from_wall:
+        return false
+    
+    _distance_from_wall = num
+    return true
 
 func add_entity(ent: Entity) -> void:
     _entities[ent] = true

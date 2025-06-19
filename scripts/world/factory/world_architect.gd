@@ -78,7 +78,7 @@ func generate_exits(world: World) -> void:
         var dirs := Direction.get_cardinal(true)
 
         for dir in dirs:
-            if dir in room.exits: continue
+            if room.has_exit(dir): continue
             if _establish_exit(world, room, dir): break
 
 
@@ -129,7 +129,7 @@ func generate_paths(world: World) -> void:
         known_nodes[start] = true
         known_nodes[end] = true
 
-        print("Path is ", path)
+        # print("Path is ", path)
 
         for i in path.size()-1:
             var chunk1 := world.get_chunk(path[i])

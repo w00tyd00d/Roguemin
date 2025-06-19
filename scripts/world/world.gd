@@ -307,7 +307,7 @@ class Chunk:
         var nbr := get_neighbor(dir)
         edges[dir.vector] = _type
         nbr.edges[dir.opposite.vector] = _type
-        print("Adding edge between ", chunk_position, " and ", nbr.chunk_position)
+        # print("Adding edge between ", chunk_position, " and ", nbr.chunk_position)
 
     func remove_edge(dir: Direction) -> void:
         var nbr := get_neighbor(dir)
