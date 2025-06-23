@@ -210,7 +210,7 @@ func _get_can_act() -> bool:
 
 func _scan() -> void:
     var size := get_used_rect().size
-    radius = ceili(size.x / 2.0)
+    radius = ceili(size.x / 2.0) #+ 1
 
     var cx := 0.0 if size.x % 2 == 0 else 0.5
     var cy := 0.0 if size.y % 2 == 0 else 0.5

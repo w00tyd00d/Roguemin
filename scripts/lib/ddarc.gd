@@ -63,7 +63,7 @@ static func collider(obj: Variant) -> Array:
 static func by_vector(
         start: Vector2,
         direction: Vector2,
-        callback: Callable,
+        callback := func(_ctx: Context): return,
         distance := INF) -> Context:
 
     return DDARC._dda_raycast(start, direction, callback, distance)
@@ -75,13 +75,14 @@ static func by_vector(
 static func to_grid_position(
         start: Vector2,
         end: Vector2,
-        callback: Callable) -> Context:
+        callback := func(_ctx: Context): return) -> Context:
 
-    var tstart := start.floor()
-    var tend := end.floor()
+    var _start := start.floor()
+    var _end := end.floor()
 
-    var direction := tstart.direction_to(tend)
-    var distance := tstart.distance_to(tend)
+    var direction := _start.direction_to(_end)
+    var distance := _start.distance_to(_end)
+    
     return DDARC._dda_raycast(start, direction, callback, distance)
 
 
@@ -165,6 +166,7 @@ static func _dda_raycast(
         # We run the passed callback function to check for collisions. If it
         # returns true, it will count as a collision and the raycast will end.
         var collided = callback.call(ctx._update_path(cell_path, current_length))
+        
         if collided:
             ctx.collider = collided[0] if typeof(collided) == TYPE_ARRAY else null
             return ctx._update_path(cell_path, current_length)

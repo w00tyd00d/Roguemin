@@ -18,13 +18,21 @@ static var north := Direction.new(Vector2i.UP)
 static var south := Direction.new(Vector2i.DOWN)
 static var west := Direction.new(Vector2i.LEFT)
 static var east := Direction.new(Vector2i.RIGHT)
-static var northwest := Direction.new(Vector2i(-1,-1), true)
-static var northeast := Direction.new(Vector2i(1,-1), true)
-static var southwest := Direction.new(Vector2i(-1,1), true)
-static var southeast := Direction.new(Vector2i(1,1), true)
+static var northwest := Direction.new(Vector2i(-1,-1))
+static var northeast := Direction.new(Vector2i(1,-1))
+static var southwest := Direction.new(Vector2i(-1,1))
+static var southeast := Direction.new(Vector2i(1,1))
 
 var vector : Vector2i
-var is_diagonal : bool
+
+var is_diagonal : bool :
+    get: return absi(vector.x) == 1 and absi(vector.y) == 1
+
+var is_vertical : bool :
+    get: return vector.x == 0
+
+var is_horizontal : bool :
+    get: return vector.y == 0
 
 var adjacent : Array[Direction] :
     get:
@@ -64,8 +72,8 @@ static func by_pattern(pattern: Variant) -> Direction:
         _: return null
     
 
-static func by_delta(pos1: Vector2i, pos2: Vector2i) -> Direction:
-    return Direction.by_pattern(Vector2i(pos2 - pos1).sign())
+static func by_delta(from_pos: Vector2i, to_pos: Vector2i) -> Direction:
+    return Direction.by_pattern(Vector2i(to_pos - from_pos).sign())
 
 
 static func get_all(shuffled := false) -> Array[Direction]:
@@ -98,6 +106,8 @@ static func get_cardinal(shuffled := false) -> Array[Direction]:
 
 func _init(vec: Vector2i, _diagonal := false) -> void:
     vector = vec
-    is_diagonal = _diagonal
+    
+    is_diagonal = absi(vector.x) + absi(vector.y) == 2
+    
     _index = ALL_VECTORS.find(vec)
     assert(_index > -1, "Invalid direction given")

@@ -59,6 +59,13 @@ var salvage_return_position : Vector2i
 var salvage_return_tile : Tile :
     get: return get_tile(salvage_return_position)
 
+## The tiles that exist along the center paths between connected chunks
+var salvage_path_tiles : Dictionary[Tile, bool] = {}
+
+## The queue (technically stack) of salvage path connections to be ran at world
+## launch
+var salvage_path_queue : Array[Array] = []
+
 var mrpas : MRPAS
 
 ## The [Whistle] object.
@@ -94,10 +101,10 @@ func setup(_size: Vector2i) -> World:
     return self
 
 
-func get_chunk(vec: Vector2i) -> Chunk:
-    if vec.x < 0 or vec.y < 0 or vec.x >= size.x or vec.y >= size.y:
+func get_chunk(pos: Vector2i) -> Chunk:
+    if pos.x < 0 or pos.y < 0 or pos.x >= size.x or pos.y >= size.y:
         return null
-    return chunks[vec.y][vec.x]
+    return chunks[pos.y][pos.x]
 
 
 ## Returns a tile object from a given location, returns null if non-existant.
@@ -241,6 +248,17 @@ func add_room(room: Room) -> void:
     rooms[room.id] = room
 
 
+func queue_salvage_path(start: Vector2i, end: Vector2i) -> void:
+    salvage_path_queue.append([start, end])
+
+
+func add_to_salvage_path(start: Vector2i, end: Vector2i) -> void:
+    var line := Geometry2D.bresenham_line(start, end)
+    for pos in line:
+        var tile := get_tile(pos)
+        salvage_path_tiles[tile] = true
+
+
 func _create_tiles() -> Array[Array]:
     var res : Array[Array] = []
     for y in size.y * Globals.CHUNK_SIZE.y:
@@ -272,11 +290,11 @@ class Chunk:
 
     ## The assigned type of the chunk.
     var type := Type.Chunk.NONE
-    ## The center tile of the chunk.
+    ## The center position of the chunk.
     var center : Vector2i
-    ## The upper left corner of the chunk.
+    ## The upper left corner position of the chunk.
     var start : Vector2i
-    ## The lower right corner of the chunk.
+    ## The lower right corner position of the chunk.
     var end : Vector2i
     ## The room id the chunk is located in, if at all.
     var room : Room
@@ -317,12 +335,18 @@ class Chunk:
     func get_edge(dir: Direction) -> Type.Edge:
         return edges.get(dir.vector, Type.Edge.NONE)
 
+    func has_edge(dir: Direction) -> bool:
+        return get_edge(dir) != Type.Edge.NONE
+
     func get_neighbor(dir: Direction) -> World.Chunk:
         return world.get_chunk(chunk_position + dir.vector)
 
 
 class Room:
-    var world : WeakRef
+    var world : World :
+        set(_world): _world_ref = weakref(_world)
+        get: return _world_ref.get_ref()
+
     var blueprint : RoomBlueprint
 
     var id : int
@@ -340,19 +364,27 @@ class Room:
     ## Used as a flag to ensure the room is connected to a path
     var open := false
 
+    var _world_ref : WeakRef
+
+
     func _init(
             _world: World,
             _blueprint: RoomBlueprint,
             pos: Vector2i,
             area: Array[World.Chunk]) -> void:
 
-        world = weakref(_world)
+        world = _world
         blueprint = _blueprint
         size = _blueprint.size
         chunk_position = pos
         chunk_area = area
 
     func set_exit(dir: Direction, chunk: Chunk) -> void:
+        for exit_chunk: Chunk in exits.values():
+            var start := chunk.center
+            var end := exit_chunk.center
+            world.queue_salvage_path(start, end)
+
         exits[dir.vector] = chunk
         chunk.add_edge(dir, Type.Edge.PATH)
 
@@ -363,9 +395,8 @@ class Room:
         return exits.get(dir.vector, null)
 
     func run_context_procedures() -> void:
-        var _world := world.get_ref() as World
         var start := chunk_area[0].start
-        blueprint.run_context_procedures(_world, start)
+        blueprint.run_context_procedures(world, start)
 
 
 

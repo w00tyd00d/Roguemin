@@ -377,9 +377,9 @@ func _broadcast_path() -> void:
             if hist.has(tile): continue
             hist[tile] = true
             for unit in tile.get_all_units():
-                if (unit.target == target and
-                    unit.path.is_empty() or
-                    unit.path[-1] != path[-1]):
+                var empty_path := unit.path.is_empty()
+                if (unit.target == target and empty_path or
+                    not empty_path and unit.path[-1] != path[-1]):
                         unit._receive_path(path)
             new_tiles.append(tile)
 

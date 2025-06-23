@@ -106,7 +106,7 @@ func generate_paths(world: World) -> void:
             # var chunk_pos1 := chunks[i].chunk_position
             # var chunk_pos2 := chunks[i+j].chunk_position
 
-            var path := astar.get_full_path(chunks[i],  chunks[i+j])
+            var path := astar.get_full_path(chunks[i], chunks[i+j])
             if not path.is_empty():
                 paths.append(path)
 
@@ -160,21 +160,20 @@ func generate_paths(world: World) -> void:
 
     # Do a scan of the entire field and begin drawing each path each walker
     # have defined
-    var dirs := [
-        Direction.east,
-        Direction.southwest,
-        Direction.south,
-        Direction.southeast
-    ]
-
     for y in range(1, world.size.y-1):
         for x in range(1, world.size.x-1):
             var chunk := world.get_chunk(Vector2i(x, y))
-            for dir in dirs:
+            for dir in [Direction.east, Direction.south]:
                 var edge := chunk.get_edge(dir)
+                var nbr := chunk.get_neighbor(dir)
+
+                # WILL NEED TO HANDLE DYNAMICALLY UPDATING FOR BREAKING WALLS
+                if edge != Type.Edge.NONE:
+                    var start := chunk.center
+                    var end := nbr.center
+                    world.queue_salvage_path(start, end)
+
                 if edge == Type.Edge.PATH:
-                    var pos := chunk.chunk_position
-                    var nbr := world.get_chunk(pos + dir.vector)
                     _draw_path(world, chunk, nbr)
 
 
