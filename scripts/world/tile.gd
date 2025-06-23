@@ -169,55 +169,24 @@ func attacked(dmg: int) -> void:
         unit.die()
 
 
-func get_flow_field_vector(wall_distance := DEFAULT_MAX_VALUE, include_water := true) -> Vector2i:
-    # if _flow_field_vector and wall_distance == DEFAULT_MAX_VALUE and include_water == true:
-    #     return _flow_field_vector
-
-    return _get_best_flow_field_vector(wall_distance, include_water)
-
-
-func _get_world() -> World:
-    return _world_ref.get_ref()
-
-
-func _get_best_flow_field_vector(wall_distance: int, include_water: bool) -> Vector2i:
+func get_flow_field_vector(exclude_water := false) -> Vector2i:
     const PENALTY := 50
     var vec : Vector2i
     var best := DEFAULT_MAX_VALUE
-    # var dist := 0
+
     for nbr in get_all_neighbors():
         var val := nbr.flow_field_value
         
-        if not include_water and nbr.type == Type.Tile.WATER:
+        if exclude_water and nbr.type == Type.Tile.WATER:
             val += PENALTY
-        
-        # if (wall_distance != DEFAULT_MAX_VALUE and
-        #     nbr.distance_from_wall < wall_distance):
-        #         val += PENALTY
 
-        if nbr.distance_from_wall < DEFAULT_MAX_VALUE:
-            var diff := (8 - nbr.distance_from_wall) * 10
-            val += diff
-        
-        
         if val < best:
             var dir := Direction.by_delta(grid_position, nbr.grid_position)
             vec = dir.vector
             best = val
 
-        
-        # if dist < wall_distance and nbr.distance_from_wall > dist:
-        #     var dir := Direction.by_delta(grid_position, nbr.grid_position)
-        #     vec = dir.vector
-        #     best = nbr.flow_field_value
-        #     dist = nbr.distance_from_wall
-        #     continue
-        
-        # elif (nbr.flow_field_value < best and
-        #     nbr.distance_from_wall >= wall_distance and
-        #     (include_water or not include_water and
-        #     nbr.type != Type.Tile.WATER)):
-        #         var dir := Direction.by_delta(grid_position, nbr.grid_position)
-        #         vec = dir.vector
-        #         best = nbr.flow_field_value
     return vec
+
+
+func _get_world() -> World:
+    return _world_ref.get_ref()

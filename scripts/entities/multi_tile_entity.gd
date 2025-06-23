@@ -200,8 +200,7 @@ func collect() -> void:
 
 
 func get_next_flow_field_position() -> Vector2i:
-    var vec := current_tile.get_flow_field_vector(radius)
-    return grid_position + vec
+    return grid_position + current_tile.get_flow_field_vector()
 
 
 func _get_can_act() -> bool:
