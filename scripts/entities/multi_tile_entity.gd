@@ -104,7 +104,11 @@ func move_towards(target: Tile) -> bool:
     else: vec = delta.sign()
 
     var valid := func(tile: Tile):
-        return tile.type == Type.Tile.GRASS and tile._distance_from_wall >= radius
+        var dist := tile.distance_from_wall
+        if is_even:
+            var diff := tile.grid_position - grid_position
+            dist -= 1 if diff.x < 0 or diff.y < 0 else 0
+        return tile.type == Type.Tile.GRASS and dist >= radius
 
     var dir := Direction.by_pattern(vec)
     var dest := world.get_tile(grid_position + dir.vector)
@@ -209,7 +213,7 @@ func _get_can_act() -> bool:
 
 func _scan() -> void:
     var size := get_used_rect().size
-    radius = ceili(size.x / 2.0) #+ 1
+    radius = ceili(size.x / 2.0)
 
     var cx := 0.0 if size.x % 2 == 0 else 0.5
     var cy := 0.0 if size.y % 2 == 0 else 0.5
