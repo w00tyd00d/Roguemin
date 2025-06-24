@@ -60,6 +60,9 @@ func generate_navigation_fields(world: World) -> void:
 
         tiles = new_tiles
         
+        if not GameState.is_valid_object(world):
+            return
+        
         # Run an iteration of the wall dijkstra map generation
         _iterate_wall_dijkstra_map(world)
 
