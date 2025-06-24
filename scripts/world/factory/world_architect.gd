@@ -384,27 +384,32 @@ func _draw_path(
         if i < size:
             var center := path[i] + half
             var vecs := Util.get_square_around_pos(center, 17)
+            
             for pos in vecs:
-                if world.get_tile(pos).type == Type.Tile.VOID:
-                    world.set_glyph(pos, Glyph.WALL)
-                    world.set_tile_type(pos, Type.Tile.WALL)
-                    world.astar.set_point_solid(pos, true)
-                    world.mrpas.set_transparent(pos, Type.Tile.WALL)
+                if world.get_tile(pos).type != Type.Tile.VOID:
+                    continue
+                world.set_glyph(pos, Glyph.WALL)
+                world.set_tile_type(pos, Type.Tile.WALL)
+                world.astar.set_point_solid(pos, true)
+                world.mrpas.set_transparent(pos, Type.Tile.WALL)
 
         if i >= 2:
             # world.set_pattern(path[i-2] + path_offset, path_pattern)
             var center := path[i-2] + half
             var vecs := Util.get_square_around_pos(center, 15, true)
             for pos in vecs:
-                if (world.get_glyph(pos).matches(Glyph.WALL) or
-                    world.get_glyph(pos).matches(Glyph.NONE)):
-                    var choices := [Glyph.GRASS, Glyph.SHRUB]
-                    var weights := PackedFloat32Array([1, .01])
-                    var idx := RNG.rand_weighted(weights)
-                    world.set_glyph(pos, choices[idx])
-                    world.set_tile_type(pos, Type.Tile.GRASS)
-                    world.astar.set_point_solid(pos, false)
-                    world.mrpas.set_transparent(pos, Type.Tile.GRASS)
+                # if (world.get_glyph(pos).matches(Glyph.WALL) or
+                #     world.get_glyph(pos).matches(Glyph.NONE)):
+                if world.get_tile(pos).type == Type.Tile.GRASS:
+                    continue
+                    
+                var choices := [Glyph.GRASS, Glyph.SHRUB]
+                var weights := PackedFloat32Array([1, .01])
+                var idx := RNG.rand_weighted(weights)
+                world.set_glyph(pos, choices[idx])
+                world.set_tile_type(pos, Type.Tile.GRASS)
+                world.astar.set_point_solid(pos, false)
+                world.mrpas.set_transparent(pos, Type.Tile.GRASS)
 
 
 class Walker:
