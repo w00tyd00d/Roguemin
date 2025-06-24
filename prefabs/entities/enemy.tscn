@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://bge48j21udel3"]
+
+[ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_3srh3"]
+[ext_resource type="Script" uid="uid://dxoxtpt6pls20" path="res://scripts/entities/enemy.gd" id="2_iir01"]
+
+[node name="Enemy" instance=ExtResource("1_3srh3")]
+script = ExtResource("2_iir01")
+sight_range = 0
+wander_distance = 0
+attack_range = 0
+attack_damage = 0
+maximum_health = 0
+current_health = 0
+
+[node name="AttackIndicator" parent="." index="0" instance=ExtResource("1_3srh3")]
+show_behind_parent = true
+z_index = 1
+
+[editable path="AttackIndicator"]

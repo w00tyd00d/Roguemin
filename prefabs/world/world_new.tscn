@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://dl53ytlod4w2y"]
+
+[ext_resource type="PackedScene" uid="uid://borrl1q1erb2s" path="res://prefabs/whistle.tscn" id="1_8ps7i"]
+[ext_resource type="Script" uid="uid://dxxivsxqj8buq" path="res://scripts/world/world_new.gd" id="1_on7k0"]
+[ext_resource type="Script" uid="uid://dlrxav462qrlt" path="res://scripts/throw_cursor.gd" id="2_on7k0"]
+[ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="3_r11xj"]
+[ext_resource type="Script" uid="uid://cmb6opbq1b2ow" path="res://scripts/test_layer.gd" id="3_ypasi"]
+
+[node name="World" type="Node2D"]
+z_index = -1
+script = ExtResource("1_on7k0")
+
+[node name="TEST" parent="." instance=ExtResource("3_r11xj")]
+z_index = 3
+script = ExtResource("3_ypasi")
+
+[node name="Whistle" parent="." instance=ExtResource("1_8ps7i")]
+z_index = 2
+
+[node name="ThrowCursor" type="Node2D" parent="."]
+z_index = 2
+script = ExtResource("2_on7k0")
+
+[node name="Cursor" parent="ThrowCursor" instance=ExtResource("3_r11xj")]
+visible = false
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 1, 0, 2, 0)
+
+[node name="BackgroundLayer" parent="ThrowCursor/Cursor" index="0"]
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0)
+
+[editable path="ThrowCursor/Cursor"]

@@ -12,7 +12,7 @@ var astar : AStarChunks
 
 # Marked chunks to spawn walkers at when ready to make paths (outside of room)
 # The bool represents if the walker is connected to the main path or not
-var _marked_exit_chunks : Dictionary[World.Chunk, bool] = {}
+var _marked_exit_chunks : Dictionary[Chunk, bool] = {}
 
 
 func run(world: World) -> void:
@@ -98,7 +98,7 @@ func generate_paths(world: World) -> void:
     # Create list of astar paths from every exit to each other
     var paths : Array[Array] = []
     var size := _marked_exit_chunks.size()
-    var chunks : Array[World.Chunk] = _marked_exit_chunks.keys()
+    var chunks : Array[Chunk] = _marked_exit_chunks.keys()
 
     for i in range(size-1):
         for j in range(1, size-i):
@@ -245,7 +245,7 @@ func _place_room(
 
 
 func _create_room(world: World, chunk_pos: Vector2i, blueprint: RoomBlueprint) -> World.Room:
-    var chunks: Array[World.Chunk] = []
+    var chunks: Array[Chunk] = []
     var room := World.Room.new(world, blueprint, chunk_pos, chunks)
 
     # Assign the chunks
@@ -309,7 +309,8 @@ func _construct_room(world: World, chunk_pos: Vector2i, blueprint: RoomBlueprint
 
             glyph = choices[idx]
             world.set_tile_type(tile_pos, Type.Tile.GRASS)
-            world.fog_of_war.set_cell(tile_pos, -1, Vector2i(-1,-1), -1)
+            # world.fog_of_war.set_cell(tile_pos, -1, Vector2i(-1,-1), -1)
+            world.reveal_fog_of_war(tile_pos)
 
         else:
             world.set_tile_type(tile_pos, Type.Tile.WALL)
@@ -318,7 +319,8 @@ func _construct_room(world: World, chunk_pos: Vector2i, blueprint: RoomBlueprint
 
         world.set_glyph(tile_pos, glyph)
         if blueprint is MainBaseBlueprint:
-            world.fog_of_war.set_cell(tile_pos, -1, Vector2i(-1,-1), -1)
+            # world.fog_of_war.set_cell(tile_pos, -1, Vector2i(-1,-1), -1)
+            world.reveal_fog_of_war(tile_pos)
 
 
 func _establish_exit(world: World, room: World.Room, dir: Direction) -> bool:
@@ -369,8 +371,8 @@ func _establish_exit(world: World, room: World.Room, dir: Direction) -> bool:
 
 func _draw_path(
         world: World,
-        chunk1: World.Chunk,
-        chunk2: World.Chunk) -> void:
+        chunk1: Chunk,
+        chunk2: Chunk) -> void:
 
     # var path_pattern := world.tile_set.get_pattern(1)
     # var path_offset := Vector2i(4,4)
@@ -384,7 +386,7 @@ func _draw_path(
         if i < size:
             var center := path[i] + half
             var vecs := Util.get_square_around_pos(center, 17)
-            
+
             for pos in vecs:
                 if world.get_tile(pos).type != Type.Tile.VOID:
                     continue
@@ -402,7 +404,7 @@ func _draw_path(
                 #     world.get_glyph(pos).matches(Glyph.NONE)):
                 if world.get_tile(pos).type == Type.Tile.GRASS:
                     continue
-                    
+
                 var choices := [Glyph.GRASS, Glyph.SHRUB]
                 var weights := PackedFloat32Array([1, .01])
                 var idx := RNG.rand_weighted(weights)
@@ -416,20 +418,20 @@ class Walker:
     var world : World
     var connected : bool
     var chunk_position : Vector2i
-    var current_chunk : World.Chunk :
+    var current_chunk : Chunk :
         get: return world.get_chunk(chunk_position)
 
     var stack : Array[Vector2i] = []
     var history := {}
 
-    var marked_chunks : Dictionary[World.Chunk, WeakRef]
+    var marked_chunks : Dictionary[Chunk, WeakRef]
     var active := true
 
     func _init(
             _world: World,
-            chunk: World.Chunk,
+            chunk: Chunk,
             _connected := false,
-            _marked_chunks : Dictionary[World.Chunk, WeakRef] = {}) -> void:
+            _marked_chunks : Dictionary[Chunk, WeakRef] = {}) -> void:
 
         world = _world
         connected = _connected
@@ -496,7 +498,7 @@ class Walker:
         return backtrack()
 
     func backtrack() -> bool:
-        for chunk: World.Chunk in history:
+        for chunk: Chunk in history:
             if chunk.connected:
                 print(self, ": ", "Previous chunk was connected, so")
                 return resolve()
@@ -510,11 +512,11 @@ class Walker:
 
     func resolve() -> bool:
         print(self, ": ", "We're done!")
-        for chunk: World.Chunk in history:
+        for chunk: Chunk in history:
             chunk.connected = true
         return false
 
-    func _path_collided(chunk: World.Chunk) -> bool:
+    func _path_collided(chunk: Chunk) -> bool:
         if not marked_chunks.has(chunk):
             return false
 

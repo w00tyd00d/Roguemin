@@ -14,7 +14,7 @@ func _init(_world: World) -> void:
     update()
 
 
-func get_full_path(chunk1: World.Chunk, chunk2: World.Chunk) -> Array[Vector2i]: 
+func get_full_path(chunk1: Chunk, chunk2: Chunk) -> Array[Vector2i]: 
     var jps_path := get_id_path(chunk1.chunk_position, chunk2.chunk_position)
     
     if jps_path.is_empty():

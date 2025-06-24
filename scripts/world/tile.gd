@@ -14,7 +14,8 @@ var world : World :
 var grid_position : Vector2i
 
 ## The chunk the tile resides in.
-var chunk : World.Chunk :
+# var chunk : World.Chunk :
+var chunk : Chunk :
     get: return world.get_chunk(grid_position / Globals.CHUNK_SIZE)
 
 ## The type of tile.
