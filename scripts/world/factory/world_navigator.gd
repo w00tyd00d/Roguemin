@@ -16,14 +16,23 @@ var _wall_tiles : Dictionary[Tile, int] = {}
 func run(world: World) -> void:
     _wall_tiles = {}
     await generate_salvage_paths(world)
+
+    if not GameState.is_valid_object(world):
+        return
+
     generate_navigation_fields(world)
 
 
 func generate_salvage_paths(world: World) -> void:
     while not world.salvage_path_queue.is_empty():
         var path : Array = world.salvage_path_queue.pop_back()
+
         world.add_to_salvage_path(path[0], path[1])
+
         await GameState.get_tree().process_frame
+
+        if not GameState.is_valid_object(world):
+            return
 
 
 func generate_navigation_fields(world: World) -> void:
@@ -59,10 +68,13 @@ func generate_navigation_fields(world: World) -> void:
                     new_tiles.append(nbr)
 
         tiles = new_tiles
-        
+
+
+        await GameState.get_tree().process_frame
+
         if not GameState.is_valid_object(world):
             return
-        
+
         # Run an iteration of the wall dijkstra map generation
         _iterate_wall_dijkstra_map(world)
 
@@ -81,4 +93,3 @@ func _iterate_wall_dijkstra_map(_world: World) -> void:
                 new_tiles[nbr] = step + 1
 
     _wall_tiles = new_tiles
-
