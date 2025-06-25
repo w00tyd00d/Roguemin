@@ -31,29 +31,29 @@ func generate_treasure(world: World) -> void:
             attempts += 1
     treasure.queue_free()
 
-    # for n in 5:
-    #     var attempts := 0
-    #     treasure = MediumTreasure.create()
-    #     while attempts < 10:
-    #         var rx := RNG.randi_range(0, world.size.x * Globals.CHUNK_SIZE.x)
-    #         var ry := RNG.randi_range(0, world.size.y * Globals.CHUNK_SIZE.y)
-    #         if not _check_for_entity_collision(world, treasure, Vector2i(rx, ry)):
-    #             world.spawn_entity(MediumTreasure, Vector2i(rx, ry))
-    #             break
-    #         attempts += 1
-    # treasure.queue_free()
+    for n in 5:
+        var attempts := 0
+        treasure = MediumTreasure.create()
+        while attempts < 10:
+            var rx := RNG.randi_range(0, world.size.x * Globals.CHUNK_SIZE.x)
+            var ry := RNG.randi_range(0, world.size.y * Globals.CHUNK_SIZE.y)
+            if not _check_for_entity_collision(world, treasure, Vector2i(rx, ry)):
+                world.spawn_entity(MediumTreasure, Vector2i(rx, ry))
+                break
+            attempts += 1
+    treasure.queue_free()
 
-    # for n in 10:
-    #     var attempts := 0
-    #     treasure = SmallTreasure.create()
-    #     while attempts < 10:
-    #         var rx := RNG.randi_range(0, world.size.x * Globals.CHUNK_SIZE.x)
-    #         var ry := RNG.randi_range(0, world.size.y * Globals.CHUNK_SIZE.y)
-    #         if not _check_for_entity_collision(world, treasure, Vector2i(rx, ry)):
-    #             world.spawn_entity(SmallTreasure, Vector2i(rx, ry))
-    #             break
-    #         attempts += 1
-    # treasure.queue_free()
+    for n in 10:
+        var attempts := 0
+        treasure = SmallTreasure.create()
+        while attempts < 10:
+            var rx := RNG.randi_range(0, world.size.x * Globals.CHUNK_SIZE.x)
+            var ry := RNG.randi_range(0, world.size.y * Globals.CHUNK_SIZE.y)
+            if not _check_for_entity_collision(world, treasure, Vector2i(rx, ry)):
+                world.spawn_entity(SmallTreasure, Vector2i(rx, ry))
+                break
+            attempts += 1
+    treasure.queue_free()
 
 
 func _check_for_entity_collision(world: World, ent: MultiTileEntity, pos: Vector2i) -> bool:

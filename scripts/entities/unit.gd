@@ -25,6 +25,7 @@ var state := State.DEAD :
         state = new_state
         _on_state_exit(old_state)
         _on_state_enter(new_state)
+
 ## The current target of the unit.
 var target
 

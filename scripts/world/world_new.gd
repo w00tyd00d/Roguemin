@@ -68,6 +68,15 @@ var salvage_path_queue : Array[Array] = []
 
 var mrpas : MRPAS
 
+## The node the chunks will be a child of for organization purposes
+@onready var chunks_node := $Chunks as Node2D
+
+## The node the chunks will be a child of for organization purposes
+@onready var treasure_node := $Treasures as Node2D
+
+## The node the chunks will be a child of for organization purposes
+@onready var enemies_node := $Enemies as Node2D
+
 ## The [Whistle] object.
 @onready var whistle := $Whistle as Whistle
 
@@ -259,7 +268,10 @@ func spawn_entity(cls, pos: Vector2i) -> void:
         var tile := get_tile(pos + delta)
         tile.add_entity(entity)
 
-    add_child(entity)
+    if entity is Treasure:
+        treasure_node.add_child(entity, true)
+    elif entity is Enemy:
+        enemies_node.add_child(entity, true)
 
 
 func spawn_unit(pos: Vector2i) -> Unit:
@@ -313,7 +325,7 @@ func _create_chunks() -> Array[Array]:
         var row := []
         for x in size.x:
             var chunk := Chunk.create().setup(self, Vector2i(x,y))
-            add_child(chunk)
+            chunks_node.add_child(chunk)
             row.append(chunk)
         res.append(row)
 

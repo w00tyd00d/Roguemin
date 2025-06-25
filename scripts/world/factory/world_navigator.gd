@@ -6,7 +6,7 @@ const ON_PATH_COST := 4
 const OFF_PATH_COST := 5
 const DIAGONAL_COST := 7
 
-const OFF_PATH_PENALTY := 50
+const OFF_PATH_PENALTY := 10000
 
 const WALL_STEP_LIMIT := 7
 

@@ -10,6 +10,12 @@
 z_index = -1
 script = ExtResource("1_on7k0")
 
+[node name="Chunks" type="Node2D" parent="."]
+
+[node name="Treasures" type="Node2D" parent="."]
+
+[node name="Enemies" type="Node2D" parent="."]
+
 [node name="TEST" parent="." instance=ExtResource("3_r11xj")]
 z_index = 3
 script = ExtResource("3_ypasi")

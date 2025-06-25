@@ -57,6 +57,8 @@ func setup(_world: World, pos: Vector2i) -> Chunk:
     center = start + Globals.CHUNK_HALF
     end = (pos + Vector2i.ONE) * Globals.CHUNK_SIZE - Vector2i.ONE
 
+    name = "Chunk ({0},{1})".format([chunk_position.x, chunk_position.y])
+
     return self
 
 
