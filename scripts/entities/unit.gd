@@ -75,10 +75,16 @@ func reset() -> void:
 
     energy_points = 0
     posture_points = 0
+    time = 0
 
     var world := GameState.world
-    GameState.player.remove_unit(self)
-    current_tile.remove_unit(self)
+    var player := GameState.player
+    
+    if player: 
+        player.remove_unit(self)
+    
+    if current_tile:
+        current_tile.remove_unit(self)
 
     if not state == State.DEAD and world:
         var count := world.unit_count
@@ -87,6 +93,7 @@ func reset() -> void:
     if held_object:
         drop_object()
 
+    target = null
     state = State.IDLE
     grid_position = Vector2()
 

@@ -33,6 +33,8 @@ func initialize_game() -> void:
     var world := world_factory.generate_new_world()
     GameState.world = world
 
+    unit_container.reset_all()
+
     var player : Player
     if not GameState.player:
         player = Player.create()
@@ -47,7 +49,9 @@ func initialize_game() -> void:
 
 
 func new_game() -> void:
-    if GameState.world: GameState.world.queue_free()
+    if GameState.world:
+        GameState.world.queue_free()
+    
     
     GameState.toggle_hud.emit(false)
     game_screen.hide()
