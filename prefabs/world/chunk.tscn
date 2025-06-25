@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://dbtxrktvxa40u" path="res://scripts/world/chunk.gd" id="2_jumhl"]
 
 [node name="Chunk" instance=ExtResource("1_swrid")]
+rendering_quadrant_size = 12
 script = ExtResource("2_jumhl")
 
 [node name="FogOfWar" type="TileMapLayer" parent="." index="1"]
