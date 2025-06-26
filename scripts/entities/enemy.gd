@@ -60,20 +60,6 @@ func _process(_dt: float) -> void:
     attack_indicator.visible = not GameState.glyph_blinking()
 
 
-func update_time(world_time: int) -> bool:
-    var old_time := time
-    time = world_time
-
-    var time_units := time - old_time
-    if add_and_check_energy(time_units):
-        if do_action():
-            posture_points = 0
-        elif state == State.ATTACK or state == State.IDLE:
-            posture_points += 1
-
-    return false
-
-
 func get_health_percent() -> float:
     return current_health / float(maximum_health)
 

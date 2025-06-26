@@ -25,7 +25,7 @@ const WORLD_SIZE := Vector2i(12,12)
 # Time
 
 ## The amount of time units that make up one second.
-const TIME_VALUE := 20
+const TIME_VALUE := 500
 
 ## The amount of time units within a single day.
 const TIME_LIMIT := (13 * 60 + 30) * TIME_VALUE # 13 min 30 sec
@@ -71,8 +71,8 @@ const MOVE_HOLD_SUBSEQUENT := 0.12
 
 # Gameplay
 
-## The amount of energy needed to make a turn.
-const ENERGY_CAP := 4
+## The default amount of energy needed to make a turn.
+const DEFAULT_ENERGY_STEP := 100
 ## The range at which the player can through the fog of war.
 const PLAYER_SIGHT_RANGE := 30
 ## The range the units can see the unit tether

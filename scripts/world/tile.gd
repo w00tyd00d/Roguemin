@@ -22,7 +22,8 @@ var chunk : Chunk :
 var type := Type.Tile.VOID
 
 ## Cached indication if this tile is naturally walkable
-var walkable := true
+var walkable : bool :
+    get: return type != Type.Tile.VOID and type != Type.Tile.WALL
 
 ## Cached indication whether the tile is inhabited by the player
 var has_player := false

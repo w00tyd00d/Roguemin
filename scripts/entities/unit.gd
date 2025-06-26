@@ -29,6 +29,11 @@ var state := State.DEAD :
 ## The current target of the unit.
 var target
 
+## The cached location which the unit last saw the player from, mainly used
+## as a means for hauling MTEs in the void where there is no flow field to
+## navigate.
+var last_player_tile : Tile
+
 ## The object the unit is currently holding on to.
 var held_object : MultiTileEntity
 
@@ -51,7 +56,6 @@ var in_limbo : bool :
 var riding_enemy : Enemy
 
 
-
 func _ready() -> void:
     add_to_group(&"units")
 
@@ -69,21 +73,58 @@ func get_metadata() -> Dictionary:
     return Unit.metadata(type)
 
 
+func update() -> bool:
+    if in_limbo:
+        return false
+    return super()
+
+    # var old_time := time
+    # time = world_time
+
+    # var time_units := time - old_time
+    # if add_and_check_energy(time_units):
+    #     return do_action()
+
+    # return false
+
+
+func do_action() -> bool:
+    var world := GameState.world
+
+    match state:
+        State.FOLLOW:
+            return _do_follow_action()
+        State.CARRY:
+            if not held_object:
+                if target.is_latch_position(grid_position):
+                    grab_object(target)
+                    return false
+                return move_towards(target.current_tile)
+        State.ATTACK:
+
+            pass
+        State.RETURN:
+            return move_towards(GameState.world.unit_ship_tile)
+
+    return false
+
+
 func reset() -> void:
     hide()
+
     modulate.a = 1
     set_background(Vector2(), Glyph.BLACK)
 
-    energy_points = 0
-    posture_points = 0
     time = 0
+    action_energy = 0
+    posture_points = 0
 
     var world := GameState.world
     var player := GameState.player
-    
-    if player: 
+
+    if player:
         player.remove_unit(self)
-    
+
     if current_tile:
         current_tile.remove_unit(self)
 
@@ -97,6 +138,7 @@ func reset() -> void:
     target = null
     state = State.IDLE
     grid_position = Vector2()
+    last_player_tile = null
 
 
 func spawn(pos: Vector2i, _type: Type.Unit, _upgraded := false) -> void:
@@ -134,8 +176,8 @@ func die() -> void:
     tween.parallel().tween_property(self, "modulate:a", 0, 1.25)
     tween.tween_callback(func():
         z_index -= 1
-        reset())
-
+        reset()
+    )
 
 
 func move_to(dest: Tile) -> void:
@@ -165,14 +207,12 @@ func move_towards(tile: Tile) -> bool:
     if res == Type.Tile.WALL:
         if state == State.RETURN and Tag.has(dest, Tags.UNIT_SHIP):
             reset()
-            return true
+            return true # We reset, so no action cost needed
         elif current_tile.type == Type.Tile.VOID:
-            move_to(dest)
-            return true
+            return _do_move_action(dest)
 
     elif res != Type.Tile.WALL and res != Type.Tile.ENTITY:
-        move_to(dest)
-        return true
+        return _do_move_action(dest)
 
     var dist := grid_position.distance_to(tile.grid_position)
     # if dist < 1.5: return false
@@ -184,8 +224,7 @@ func move_towards(tile: Tile) -> bool:
             continue
         if _check_tile_at(grid_position + adj_dir.vector) == Type.Tile.GRASS:
             dest = world.get_tile(grid_position + adj_dir.vector)
-            move_to(dest)
-            return true
+            return _do_move_action(dest)
 
     if dist < limit:
         return false
@@ -194,14 +233,16 @@ func move_towards(tile: Tile) -> bool:
         # if grid_position + ort_dir.vector == last_position: continue
         if _check_tile_at(grid_position + ort_dir.vector) == Type.Tile.GRASS:
             dest = world.get_tile(grid_position + ort_dir.vector)
-            move_to(dest)
-            return true
+            return _do_move_action(dest)
 
     return false
 
 
 func throw_to(tile: Tile) -> void:
+    last_player_tile = GameState.player.current_tile
+
     var world := GameState.world
+
     if tile.has_entities:
         var ent := tile.get_first_entity()
         if ent:
@@ -215,18 +256,22 @@ func throw_to(tile: Tile) -> void:
                         return
 
         tile = world.get_closest_empty_tile(tile)
+
+    action_energy = 0
+
     move_to(tile)
-    go_idle()
-
-
-func go_idle() -> void:
-    state = State.IDLE
-    GameState.player.remove_unit(self)
+    _go_idle()
 
 
 func join_squad() -> void:
+    last_player_tile = null
     state = State.FOLLOW
     GameState.player.add_unit(self)
+
+
+func dismiss() -> void:
+    last_player_tile = GameState.player.current_tile
+    _go_idle()
 
 
 func go_home() -> void:
@@ -268,38 +313,9 @@ func drop_object() -> void:
     held_object = null
 
 
-
-func update_time(world_time: int) -> bool:
-    var old_time := time
-    time = world_time
-
-    if not in_limbo:
-        var time_units := time - old_time
-        if add_and_check_energy(time_units):
-            return do_action()
-
-    return false
-
-
-func do_action() -> bool:
-    var world := GameState.world
-
-    match state:
-        State.FOLLOW:
-            return _do_follow_action()
-        State.CARRY:
-            if not held_object:
-                if target.is_latch_position(grid_position):
-                    grab_object(target)
-                    return false
-                return move_towards(target.current_tile)
-        State.ATTACK:
-
-            pass
-        State.RETURN:
-            return move_towards(GameState.world.unit_ship_tile)
-
-    return false
+func _go_idle() -> void:
+    state = State.IDLE
+    GameState.player.remove_unit(self)
 
 
 func _do_follow_action() -> bool:
@@ -312,7 +328,7 @@ func _do_follow_action() -> bool:
     var dest := tether.tail.current_tile
 
     if not _in_range_of_tether():
-        go_idle()
+        _go_idle()
         return false
 
     if _can_see_tether():
@@ -330,6 +346,26 @@ func _do_follow_action() -> bool:
             return move_towards(world.get_tile(path[0]))
 
     return false
+
+
+func _do_move_action(dest: Tile) -> bool:
+    # ALLOW TO BE MODIFIED BY BEING BOOSTED WITH SPICY SPRAY
+    # AND RUSH BOOTS!
+    var cost := Globals.DEFAULT_ENERGY_STEP
+
+    move_to(dest)
+
+    action_energy -= cost
+    return true
+
+
+func _spend_attack_action() -> bool:
+    # ALLOW TO BE MODIFIED BY BEING BOOSTED WITH SPICY SPRAY
+    # AND POSSIBLY RUSH BOOTS!
+    var cost := Globals.DEFAULT_ENERGY_STEP
+
+    action_energy -= cost
+    return true
 
 
 func _in_range_of_tether() -> bool:
@@ -366,7 +402,7 @@ func _check_tile_at(pos: Vector2i) -> Type.Tile:
     if res == Type.Tile.ENTITY:
         var any := false
         for unit in tile.get_all_units():
-            if unit.time < GameState.world.time and unit.update_time(world.time):
+            if unit.time < GameState.world.time and unit.update():
                 any = true
         if any:
             return _check_tile_at(pos)

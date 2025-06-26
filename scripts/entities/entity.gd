@@ -17,9 +17,10 @@ var entity_name := "Unknown Entity"
 var time := 0
 
 ## The amount of energy points the entity has accumulated.
-var energy_points := 0
+var action_energy := 0
 
 ## The amount of posture points the entity currently has.
+# DEPRECATE THIS!
 var posture_points := 0
 
 ## Flag for signaling if the entity can act on this turn.
@@ -64,23 +65,32 @@ func move_towards(target: Tile) -> bool:
     return false
 
 
-func update_time(world_time: int) -> bool:
-    var old_time := time
+func update() -> bool:
+    var world_time := maxi(time, GameState.world.time)
+    var time_units := world_time - time
+
     time = world_time
 
-    var time_units := time - old_time
-    if add_and_check_energy(time_units):
-        return do_action()
-
-    return false
+    return add_and_check_energy(time_units)
 
 
 func do_action() -> bool:
     return false
 
 
-func add_and_check_energy(amt: int) -> bool:
-    energy_points += amt
+func add_and_check_energy(time_units: int) -> bool:
+    # If we already can act, refund the points if the action fails
+    if can_act:
+        if do_action():
+            return can_act
+        action_energy -= time_units
+        return false
+
+    # Otherwise, we can continue to accumulate    
+    action_energy += time_units
+    
+    if can_act: do_action()
+
     return can_act
 
 
@@ -101,4 +111,4 @@ func reset_immunities() -> void:
 
 
 func _get_can_act() -> bool:
-    return energy_points >= Globals.ENERGY_CAP
+    return action_energy >= Globals.DEFAULT_ENERGY_STEP

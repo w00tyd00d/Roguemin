@@ -1,5 +1,9 @@
 class_name PlayerWalk extends PlayerState
 
+var _action_cost : int :
+    # ALLOW TO BE MODIFIED BY RUSH BOOTS ITEM!
+    get: return Globals.DEFAULT_ENERGY_STEP
+
 
 func enter():
     super()
@@ -23,8 +27,8 @@ func update(inp: StringName) -> Array:
                     state_changed.emit("throw")
             &"c_dismiss":
                 for unit in player.get_all_units():
-                    unit.go_idle()
-                return [true, 4]
+                    unit.dismiss()
+                return [true, _action_cost]
             &"c_cycle_right":
                 player.cycle_selected_unit()
             &"c_cycle_left":
@@ -34,7 +38,7 @@ func update(inp: StringName) -> Array:
                 return [false]
 
     if inp == &"c_wait":
-        return [true, 4]
+        return [true, _action_cost]
     
     var dir := Direction.by_pattern(inp)
     if not dir: return [false]
@@ -54,4 +58,4 @@ func update(inp: StringName) -> Array:
             player.move_to(dest)
         _: return [false]
     
-    return [true, 4]
+    return [true, _action_cost]

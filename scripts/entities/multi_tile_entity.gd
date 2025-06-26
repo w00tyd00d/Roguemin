@@ -32,8 +32,9 @@ var spawn_tile : Tile :
             return GameState.world.get_tile(spawn_position)
         return null
 
-## A dictionary of any units currently hauling the entity.
-var carriers : Dictionary[Unit, Vector2i] = {}
+## A dictionary of any units currently hauling the entity
+# var carriers : Dictionary[Unit, Vector2i] = {}
+var carriers := {}
 
 ## A cached value of the total amount of latch points around the entity.
 var latch_point_count : int
@@ -41,9 +42,14 @@ var latch_point_count : int
 ## A cached value of how many carriers the entity has.
 var carrier_count := 0
 
-## A percentage value of energy built up from being carried. A value of
-## [code]1.0[/code] allows the entity to act (move).
-var carry_energy := 0.0
+# ## A percentage value of energy built up from being carried. A value of
+# ## [code]1.0[/code] allows the entity to act (move).
+# var carry_energy := 0.0
+
+## The location of where the last unit attached was thrown from to provide a
+## carry location if located in the void
+var default_carry_location : Tile
+
 
 func _init() -> void:
     _scan()
@@ -66,7 +72,7 @@ func delete() -> void:
         if dist <= Globals.UNIT_SIGHT_RANGE:
             unit.join_squad()
         else:
-            unit.go_idle()
+            unit.dismiss()
 
     # Don't have time to set up an entity recycler, so just delete
     queue_free()
@@ -82,10 +88,10 @@ func move_to(dest: Tile) -> void:
         var tile := world.get_tile(dest.grid_position + pos)
         tile.add_entity(self)
 
-    for carrier: Unit in carriers:
-        var pos : Vector2i = carriers[carrier]
+    for unit: Unit in carriers:
+        var pos : Vector2i = carriers[unit]
         var tile := world.get_tile(dest.grid_position + pos)
-        carrier.move_to(tile)
+        unit.move_to(tile)
 
     last_position = grid_position
     grid_position = dest.grid_position
@@ -126,17 +132,6 @@ func move_towards(target: Tile) -> bool:
     return false
 
 
-func update_time(world_time: int) -> bool:
-    var old_time := time
-    time = world_time
-
-    var time_units := time - old_time
-    if add_and_check_energy(time_units):
-        return do_action()
-
-    return false
-
-
 func get_area_tiles(from := grid_position) -> Array[Vector2i]:
     var res : Array[Vector2i] = []
     for pos in area_positions:
@@ -162,6 +157,10 @@ func add_carrier(unit: Unit) -> bool:
     carriers[unit] = pos
     latch_positions[pos] = false
     carrier_count += 1
+
+    if unit.last_player_tile:
+        default_carry_location = unit.last_player_tile
+
     return true
 
 
@@ -193,7 +192,7 @@ func get_all_latch_tiles() -> Array[Tile]:
     var world := GameState.world
     var res : Array[Tile] = []
 
-    for pos in latch_positions.keys():
+    for pos in latch_positions:
         res.append(world.get_tile(pos + grid_position))
 
     return res
@@ -203,12 +202,24 @@ func collect() -> void:
     delete()
 
 
-func get_next_flow_field_position() -> Vector2i:
-    return grid_position + current_tile.get_flow_field_vector()
+## The action called whenever the entity is being carried by units
+func get_hauled() -> void:
+    if not current_tile.walkable:
+        move_towards(default_carry_location)
+    else:
+        move_to(get_next_flow_field_tile())
+        _check_for_collection()
+
+    action_energy -= Globals.DEFAULT_ENERGY_STEP
+
+
+func get_next_flow_field_tile() -> Tile:
+    var dest := grid_position + current_tile.get_flow_field_vector()
+    return GameState.world.get_tile(dest)
 
 
 func _get_can_act() -> bool:
-    return energy_points >= Globals.ENERGY_CAP or carry_energy >= 1.0
+    return action_energy >= Globals.DEFAULT_ENERGY_STEP
 
 
 func _scan() -> void:
@@ -233,4 +244,5 @@ func _scan() -> void:
 func _check_for_collection() -> void:
     var world := GameState.world
     var dist := Util.chebyshev_distance(grid_position, world.salvage_return_position)
-    if dist < 3: collect()
+
+    if dist < 2: collect()

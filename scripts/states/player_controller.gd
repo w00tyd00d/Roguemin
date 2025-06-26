@@ -66,7 +66,6 @@ func input_handler(dt: float) -> void:
 
 
 
-
 func _update_state(inp: StringName) -> void:
     var res := current_state.update(inp)
     if res[0]: TurnManager.process_turns(res[1])
