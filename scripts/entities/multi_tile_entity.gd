@@ -28,8 +28,8 @@ var spawn_position : Vector2i
 ## The tile of the entity's spawn position.
 var spawn_tile : Tile :
     get:
-        if GameState.world:
-            return GameState.world.get_tile(spawn_position)
+        if world:
+            return world.get_tile(spawn_position)
         return null
 
 ## A dictionary of any units currently hauling the entity
@@ -60,8 +60,6 @@ func _ready() -> void:
 
 
 func delete() -> void:
-    var world := GameState.world
-    var player := GameState.player
     for pos in area_positions:
         var tile := world.get_tile(grid_position + pos)
         if tile: tile.remove_entity(self)
@@ -79,7 +77,6 @@ func delete() -> void:
 
 
 func move_to(dest: Tile) -> void:
-    var world := GameState.world
     # We have to run twice since we reference the same entity
     for pos in area_positions:
         var tile := world.get_tile(grid_position + pos)
@@ -98,7 +95,6 @@ func move_to(dest: Tile) -> void:
 
 
 func move_towards(target: Tile) -> bool:
-    var world := GameState.world
     var delta := target.grid_position - grid_position
     var ax := absi(delta.x)
     var ay := absi(delta.y)
@@ -179,7 +175,6 @@ func is_latch_position(pos: Vector2i) -> bool:
 
 ## Returns an open latch position in world tile coordinates
 func get_open_latch_tile() -> Tile:
-    var world := GameState.world
     var filter := func(key): return latch_positions[key]
     var open := latch_positions.keys().filter(filter)
     if not open: return null
@@ -189,7 +184,6 @@ func get_open_latch_tile() -> Tile:
 
 
 func get_all_latch_tiles() -> Array[Tile]:
-    var world := GameState.world
     var res : Array[Tile] = []
 
     for pos in latch_positions:
@@ -215,7 +209,7 @@ func get_hauled() -> void:
 
 func get_next_flow_field_tile() -> Tile:
     var dest := grid_position + current_tile.get_flow_field_vector()
-    return GameState.world.get_tile(dest)
+    return world.get_tile(dest)
 
 
 func _get_can_act() -> bool:
@@ -242,7 +236,6 @@ func _scan() -> void:
 
 
 func _check_for_collection() -> void:
-    var world := GameState.world
     var dist := Util.chebyshev_distance(grid_position, world.salvage_return_position)
-
-    if dist < 2: collect()
+    if dist < ceili(radius / 2.0):
+        collect()

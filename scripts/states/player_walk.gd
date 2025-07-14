@@ -11,8 +11,6 @@ func enter():
 
 
 func update(inp: StringName) -> Array:
-    var player := GameState.player
-    var world := GameState.world
     var just_pressed := Input.is_action_just_pressed(inp)
     
     if just_pressed:

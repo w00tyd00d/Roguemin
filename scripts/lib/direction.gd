@@ -14,6 +14,8 @@ const ALL_VECTORS : Array[Vector2i] = [
     Vector2i.LEFT,
 ]
 
+static var empty := Direction.new(Vector2i())
+
 static var north := Direction.new(Vector2i.UP)
 static var south := Direction.new(Vector2i.DOWN)
 static var west := Direction.new(Vector2i.LEFT)
@@ -25,33 +27,31 @@ static var southeast := Direction.new(Vector2i(1,1))
 
 var vector : Vector2i
 
-var is_diagonal : bool :
-    get: return absi(vector.x) == 1 and absi(vector.y) == 1
-
-var is_vertical : bool :
-    get: return vector.x == 0
-
-var is_horizontal : bool :
-    get: return vector.y == 0
+var is_diagonal : bool
+var is_vertical : bool
+var is_horizontal : bool
 
 var adjacent : Array[Direction] :
     get:
+        if vector == Vector2i(): return [Direction.empty, Direction.empty]
         if not adjacent:
             var left := ALL_VECTORS[(_index-1 + 8) % 8]
             var right := ALL_VECTORS[(_index+1) % 8]
             adjacent = [Direction.by_pattern(left), Direction.by_pattern(right)]
         return adjacent
 
-var orthagonal : Array[Direction] :
+var orthogonal : Array[Direction] :
     get:
-        if not orthagonal:
+        if vector == Vector2i(): return [Direction.empty, Direction.empty]
+        if not orthogonal:
             var left := ALL_VECTORS[(_index-2 + 8) % 8]
             var right := ALL_VECTORS[(_index+2) % 8]
-            orthagonal = [Direction.by_pattern(left), Direction.by_pattern(right)]
-        return orthagonal
+            orthogonal = [Direction.by_pattern(left), Direction.by_pattern(right)]
+        return orthogonal
 
 var opposite : Direction :
     get:
+        if vector == Vector2i(): return Direction.empty
         if not opposite:
             opposite = Direction.by_pattern(ALL_VECTORS[(_index+4) % 8])
         return opposite
@@ -107,7 +107,13 @@ static func get_cardinal(shuffled := false) -> Array[Direction]:
 func _init(vec: Vector2i, _diagonal := false) -> void:
     vector = vec
     
+    if vec == Vector2i():
+        _index = -1
+        return
+    
     is_diagonal = absi(vector.x) + absi(vector.y) == 2
+    is_vertical = vector.x == 0
+    is_horizontal = vector.y == 0
     
     _index = ALL_VECTORS.find(vec)
     assert(_index > -1, "Invalid direction given")

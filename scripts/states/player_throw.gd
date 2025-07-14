@@ -3,7 +3,6 @@ class_name PlayerThrow extends PlayerState
 
 var grid_position : Vector2i :
     set(vec):
-        var world := GameState.world
         grid_position = vec
         world.throw_cursor.grid_position = grid_position
 
@@ -13,14 +12,12 @@ var grid_position : Vector2i :
 
 func enter() -> void:
     super()
-    grid_position = GameState.player.grid_position
-    GameState.world.throw_cursor.show()
+    grid_position = player.grid_position
+    world.throw_cursor.show()
     GameState.display_unit_toggle.emit(false)
 
 
 func update(inp: StringName) -> Array:
-    var world := GameState.world
-    var player := GameState.player
     var just_pressed := Input.is_action_just_pressed(inp)
 
     if just_pressed:
@@ -90,6 +87,6 @@ func update(inp: StringName) -> Array:
 
 
 func exit() -> void:
-    GameState.world.throw_cursor.hide()
+    world.throw_cursor.hide()
     GameState.update_info_box.emit(null)
     super()

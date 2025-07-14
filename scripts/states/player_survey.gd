@@ -7,7 +7,6 @@ func enter() -> void:
 
 
 func update(inp: StringName) -> Array:
-    var player := GameState.player
     var camera := player.camera
     var just_pressed := Input.is_action_just_pressed(inp)
     
@@ -29,6 +28,6 @@ func update(inp: StringName) -> Array:
 
 
 func exit() -> void:
-    GameState.player.camera.offset = Vector2()
+    player.camera.offset = Vector2()
     GameState.display_survey_indicator.emit(false)
     super()

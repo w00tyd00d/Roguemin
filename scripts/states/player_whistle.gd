@@ -15,13 +15,11 @@ var whistle_level := 1 :
 
 func enter() -> void:
     super()
-    grid_position = GameState.player.grid_position
+    grid_position = player.grid_position
     GameState.display_unit_toggle.emit(true)
 
 
 func update(inp: StringName) -> Array:
-    var world := GameState.world
-    var player := GameState.player
     var just_pressed := Input.is_action_just_pressed(inp)
     
     if just_pressed:
@@ -69,13 +67,13 @@ func update(inp: StringName) -> Array:
 
 
 func exit() -> void:
-    GameState.world.whistle.cancel_preview()
+    world.whistle.cancel_preview()
     super()
 
 
 func _update_preview() -> void:
-    GameState.world.whistle.preview(grid_position, whistle_level)
+    world.whistle.preview(grid_position, whistle_level)
 
 
 func _get_whistle_area() -> Array[Vector2i]:
-    return GameState.world.whistle.get_area(whistle_level)
+    return world.whistle.get_area(whistle_level)

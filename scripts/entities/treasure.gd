@@ -26,9 +26,9 @@ func add_and_check_energy(time_units: int) -> bool:
 
     action_energy += int(val * time_units)
 
-    if can_act: do_action()
+    var res := do_action() if can_act else false
 
-    return can_act
+    return res
 
 
 func do_action() -> bool:

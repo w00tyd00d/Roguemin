@@ -79,7 +79,6 @@ func remove_unit(unit: Unit) -> void:
 
 
 func buck_units() -> void:
-    var world := GameState.world
     var size := riding_units.size()
     var empty_tiles := world.get_closest_empty_tiles(current_tile, size)
     var _units = riding_units.keys()
@@ -91,8 +90,6 @@ func buck_units() -> void:
 
 
 func get_closest_target() -> Entity:
-    var world := GameState.world
-    var player := GameState.player
     var unit := world.unit_container.get_closest_unit_to(grid_position)
     if not unit:
         var dist := Util.chebyshev_distance(player.grid_position, grid_position)
@@ -128,8 +125,6 @@ func return_home() -> void:
 
 
 func do_action() -> bool:
-    # var world := GameState.world
-
     match state:
         State.IDLE:
             if _check_next_to():
@@ -137,8 +132,7 @@ func do_action() -> bool:
                     target_entity = get_closest_target()
                     state = State.ATTACK
                     return true
-                return false
-            return true
+            return false
 
         State.ATTACK:
             return _do_attack_action()
@@ -206,7 +200,6 @@ func _get_attack_position() -> Vector2i:
 
 
 func _get_attack_area() -> Array[Tile]:
-    var world := GameState.world
     var res : Array[Tile] = []
     for pos in attack_indicator.get_used_cells():
         var apos := _get_attack_position()

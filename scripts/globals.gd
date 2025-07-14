@@ -67,7 +67,7 @@ const ACTION_INPUTS := [
 const MOVE_HOLD_INITIAL := 0.3
 
 ## The time in between subsequent directional calls if the button is held.
-const MOVE_HOLD_SUBSEQUENT := 0.12
+const MOVE_HOLD_SUBSEQUENT := 0.1
 
 # Gameplay
 
@@ -86,3 +86,10 @@ const WHISTLE_MIN_SIZE := 1
 
 ## The maximum size of the whistle
 const WHISTLE_MAX_SIZE := 4
+
+# Units 
+
+var BOID_COHESION_WEIGHT := 1.5
+var BOID_ALIGNMENT_WEIGHT := 1.5
+var BOID_AVOIDANCE_WEIGHT := 1.0
+var BOID_DESTINATION_WEIGHT := 5.0

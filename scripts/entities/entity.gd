@@ -2,13 +2,32 @@ class_name Entity extends DualMapLayer
 
 ## The base class for all entities in the game.
 
+var RNG : RandomNumberGenerator :
+    get: return GameState.RNG
+
+var world : World :
+    get: return GameState.world
+
+var player : Player :
+    get: return GameState.player
+
 var current_tile : Tile :
     get:
-        if not GameState.world: return null
-        return GameState.world.get_tile(grid_position)
+        if not world: return null
+        return world.get_tile(grid_position)
 
 ## The cached last position of the entity.
 var last_position : Vector2i
+
+## The last direction the entity had traveled
+var last_direction : Direction :
+    get:
+        if last_position == Vector2i(): return Direction.empty
+        return Direction.by_delta(last_position, grid_position)
+
+## The last vector the entity had traveled
+var last_velocity : Vector2i :
+    get: return last_direction.vector
 
 ## The in-game name of the entity.
 var entity_name := "Unknown Entity"
@@ -31,13 +50,12 @@ var _immunities := {}
 
 
 func move_to(dest: Tile) -> void:
-    GameState.world.move_entity(self, dest)
+    world.move_entity(self, dest)
     last_position = grid_position
     grid_position = dest.grid_position
 
 
 func move_towards(target: Tile) -> bool:
-    var world := GameState.world
     var delta := target.grid_position - grid_position
     var ax := absi(delta.x)
     var ay := absi(delta.y)
@@ -58,7 +76,7 @@ func move_towards(target: Tile) -> bool:
     for _dir in dir.adjacent:
         if grid_position + _dir.vector == last_position: continue
         if world.query_tile_at(grid_position + _dir.vector) == Type.Tile.GRASS:
-            var dest = world.get_tile(grid_position + _dir.vector)
+            var dest := world.get_tile(grid_position + _dir.vector)
             move_to(dest)
             return true
 
@@ -66,7 +84,7 @@ func move_towards(target: Tile) -> bool:
 
 
 func update() -> bool:
-    var world_time := maxi(time, GameState.world.time)
+    var world_time := maxi(time, world.time)
     var time_units := world_time - time
 
     time = world_time
@@ -82,16 +100,16 @@ func add_and_check_energy(time_units: int) -> bool:
     # If we already can act, refund the points if the action fails
     if can_act:
         if do_action():
-            return can_act
+            return true
         action_energy -= time_units
         return false
 
-    # Otherwise, we can continue to accumulate    
+    # Otherwise, we can continue to accumulate
     action_energy += time_units
-    
-    if can_act: do_action()
 
-    return can_act
+    var res := do_action() if can_act else false
+
+    return res
 
 
 func add_immunity(hazard: Type.Hazard) -> void:

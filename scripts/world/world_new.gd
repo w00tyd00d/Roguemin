@@ -274,8 +274,13 @@ func spawn_entity(cls, pos: Vector2i) -> void:
         enemies_node.add_child(entity, true)
 
 
-func spawn_unit(pos: Vector2i) -> Unit:
-    var type : Type.Unit = [Type.Unit.RED, Type.Unit.YELLOW, Type.Unit.BLUE].pick_random()
+func spawn_unit(
+        pos: Vector2i,
+        type := Type.Unit.NONE) -> Unit:
+
+    if type == Type.Unit.NONE:
+        type = [Type.Unit.RED, Type.Unit.YELLOW, Type.Unit.BLUE].pick_random()
+    
     var unit : Unit = unit_container.get_available_unit()
     var tile := get_tile(pos)
     if not unit or not tile: return

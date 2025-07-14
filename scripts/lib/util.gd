@@ -28,10 +28,14 @@ func get_bresenham_line(a: Vector2i, b: Vector2i) -> Array[Vector2i]:
     return res
 
 
-func get_square_around_pos(pos: Vector2i, length: int, filled := false) -> Array[Vector2i]:
-    if length < 2: return [pos]
+func get_square_around_pos(
+        pos: Vector2i,
+        side_length: int,
+        filled := false) -> Array[Vector2i]:
+            
+    if side_length < 2: return [pos]
     
-    var half := (length-1) / 2.0
+    var half := (side_length-1) / 2.0
     var left := floori(-half)
     var right := floori(half)
     var res : Array[Vector2i] = []

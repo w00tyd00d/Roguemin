@@ -65,7 +65,7 @@ func move_to(dest: Tile) -> void:
     camera.align()
     unit_tether.update()
     
-    GameState.world.update_fog_of_war(dest.grid_position, Globals.PLAYER_SIGHT_RANGE)
+    world.update_fog_of_war(dest.grid_position, Globals.PLAYER_SIGHT_RANGE)
 
 
 func cycle_selected_unit(left := false) -> void:

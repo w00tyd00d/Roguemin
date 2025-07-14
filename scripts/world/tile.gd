@@ -5,7 +5,7 @@ class_name Tile extends RefCounted
 const DEFAULT_MAX_VALUE := 2**31-1
 
 ## The weakref of the world object this tile is attached to.
-var world : World : 
+var world : World :
     set(_world):
         _world_ref = weakref(_world)
     get: return _get_world()
@@ -79,10 +79,10 @@ func get_neighbor(dir: Direction) -> Tile:
 func get_cardinal_neighbors() -> Array[Tile]:
     if not GameState.is_valid_object(world):
         return []
-    
+
     var res : Array[Tile] = []
     var arr := Direction.get_cardinal(true)
-    
+
     for dir in arr:
         var npos := grid_position + dir.vector
         var tile := _get_world().get_tile(npos)
@@ -93,10 +93,10 @@ func get_cardinal_neighbors() -> Array[Tile]:
 func get_all_neighbors() -> Array[Tile]:
     if not GameState.is_valid_object(_get_world()):
         return []
-    
+
     var res : Array[Tile] = []
     var arr := Direction.get_all(true)
-    
+
     for dir in arr:
         var npos := grid_position + dir.vector
         var tile := _get_world().get_tile(npos)
@@ -107,7 +107,7 @@ func get_all_neighbors() -> Array[Tile]:
 func set_distance_from_wall(num: int) -> bool:
     if num >= distance_from_wall:
         return false
-    
+
     distance_from_wall = num
     return true
 
@@ -143,7 +143,7 @@ func remove_unit(unit: Unit) -> void:
     _units[unit.type].erase(unit)
 
 
-func get_units(_type: Type.Unit) -> Array[Unit]:
+func get_units(_type: Type.Unit) -> Array:
     return _units[_type].keys()
 
 
@@ -178,7 +178,7 @@ func get_flow_field_vector(exclude_water := false) -> Vector2i:
 
     for nbr in get_all_neighbors():
         var val := nbr.flow_field_value
-        
+
         if exclude_water and nbr.type == Type.Tile.WATER:
             val += PENALTY
 
