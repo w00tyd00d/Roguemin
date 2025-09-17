@@ -24,7 +24,7 @@ var rooms : Dictionary[int, Room] = {}
 var time := 0 :
     set(n):
         time = n
-        GameState.update_sun_meter.emit(n)
+        GameState.world_time_changed.emit(n)
 
 ## The container node of all of the unit objects in-game
 var unit_container : UnitContainer # injected upon World creation
