@@ -72,8 +72,29 @@ static func by_pattern(pattern: Variant) -> Direction:
         _: return null
     
 
+static func by_normalized(nvec: Vector2) -> Direction:
+    if nvec.is_zero_approx():
+        return null
+
+    # Ensure the passed vector is in fact normalized
+    nvec = nvec.normalized()
+
+    var best_dot := -1.0
+    var best_vec : Vector2i
+
+    for vec in ALL_VECTORS:
+        var dot := nvec.dot(Vector2(vec).normalized())
+        if dot > best_dot:
+            best_dot = dot
+            best_vec = vec
+
+    return Direction.by_pattern(best_vec)
+
+
+
 static func by_delta(from_pos: Vector2i, to_pos: Vector2i) -> Direction:
-    return Direction.by_pattern(Vector2i(to_pos - from_pos).sign())
+    return Direction.by_normalized(Vector2(from_pos).direction_to(to_pos))
+    # return Direction.by_pattern(Vector2i(to_pos - from_pos).sign())
 
 
 static func get_all(shuffled := false) -> Array[Direction]:
