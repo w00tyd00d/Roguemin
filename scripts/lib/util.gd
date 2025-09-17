@@ -30,12 +30,12 @@ func get_bresenham_line(a: Vector2i, b: Vector2i) -> Array[Vector2i]:
 
 func get_square_around_pos(
         pos: Vector2i,
-        side_length: int,
+        face_length: int,
         filled := false) -> Array[Vector2i]:
             
-    if side_length < 2: return [pos]
+    if face_length < 2: return [pos]
     
-    var half := (side_length-1) / 2.0
+    var half := (face_length-1) / 2.0
     var left := floori(-half)
     var right := floori(half)
     var res : Array[Vector2i] = []
@@ -51,6 +51,39 @@ func get_square_around_pos(
             if n > left and n < right:
                 res.append(Vector2i(pos.x + left, pos.y + n))
                 res.append(Vector2i(pos.x + right, pos.y + n))
+    
+    return res
+
+
+func foreach_around_pos(
+        pos: Vector2i,
+        face_length: int,
+        callback: Callable,
+        filled := true) -> Dictionary:
+
+    var res := {}
+
+    if face_length < 2:
+        if face_length == 0:
+            return {}
+        callback.call(pos, res)
+        return res
+    
+    var half := (face_length-1) / 2.0
+    var left := floori(-half)
+    var right := floori(half)
+
+    if filled:
+        for y in range(left, right+1):
+            for x in range(left, right+1):
+                callback.call(Vector2i(pos.x + x, pos.y + y), res)
+    else:
+        for n in range(left, right+1):
+            callback.call(Vector2i(pos.x + n, pos.y + left), res)
+            callback.call(Vector2i(pos.x + n, pos.y + right), res)
+            if n > left and n < right:
+                callback.call(Vector2i(pos.x + left, pos.y + n), res)
+                callback.call(Vector2i(pos.x + right, pos.y + n), res)
     
     return res
 

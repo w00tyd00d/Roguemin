@@ -12,7 +12,7 @@ signal new_game
 
 signal toggle_hud(val: bool)
 
-signal update_sun_meter(time: int)
+signal world_time_changed(time: int)
 
 signal display_unit_toggle(val: bool)
 signal update_unit_toggle(dict: Dictionary)

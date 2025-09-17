@@ -4,12 +4,12 @@ var world_factory := WorldFactory.new()
 
 var game_started := false
 
-@onready var game_viewport := $GameScreen/%SubViewport as SubViewport
-@onready var unit_container := $GameScreen/%UnitContainer as UnitContainer
-
 @onready var main_screen := $MainScreen as Control
 @onready var loading_screen := $LoadingScreen as Control
 @onready var game_screen := $GameScreen as Control
+
+@onready var game_viewport := $GameScreen/%SubViewport as SubViewport
+@onready var unit_container := $GameScreen/%UnitContainer as UnitContainer
 
 func _ready() -> void:
     # Set the default background color to black at runtime
