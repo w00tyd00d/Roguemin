@@ -124,21 +124,21 @@ func set_glyph(grid_pos: Vector2i, glyph: Glyph) -> void:
     var chunk_pos := grid_pos / Globals.CHUNK_SIZE
     var tile_pos := grid_pos % Globals.CHUNK_SIZE
 
-    get_chunk(chunk_pos).set_glyph(tile_pos, glyph)    
+    get_chunk(chunk_pos).set_glyph(tile_pos, glyph)
 
 
 func get_glyph(grid_pos: Vector2i) -> Glyph:
     var chunk_pos := grid_pos / Globals.CHUNK_SIZE
     var tile_pos := grid_pos % Globals.CHUNK_SIZE
 
-    return get_chunk(chunk_pos).get_glyph(tile_pos)  
+    return get_chunk(chunk_pos).get_glyph(tile_pos)
 
 
 func set_background(grid_pos: Vector2i, glyph: Glyph):
     var chunk_pos := grid_pos / Globals.CHUNK_SIZE
     var tile_pos := grid_pos % Globals.CHUNK_SIZE
 
-    get_chunk(chunk_pos).set_background(tile_pos, glyph) 
+    get_chunk(chunk_pos).set_background(tile_pos, glyph)
 
 
 func get_background(grid_pos: Vector2i):
@@ -253,8 +253,8 @@ func move_entity(ent: Entity, dest: Tile) -> void:
 
 func move_unit(unit: Unit, dest: Tile) -> void:
     var tile := unit.current_tile
-    dest.add_unit(unit)
     tile.remove_unit(unit)
+    dest.add_unit(unit)
 
 
 func spawn_entity(cls, pos: Vector2i) -> void:
@@ -280,7 +280,7 @@ func spawn_unit(
 
     if type == Type.Unit.NONE:
         type = [Type.Unit.RED, Type.Unit.YELLOW, Type.Unit.BLUE].pick_random()
-    
+
     var unit : Unit = unit_container.get_available_unit()
     var tile := get_tile(pos)
     if not unit or not tile: return

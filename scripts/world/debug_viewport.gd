@@ -8,14 +8,18 @@ func _gui_input(event: InputEvent) -> void:
     var chunk := world.get_chunk(chunk_pos)
     var room := chunk.room if chunk else null
 
-    var debug_string := "COH: {0}, ALI: {1}, SEP: {2}, DST: {3}".format([
+    var debug_string := "COH: {0}\nALI: {1}\nDST: {2}".format([
         Globals.BOID_COHESION_WEIGHT,
         Globals.BOID_ALIGNMENT_WEIGHT,
-        Globals.BOID_AVOIDANCE_WEIGHT,
-        Globals.BOID_DESTINATION_WEIGHT
+        Globals.BOID_DESTINATION_WEIGHT,
+
     ])
 
-    # var debug_str := "({0},{1})".format([chunk_pos.x, chunk_pos.y])
+    debug_string += "\n({0},{1})\n({2},{3})\n({4},{5})".format([
+        chunk_pos.x, chunk_pos.y,
+        grid_pos.x % Globals.CHUNK_SIZE.x, grid_pos.y % Globals.CHUNK_SIZE.y,
+        grid_pos.x, grid_pos.y
+    ])
 
     # if room: debug_str += "\nRoom {0}".format([room.id])
     # if tile:
@@ -67,7 +71,6 @@ func _gui_input(event: InputEvent) -> void:
         var _sign := -1 if Input.is_action_pressed(&"k_shift") else 1
 
         match cmd:
-            &"d_F9": Globals.BOID_COHESION_WEIGHT += _val * _sign
-            &"d_F10": Globals.BOID_ALIGNMENT_WEIGHT += _val * _sign
-            &"d_F11": Globals.BOID_AVOIDANCE_WEIGHT += _val * _sign
+            &"d_F10": Globals.BOID_COHESION_WEIGHT += _val * _sign
+            &"d_F11": Globals.BOID_ALIGNMENT_WEIGHT += _val * _sign
             &"d_F12": Globals.BOID_DESTINATION_WEIGHT += _val * _sign

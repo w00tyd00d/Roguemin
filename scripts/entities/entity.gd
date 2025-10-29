@@ -22,7 +22,7 @@ var last_position : Vector2i
 ## The last direction the entity had traveled
 var last_direction : Direction :
     get:
-        if last_position == Vector2i(): return Direction.empty
+        if last_position == Vector2i(): return Direction.none
         return Direction.by_delta(last_position, grid_position)
 
 ## The last vector the entity had traveled
@@ -97,19 +97,18 @@ func do_action() -> bool:
 
 
 func add_and_check_energy(time_units: int) -> bool:
-    # If we already can act, refund the points if the action fails
+    # If we can already act, don't add any more energy
     if can_act:
-        if do_action():
-            return true
-        action_energy -= time_units
-        return false
+        return do_action()
+        #if do_action():
+            #return true
+        #action_energy -= time_units
+        #return false
 
     # Otherwise, we can continue to accumulate
     action_energy += time_units
 
-    var res := do_action() if can_act else false
-
-    return res
+    return do_action() if can_act else false
 
 
 func add_immunity(hazard: Type.Hazard) -> void:

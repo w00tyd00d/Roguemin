@@ -6,7 +6,7 @@ class_name AStarTiles extends AStarGrid2D
 var world : World
 
 # The cached entity committing the search.
-var _entity : Entity
+# var _entity : Entity
 
 
 func _init(_world: World) -> void:
@@ -21,12 +21,12 @@ func _compute_cost(from_id: Vector2i, to_id: Vector2i) -> float:
     # Check for walls
     if world.query_tile(dest) == Type.Tile.WALL and not world.query_tile(tile) == Type.Tile.VOID:
         return INF
-    
+
     # Check for hazards
 
     return from_id.distance_to(to_id)
 
 
-func find_path_to(ent: Entity, pos: Vector2i) -> Array[Vector2i]:
-    _entity = ent
-    return get_id_path(ent.grid_position, pos)
+func find_path_to(pos: Vector2i, dest: Vector2i) -> Array[Vector2i]:
+    # _entity = ent
+    return get_id_path(pos, dest)

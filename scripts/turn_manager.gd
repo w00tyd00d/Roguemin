@@ -12,6 +12,7 @@ func process_turns(time_units: int) -> void:
     var entities := get_tree().get_nodes_in_group(&"entities")
 
     GameState.world.time += time_units
+    Unit.toggle_centroid_buffer()
 
     # var _start_time := Time.get_ticks_msec()
 
@@ -22,7 +23,7 @@ func process_turns(time_units: int) -> void:
         if unit.time < GameState.world.time:
             if unit.update() and unit.can_act:
                 unit_queue.append(unit)
-    
+
     while not unit_queue.is_empty():
         var unit : Unit = unit_queue.pop_front()
         if unit.update() and unit.can_act:
@@ -32,7 +33,7 @@ func process_turns(time_units: int) -> void:
         if entity.time < GameState.world.time:
             if entity.update() and entity.can_act:
                 entity_queue.append(entity)
-    
+
     while not entity_queue.is_empty():
         var entity : MultiTileEntity = entity_queue.pop_front()
         if entity.update() and entity.can_act:

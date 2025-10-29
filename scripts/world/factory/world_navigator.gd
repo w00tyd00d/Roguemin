@@ -69,7 +69,6 @@ func generate_navigation_fields(world: World) -> void:
 
         tiles = new_tiles
 
-
         await GameState.get_tree().process_frame
 
         if not GameState.is_valid_object(world):

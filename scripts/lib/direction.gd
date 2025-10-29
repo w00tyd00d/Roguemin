@@ -14,7 +14,7 @@ const ALL_VECTORS : Array[Vector2i] = [
     Vector2i.LEFT,
 ]
 
-static var empty := Direction.new(Vector2i())
+static var none := Direction.new(Vector2i())
 
 static var north := Direction.new(Vector2i.UP)
 static var south := Direction.new(Vector2i.DOWN)
@@ -33,7 +33,7 @@ var is_horizontal : bool
 
 var adjacent : Array[Direction] :
     get:
-        if vector == Vector2i(): return [Direction.empty, Direction.empty]
+        if vector == Vector2i(): return [Direction.none, Direction.none]
         if not adjacent:
             var left := ALL_VECTORS[(_index-1 + 8) % 8]
             var right := ALL_VECTORS[(_index+1) % 8]
@@ -42,7 +42,7 @@ var adjacent : Array[Direction] :
 
 var orthogonal : Array[Direction] :
     get:
-        if vector == Vector2i(): return [Direction.empty, Direction.empty]
+        if vector == Vector2i(): return [Direction.none, Direction.none]
         if not orthogonal:
             var left := ALL_VECTORS[(_index-2 + 8) % 8]
             var right := ALL_VECTORS[(_index+2) % 8]
@@ -51,7 +51,7 @@ var orthogonal : Array[Direction] :
 
 var opposite : Direction :
     get:
-        if vector == Vector2i(): return Direction.empty
+        if vector == Vector2i(): return Direction.none
         if not opposite:
             opposite = Direction.by_pattern(ALL_VECTORS[(_index+4) % 8])
         return opposite
@@ -70,14 +70,14 @@ static func by_pattern(pattern: Variant) -> Direction:
         &"c_downleft", Vector2i(-1,1): return Direction.southwest
         &"c_downright", Vector2i(1,1): return Direction.southeast
         _: return null
-    
+
 
 static func by_normalized(nvec: Vector2) -> Direction:
-    if nvec.is_zero_approx():
-        return null
-
     # Ensure the passed vector is in fact normalized
     nvec = nvec.normalized()
+
+    if nvec.is_zero_approx():
+        return Direction.none
 
     var best_dot := -1.0
     var best_vec : Vector2i
@@ -91,10 +91,10 @@ static func by_normalized(nvec: Vector2) -> Direction:
     return Direction.by_pattern(best_vec)
 
 
-
 static func by_delta(from_pos: Vector2i, to_pos: Vector2i) -> Direction:
+    if from_pos == to_pos:
+        return Direction.none
     return Direction.by_normalized(Vector2(from_pos).direction_to(to_pos))
-    # return Direction.by_pattern(Vector2i(to_pos - from_pos).sign())
 
 
 static func get_all(shuffled := false) -> Array[Direction]:
@@ -127,14 +127,14 @@ static func get_cardinal(shuffled := false) -> Array[Direction]:
 
 func _init(vec: Vector2i, _diagonal := false) -> void:
     vector = vec
-    
+
     if vec == Vector2i():
         _index = -1
         return
-    
+
     is_diagonal = absi(vector.x) + absi(vector.y) == 2
     is_vertical = vector.x == 0
     is_horizontal = vector.y == 0
-    
+
     _index = ALL_VECTORS.find(vec)
     assert(_index > -1, "Invalid direction given")

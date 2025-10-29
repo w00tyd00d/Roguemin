@@ -11,12 +11,15 @@ enum State {
     DEAD
 }
 
+## The boolean toggle to indicate which centroid buffer variable we're
+## currently watching.
+static var centroid_buffer := false
+
 ## The current type of the unit.
 var type : Type.Unit
 
 ## Returns if the unit has been upgraded or not.
 var upgraded : bool
-
 
 ## The current state of the unit.
 var state := State.DEAD :
@@ -47,8 +50,35 @@ var path : Array :
         if not path.is_empty():
             GameState.ASTAR_TEST.emit(arr)
 
-## Cached result of the location of the units current boid centroid
-var centroid : Vector2i
+## The location of the next point along the unit's path
+var next_destination : Vector2i :
+    get:
+        if not path.is_empty():
+            return path[0]
+        elif target:
+            return target.grid_position
+
+        return Vector2i()
+
+## Cached location of the unit's current boid centroid
+var centroid : Centroid :
+    get: return _centroid_b if Unit.centroid_buffer else _centroid_a
+    set(cent):
+        if Unit.centroid_buffer:
+            _centroid_a = null
+            _centroid_b = cent
+        else:
+            _centroid_a = cent
+            _centroid_b = null
+        # DEBUG
+        if cent != null:
+            sightline_centroid.rotation = cent.cohesion_vector(grid_position).angle()
+
+var cohesion_vector : Vector2 :
+    get:
+        if centroid:
+            return centroid.cohesion_vector(grid_position)
+        return Vector2()
 
 ## A flag representing if the unit is idle.
 var idle : bool :
@@ -61,6 +91,21 @@ var in_limbo : bool :
 ## A flag for whether not the unit is allowed to stack with other units
 var can_stack : bool :
     get: return state == State.ATTACK
+
+## First centroid buffer slot
+var _centroid_a : Centroid
+
+## Second centroid buffer slot
+var _centroid_b : Centroid
+
+## Cached boid alignment vector
+var _alignment_vector : Vector2i
+
+
+# DEBUG
+@onready var sightline_boid := $Sightline1 as ColorRect
+@onready var sightline_centroid := $Sightline2 as ColorRect
+#
 
 
 func _ready() -> void:
@@ -76,6 +121,10 @@ static func metadata(_type: Type.Unit) -> Dictionary:
     return {}
 
 
+static func toggle_centroid_buffer() -> void:
+    Unit.centroid_buffer = not Unit.centroid_buffer
+
+
 func get_metadata() -> Dictionary:
     return Unit.metadata(type)
 
@@ -84,12 +133,14 @@ func update() -> bool:
     if in_limbo:
         time = maxi(time, world.time)
         return false
+
+    if centroid == null:
+        _calculate_centroid()
+
     return super()
 
 
 func do_action() -> bool:
-    centroid = Vector2i()
-
     match state:
         State.FOLLOW:
             return _do_follow_action()
@@ -136,14 +187,15 @@ func reset() -> void:
     grid_position = Vector2()
     last_player_tile = null
 
-    centroid = Vector2i()
+    # _centroid_a = Vector2i()
+    centroid = null
 
 
 func spawn(pos: Vector2i, _type: Type.Unit, _upgraded := false) -> void:
     type = _type
     upgraded = true # No time to implement nectar :(
-    state = State.FOLLOW if _in_range_of_tether() else State.IDLE
     grid_position = pos
+    state = State.FOLLOW if _in_range_of_tether() else State.IDLE
     show()
 
 
@@ -186,84 +238,98 @@ func move_to(dest: Tile) -> void:
 func swap_with(dest: Tile) -> bool:
     var units := dest.get_all_units()
 
-    if units.size() > 1 or last_position == grid_position or centroid == Vector2i():
-        return false
-
-    var unit := units[0] as Unit
-    var dist1 := grid_position.distance_to(centroid)
-    var dist2 := unit.grid_position.distance_to(unit.centroid)
-
-    if (centroid == Vector2i() or
-        dest.grid_position.distance_to(centroid) > dist1 or
-        unit.centroid != Vector2i() and
-        grid_position.distance_to(unit.centroid) > dist2):
+    if (units.size() > 1 or                 # Can't swap with multiple units
+        last_position == grid_position):    # Prevent oscillation
             return false
 
-    units[0].move_to(current_tile)
+    # Do a centroid distance check
+    var dist1 := Util.chebyshev_distance(centroid.position, grid_position)
+    var dist2 := Util.chebyshev_distance(centroid.position, dest.grid_position)
+
+    # NOT CHECKING DISTANCE OF OTHER UNIT'S CENTROID MIGHT CAUSE OSCILLATION
+    # LEAVING IT SIMPLE FOR NOW
+    if dist1 <= dist2:
+        return false
+
+    var nbr := units[0]
+
+    if nbr.centroid.count > 1:
+        var ndist1 := Util.chebyshev_distance(nbr.centroid.position, nbr.grid_position)
+        var ndist2 := Util.chebyshev_distance(nbr.centroid.position, nbr.grid_position)
+        if ndist1 <= ndist2:
+            return false
+
+    nbr.move_to(current_tile)
     move_to(dest)
 
     return true
 
 
-func move_towards(tile: Tile) -> bool:
-    var delta := tile.grid_position - grid_position
-    var ax := absi(delta.x)
-    var ay := absi(delta.y)
+func move_towards(dest: Tile) -> bool:
+    var boid_tile := _apply_boid_calculation(dest)
 
-    var vec : Vector2i
+    if boid_tile == current_tile:
+        return false
 
-    if ax >= ay * 2: vec = Vector2i(delta.sign().x, 0)
-    elif ay >= ax * 2: vec = Vector2i(0, delta.sign().y)
-    else: vec = delta.sign()
+    #var delta := boid_tile.grid_position - grid_position
+    #var ax := absi(delta.x)
+    #var ay := absi(delta.y)
 
-    var dir := Direction.by_pattern(vec)
-    if not dir: return false
+    #var vec : Vector2i
+#
+    #if ax >= ay * 2: vec = Vector2i(delta.sign().x, 0)
+    #elif ay >= ax * 2: vec = Vector2i(0, delta.sign().y)
+    #else: vec = delta.sign()
 
-    tile = _apply_boid_calculation(tile)
-    if tile == current_tile:
+    #var dir := Direction.by_pattern(dir.vector)
+    var dir := Direction.by_delta(grid_position, boid_tile.grid_position)
+
+    if not dir or dir == Direction.none:
         return false
 
     var res := _check_tile_at(grid_position + dir.vector)
-    var dest := world.get_tile(grid_position + dir.vector)
+    var next_tile := world.get_tile(grid_position + dir.vector)
 
     match res:
         Type.Tile.WALL:
-            if state == State.RETURN and Tag.has(dest, Tags.UNIT_SHIP):
+            if state == State.RETURN and Tag.has(next_tile, Tags.UNIT_SHIP):
                 reset()
                 return true # We reset, so no action cost needed
             elif current_tile.type == Type.Tile.VOID:
-                return _do_move_action(dest)
+                return _do_move_action(next_tile)
 
         Type.Tile.ENTITY:
             # Has units, but not entities
-            if not tile.has_entities:
-                if _do_move_action(dest):
+            if not next_tile.has_entities:
+                if _do_move_action(next_tile):
                     return true
-            # pass
         _:
-            return _do_move_action(dest)
+            return _do_move_action(next_tile)
 
-    var dist := grid_position.distance_to(tile.grid_position)
-    # if dist < 1.5: return false
+    var dist := grid_position.distance_to(target.grid_position)
+    var limit := 5
 
-    var limit := 11
+    if dist < 1.5:
+        return false
 
     for adj_dir in dir.adjacent:
         if (grid_position + adj_dir.vector == last_position and dist <= limit or
             dir.orthogonal.has(last_direction)):
             continue
         if _check_tile_at(grid_position + adj_dir.vector) == Type.Tile.GRASS:
-            dest = world.get_tile(grid_position + adj_dir.vector)
-            return _do_move_action(dest)
+            next_tile = world.get_tile(grid_position + adj_dir.vector)
+            return _do_move_action(next_tile)
 
-    if dist < limit:
+    var cheby := Util.chebyshev_distance(grid_position, target.grid_position)
+    if cheby <= limit:
         return false
 
     for ort_dir in dir.orthogonal:
-        # if grid_position + ort_dir.vector == last_position: continue
+        if grid_position + ort_dir.vector == last_position:
+            continue
         if _check_tile_at(grid_position + ort_dir.vector) == Type.Tile.GRASS:
-            dest = world.get_tile(grid_position + ort_dir.vector)
-            return _do_move_action(dest)
+            next_tile = world.get_tile(grid_position + ort_dir.vector)
+            return _do_move_action(next_tile)
 
     return false
 
@@ -349,6 +415,9 @@ func _go_idle() -> void:
 func _do_follow_action() -> bool:
     if not player: return false
 
+    if name == "Unit26":
+        pass
+
     var tether := player.unit_tether
     var dest := tether.tail.current_tile
 
@@ -357,92 +426,186 @@ func _do_follow_action() -> bool:
         return false
 
     if _can_see_tether():
+        path = []
         return move_towards(dest)
-    else:
-        if (path.is_empty() or
-            Util.chebyshev_distance(path[-1], target.grid_position) > 5):
-                path = world.astar.find_path_to(self, dest.grid_position)
-                _broadcast_path()
 
-        var dist := Util.chebyshev_distance(current_tile.grid_position, path[0])
-        if dist < 2:
-            path.pop_front()
-        if not path.is_empty():
-            return move_towards(world.get_tile(path[0]))
+    if (path.is_empty() or
+        Util.chebyshev_distance(path[0], dest.grid_position) >= 5):
+            # We get the path in reverse to use as a stack
+            path = world.astar.get_id_path(dest.grid_position, grid_position)
+            _broadcast_path()
+
+    if path.is_empty():
+        return false
+
+    var dist := Util.chebyshev_distance(current_tile.grid_position, path[-1])
+    if dist < 2:
+        path.pop_back()
+    if not path.is_empty():
+        return move_towards(world.get_tile(path[-1]))
 
     return false
 
 
-func _apply_boid_calculation(dest: Tile) -> Tile:
-    var area := Util.get_square_around_pos(grid_position, 5, true)
+func _calculate_centroid() -> void:
+    var cent := Centroid.new()
+    var data := _dfs_centroid_scan({})
 
-    var cohesion_sum := Vector2i()
-    var alignment_sum := Vector2i()
-    var avoidance_sum := Vector2i()
+    for unit: Unit in data:
+        cent.add_position(data[unit])
+        unit.centroid = cent
 
-    var count := 0
 
-    for pos in area:
-        if pos == grid_position: continue
-
+func _dfs_centroid_scan(history: Dictionary[Unit, Vector2i]) -> Dictionary:
+    var res := Util.foreach_around_pos(grid_position, 5, func(pos: Vector2i, data: Dictionary):
         var tile := world.get_tile(pos)
-        var dist := Util.chebyshev_distance(tile.grid_position, grid_position)
 
         if tile.has_units:
             var same_units := tile.get_units(type)
 
-            if not same_units.is_empty():
-                cohesion_sum += tile.grid_position
-                alignment_sum += same_units[0].last_velocity
-                count += 1
+            if same_units.is_empty():
+                return
 
-                if dist == 1:
-                    avoidance_sum += grid_position - tile.grid_position
+            if data.is_empty():
+                data.centroid_sum = Vector2i()
+                data.velocity_sum = Vector2i()
+                data.count = 0
+                data.units = []
 
-        if (dist == 1 and (tile.has_entities or
-            current_tile.walkable and tile.type == Type.Tile.WALL)):
-            avoidance_sum += grid_position - tile.grid_position
+            for unit in same_units:
+                if next_destination == unit.next_destination:
+                    data.centroid_sum += tile.grid_position
+                    data.velocity_sum += unit.last_velocity
+                    data.count += 1
+                    data.units.append(unit)
+    )
 
-    var cohesion := Vector2()
-    var alignment := Vector2()
+    if res.is_empty():
+        return history
 
-    if count > 0:
-        var _centroid := Vector2(cohesion_sum) / count
-        centroid = _centroid
+    history[self] = res.centroid_sum / res.count
 
-        Vector2(_centroid - Vector2(grid_position)).normalized()
-        Vector2(Vector2(alignment_sum) / count - Vector2(last_velocity)).normalized()
+    # We directly assign its local alignment while we have the data handy
+    _alignment_vector = (Vector2(res.velocity_sum) / res.count)
 
-    var avoidance := Vector2(avoidance_sum).normalized()
-    var destination := Vector2(dest.grid_position - grid_position).normalized()
+    for unit: Unit in res.units:
+        if not history.has(unit):
+            unit._dfs_centroid_scan(history)
 
-    var vector := (
-        cohesion * Globals.BOID_COHESION_WEIGHT +
-        alignment * Globals.BOID_ALIGNMENT_WEIGHT +
-        avoidance * Globals.BOID_AVOIDANCE_WEIGHT +
-        destination * Globals.BOID_DESTINATION_WEIGHT
-    ).normalized()
+    return history
 
-    var result : Tile
 
-    if is_equal_approx(vector.x, vector.y):
-        if is_zero_approx(vector.x):
-            result = current_tile
-        else:
-            var dir := Direction.by_pattern(Vector2i(vector.sign()))
-            var adj := dir.adjacent.pick_random() as Direction
-            result = current_tile.get_neighbor(adj)
-    else:
-        var dir := Direction.by_pattern(Vector2i(vector.round()))
-        result = current_tile.get_neighbor(dir)
+func _apply_boid_calculation(dest: Tile) -> Tile:
+    var dest_vec := Vector2(grid_position).direction_to(Vector2(dest.grid_position))
+    var cohe_vec := centroid.cohesion_vector(grid_position)
 
-    return result
+    var boid_vector := (
+        dest_vec * Globals.BOID_DESTINATION_WEIGHT +
+        cohe_vec * Globals.BOID_COHESION_WEIGHT +
+        _alignment_vector * Globals.BOID_ALIGNMENT_WEIGHT
+    )
+
+    # DEBUG
+    sightline_boid.rotation = boid_vector.angle()
+
+    if boid_vector.length() < 0.2:
+        return current_tile
+
+    # DEBUG
+    # var delta := dest.grid_position - grid_position
+    # var original_vector : Vector2i
+
+    # if absi(delta.x) >= absi(delta.y) * 2: original_vector = Vector2i(delta.sign().x, 0)
+    # elif absi(delta.y) >= absi(delta.x) * 2: original_vector = Vector2i(0, delta.sign().y)
+    # else: original_vector = delta.sign()
+
+    # print("Original Vector : ", original_vector)
+    # print("Normalized Vector : ", dest_vec)
+    # print("Flocking Vector : ", boid_vector.normalized())
+
+    var dir := Direction.by_normalized(boid_vector.normalized())
+
+    # print("Resulting Vector : ", dir.vector, "\n")
+
+    return world.get_tile(grid_position + dir.vector)
+
+
+
+# func _apply_boid_calculation_old(dest: Tile) -> Tile:
+#     var area := Util.get_square_around_pos(grid_position, 5, true)
+
+#     var cohesion_sum := Vector2i()
+#     var alignment_sum := Vector2i()
+#     var avoidance_sum := Vector2i()
+
+#     var count := 0
+
+#     for pos in area:
+#         if pos == grid_position: continue
+
+#         var tile := world.get_tile(pos)
+#         var dist := Util.chebyshev_distance(tile.grid_position, grid_position)
+
+#         if tile.has_units:
+#             var same_units := tile.get_units(type)
+
+#             if not same_units.is_empty():
+#                 cohesion_sum += tile.grid_position
+#                 alignment_sum += same_units[0].last_velocity
+#                 count += 1
+
+#                 if dist == 1:
+#                     avoidance_sum += grid_position - tile.grid_position
+
+#         if (dist == 1 and (tile.has_entities or
+#             current_tile.walkable and tile.type == Type.Tile.WALL)):
+#             avoidance_sum += grid_position - tile.grid_position
+
+#     #region
+#     var cohesion := Vector2()
+#     var alignment := Vector2()
+
+#     if count > 0:
+#         var _centroid := Vector2(cohesion_sum) / count
+#         _centroid_a = _centroid
+
+#         Vector2(_centroid - Vector2(grid_position)).normalized()
+#         Vector2(Vector2(alignment_sum) / count - Vector2(last_velocity)).normalized()
+
+#     var avoidance := Vector2(avoidance_sum).normalized()
+#     var destination := Vector2(dest.grid_position - grid_position).normalized()
+#     #endregion
+
+#     var vector := (
+#         cohesion * Globals.BOID_COHESION_WEIGHT +
+#         alignment * Globals.BOID_ALIGNMENT_WEIGHT +
+#         avoidance * Globals.BOID_AVOIDANCE_WEIGHT +
+#         destination * Globals.BOID_DESTINATION_WEIGHT
+#     ).normalized()
+
+#     var result : Tile
+
+#     if is_equal_approx(vector.x, vector.y):
+#         if is_zero_approx(vector.x):
+#             result = current_tile
+#         else:
+#             var dir := Direction.by_pattern(Vector2i(vector.sign()))
+#             var adj := dir.adjacent.pick_random() as Direction
+#             result = current_tile.get_neighbor(adj)
+
+#     else:
+#         var dir := Direction.by_pattern(Vector2i(vector.round()))
+#         result = current_tile.get_neighbor(dir)
+
+#     return result
 
 
 func _do_move_action(dest: Tile) -> bool:
     # ALLOW TO BE MODIFIED BY BEING BOOSTED WITH SPICY SPRAY
     # AND RUSH BOOTS!
-    var cost := Globals.DEFAULT_ENERGY_STEP - 10
+    var step := Globals.DEFAULT_ENERGY_STEP
+    var dist := Util.chebyshev_distance(grid_position, player.grid_position)
+    var cost := step - 20 if state == State.FOLLOW and dist > 8 else step
 
     if dest.has_units and not can_stack:
         if not swap_with(dest):
@@ -484,7 +647,8 @@ func _can_see_tether() -> bool:
     var raycast := DDARC.to_grid_position(
         grid_position,
         tail.grid_position,
-        callback)
+        callback
+    )
 
     return raycast.grid_position == tail.grid_position
 
@@ -510,16 +674,21 @@ func _broadcast_path() -> void:
 
     var hist := {}
     var tiles := current_tile.get_all_neighbors()
+
     for _i in 2:
         var new_tiles : Array[Tile] = []
+
         for tile in tiles:
-            if hist.has(tile): continue
+            if hist.has(tile):
+                continue
             hist[tile] = true
+
             for unit in tile.get_all_units():
                 var empty_path := unit.path.is_empty()
                 if (unit.target == target and empty_path or
-                    not empty_path and unit.path[-1] != path[-1]):
+                    not empty_path and unit.path[0] != path[0]):
                         unit._receive_path(path)
+
             new_tiles.append(tile)
 
 
@@ -567,6 +736,8 @@ func _on_state_enter(_state: State) -> void:
             player.remove_unit(self)
         State.CARRY:
             player.remove_unit(self)
+        State.RETURN:
+            target = world.unit_ship_tile
 
 
 func _on_state_exit(_state: State) -> void:
@@ -575,3 +746,26 @@ func _on_state_exit(_state: State) -> void:
             _update_glyph()
         State.CARRY:
             drop_object()
+
+
+class Centroid:
+    var count := 0
+    var position : Vector2 :
+        get:
+            if position == Vector2():
+                var res := Vector2()
+                for vec in _vectors:
+                    res += Vector2(vec)
+                position = res / _vectors.size()
+            return position
+
+    var _vectors : Array[Vector2i]
+
+    func add_position(vec: Vector2i) -> void:
+        _vectors.append(vec)
+        count += 1
+        # Reset grid_position so it recalculates
+        position = Vector2i()
+
+    func cohesion_vector(pos: Vector2i) -> Vector2:
+        return Vector2(pos).direction_to(position)
