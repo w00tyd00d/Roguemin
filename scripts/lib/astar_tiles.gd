@@ -18,8 +18,10 @@ func _compute_cost(from_id: Vector2i, to_id: Vector2i) -> float:
     var tile := world.get_tile(from_id)
     var dest := world.get_tile(to_id)
 
-    # Check for walls
-    if world.query_tile(dest) == Type.Tile.WALL and not world.query_tile(tile) == Type.Tile.VOID:
+        # Check for walls
+    if (world.query_tile(dest) == Type.Tile.WALL and not world.query_tile(tile) == Type.Tile.VOID or
+        # Check for entities
+        dest.has_entities):
         return INF
 
     # Check for hazards

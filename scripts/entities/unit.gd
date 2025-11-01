@@ -243,8 +243,11 @@ func swap_with(dest: Tile) -> bool:
             return false
 
     # Do a centroid distance check
-    var dist1 := Util.chebyshev_distance(centroid.position, grid_position)
-    var dist2 := Util.chebyshev_distance(centroid.position, dest.grid_position)
+    #var dist1 := Util.chebyshev_distance(centroid.position, grid_position)
+    #var dist2 := Util.chebyshev_distance(centroid.position, dest.grid_position)
+
+    var dist1 := centroid.position.distance_to(grid_position)
+    var dist2 := centroid.position.distance_to(dest.grid_position)
 
     # NOT CHECKING DISTANCE OF OTHER UNIT'S CENTROID MIGHT CAUSE OSCILLATION
     # LEAVING IT SIMPLE FOR NOW
@@ -253,10 +256,19 @@ func swap_with(dest: Tile) -> bool:
 
     var nbr := units[0]
 
-    if nbr.centroid.count > 1:
-        var ndist1 := Util.chebyshev_distance(nbr.centroid.position, nbr.grid_position)
-        var ndist2 := Util.chebyshev_distance(nbr.centroid.position, nbr.grid_position)
-        if ndist1 <= ndist2:
+    # MAY NEED TO CHANGE FOR ATTACKING PURPOSES
+    if nbr.type == type:
+        return false
+
+    if nbr.centroid and nbr.centroid.count > 1:
+        #var ndist1 := Util.chebyshev_distance(nbr.centroid.position, nbr.grid_position)
+        #var ndist2 := Util.chebyshev_distance(nbr.centroid.position, nbr.grid_position)
+
+        # Check distance from current position to neighbors centroid to see
+        # what their new distance would be if they moved
+        var ndist := grid_position.distance_to(nbr.centroid.position)
+
+        if ndist > dist2:
             return false
 
     nbr.move_to(current_tile)
@@ -307,18 +319,28 @@ func move_towards(dest: Tile) -> bool:
             return _do_move_action(next_tile)
 
     var dist := grid_position.distance_to(target.grid_position)
-    var limit := 5
+    var limit := 8
 
     if dist < 1.5:
         return false
 
     for adj_dir in dir.adjacent:
-        if (grid_position + adj_dir.vector == last_position and dist <= limit or
-            dir.orthogonal.has(last_direction)):
-            continue
-        if _check_tile_at(grid_position + adj_dir.vector) == Type.Tile.GRASS:
-            next_tile = world.get_tile(grid_position + adj_dir.vector)
-            return _do_move_action(next_tile)
+        #if (grid_position + adj_dir.vector == last_position and dist <= limit or
+            #dir.orthogonal.has(last_direction)):
+            #continue
+        var res2 := _check_tile_at(grid_position + adj_dir.vector)
+        match res2:
+            Type.Tile.WALL:
+                continue
+            Type.Tile.GRASS:
+                next_tile = world.get_tile(grid_position + adj_dir.vector)
+                return _do_move_action(next_tile)
+            Type.Tile.ENTITY:
+                # Has units, but not entities
+                if not next_tile.has_entities:
+                    if _do_move_action(next_tile):
+                        return true
+        continue
 
     var cheby := Util.chebyshev_distance(grid_position, target.grid_position)
     if cheby <= limit:
@@ -415,7 +437,7 @@ func _go_idle() -> void:
 func _do_follow_action() -> bool:
     if not player: return false
 
-    if name == "Unit26":
+    if name == "Unit96":
         pass
 
     var tether := player.unit_tether
@@ -499,8 +521,13 @@ func _apply_boid_calculation(dest: Tile) -> Tile:
     var dest_vec := Vector2(grid_position).direction_to(Vector2(dest.grid_position))
     var cohe_vec := centroid.cohesion_vector(grid_position)
 
+    #var cohe_weight := Globals.BOID_COHESION_WEIGHT
+    var bdw := Globals.BOID_DESTINATION_WEIGHT
+    var dist := Util.chebyshev_distance(grid_position, target.grid_position)
+    var dest_weight := minf(bdw, bdw * dist / 4) # scale lower when within 10 tiles of target
+
     var boid_vector := (
-        dest_vec * Globals.BOID_DESTINATION_WEIGHT +
+        dest_vec * dest_weight +
         cohe_vec * Globals.BOID_COHESION_WEIGHT +
         _alignment_vector * Globals.BOID_ALIGNMENT_WEIGHT
     )
@@ -685,9 +712,8 @@ func _broadcast_path() -> void:
 
             for unit in tile.get_all_units():
                 var empty_path := unit.path.is_empty()
-                if (unit.target == target and empty_path or
-                    not empty_path and unit.path[0] != path[0]):
-                        unit._receive_path(path)
+                if unit.target == target and (empty_path or unit.path[0] != path[0]):
+                    unit._receive_path(path)
 
             new_tiles.append(tile)
 
