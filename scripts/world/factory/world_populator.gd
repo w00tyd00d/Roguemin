@@ -2,7 +2,7 @@ class_name WorldPopulator extends RefCounted
 
 ## The class responsible for populating the world instance with entities.
 
-var RNG := GameState.RNG 
+var RNG := GameState.RNG
 
 
 func run(world: World) -> void:
@@ -18,42 +18,9 @@ func generate_enemies(world: World) -> void:
 
 
 func generate_treasure(world: World) -> void:
-    var treasure : Treasure
-    for n in 20:
-        var attempts := 0
-        treasure = LargeTreasure.create()
-        while attempts < 10:
-            var rx := RNG.randi_range(0, world.size.x * Globals.CHUNK_SIZE.x)
-            var ry := RNG.randi_range(0, world.size.y * Globals.CHUNK_SIZE.y)
-            if not _check_for_entity_collision(world, treasure, Vector2i(rx, ry)):
-                world.spawn_entity(LargeTreasure, Vector2i(rx, ry))
-                break
-            attempts += 1
-    treasure.queue_free()
-
-    for n in 5:
-        var attempts := 0
-        treasure = MediumTreasure.create()
-        while attempts < 10:
-            var rx := RNG.randi_range(0, world.size.x * Globals.CHUNK_SIZE.x)
-            var ry := RNG.randi_range(0, world.size.y * Globals.CHUNK_SIZE.y)
-            if not _check_for_entity_collision(world, treasure, Vector2i(rx, ry)):
-                world.spawn_entity(MediumTreasure, Vector2i(rx, ry))
-                break
-            attempts += 1
-    treasure.queue_free()
-
-    for n in 10:
-        var attempts := 0
-        treasure = SmallTreasure.create()
-        while attempts < 10:
-            var rx := RNG.randi_range(0, world.size.x * Globals.CHUNK_SIZE.x)
-            var ry := RNG.randi_range(0, world.size.y * Globals.CHUNK_SIZE.y)
-            if not _check_for_entity_collision(world, treasure, Vector2i(rx, ry)):
-                world.spawn_entity(SmallTreasure, Vector2i(rx, ry))
-                break
-            attempts += 1
-    treasure.queue_free()
+    _verify_treasure_placement(world, LargeTreasure, 20)
+    _verify_treasure_placement(world, MediumTreasure, 5)
+    _verify_treasure_placement(world, SmallTreasure, 10)
 
 
 func _check_for_entity_collision(world: World, ent: MultiTileEntity, pos: Vector2i) -> bool:
@@ -69,3 +36,20 @@ func _check_for_entity_collision(world: World, ent: MultiTileEntity, pos: Vector
         if tile._entities.size() > 1:
             return true
     return false
+
+
+func _verify_treasure_placement(world: World, cls: GDScript, count: int) -> void:
+    var treasure := cls.create() as Treasure
+    world.add_child(treasure)
+
+    for n in count:
+        var attempts := 0
+        while attempts < 10:
+            var rx := RNG.randi_range(0, world.size.x * Globals.CHUNK_SIZE.x)
+            var ry := RNG.randi_range(0, world.size.y * Globals.CHUNK_SIZE.y)
+            if not _check_for_entity_collision(world, treasure, Vector2i(rx, ry)):
+                world.spawn_entity(cls, Vector2i(rx, ry))
+                break
+            attempts += 1
+
+    treasure.queue_free()
