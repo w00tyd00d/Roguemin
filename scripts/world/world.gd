@@ -235,8 +235,14 @@ func set_tile_type(pos: Vector2i, type: Type.Tile) -> void:
 func query_tile(tile: Tile) -> Type.Tile:
     if not tile: return Type.Tile.VOID
 
-    if not tile.is_empty:
+    if tile.has_entities:
+        # DEBUG
+        if tile.type == Type.Tile.WALL:
+            pass
         return Type.Tile.ENTITY
+
+    if tile.has_units:
+        return Type.Tile.UNIT
 
     return tile.type
 
@@ -257,16 +263,19 @@ func move_unit(unit: Unit, dest: Tile) -> void:
     dest.add_unit(unit)
 
 
-func spawn_entity(cls, pos: Vector2i) -> void:
-    var entity : Entity = cls.create()
+func spawn_entity(cls: GDScript, pos: Vector2i) -> void:
+    var entity : MultiTileEntity = cls.create()
     entity.grid_position = pos
 
     if entity is MultiTileEntity:
         entity.spawn_position = pos
 
-    for delta in entity.area_positions:
-        var tile := get_tile(pos + delta)
+    for delta: Vector2i in entity.area_positions:
+        var dpos := pos + delta
+        var tile := get_tile(dpos)
         tile.add_entity(entity)
+        # MIGHT NEED TO MAKE A GRADIENT INSTEAD OF JUST INF
+        astar.set_point_weight_scale(dpos, INF)
 
     if entity is Treasure:
         treasure_node.add_child(entity, true)

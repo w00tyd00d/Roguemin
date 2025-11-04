@@ -12,7 +12,7 @@ func enter():
 
 func update(inp: StringName) -> Array:
     var just_pressed := Input.is_action_just_pressed(inp)
-    
+
     if just_pressed:
         match inp:
             &"c_whistle":
@@ -37,23 +37,22 @@ func update(inp: StringName) -> Array:
 
     if inp == &"c_wait":
         return [true, _action_cost]
-    
+
     var dir := Direction.by_pattern(inp)
     if not dir: return [false]
 
     var tile := player.current_tile
-    
+
     var dest := tile.get_neighbor(dir)
     var res := world.query_tile(dest)
-    
+
     match res:
         Type.Tile.GRASS: player.move_to(dest)
-        Type.Tile.ENTITY:
-            if dest.has_entities: return [false]
+        Type.Tile.UNIT:
             for unit in dest.get_all_units():
                 unit.move_to(tile)
                 unit.join_squad()
             player.move_to(dest)
         _: return [false]
-    
+
     return [true, _action_cost]

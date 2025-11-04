@@ -18,10 +18,13 @@ func _compute_cost(from_id: Vector2i, to_id: Vector2i) -> float:
     var tile := world.get_tile(from_id)
     var dest := world.get_tile(to_id)
 
+    var query_self := world.query_tile(tile)
+    var query_dest := world.query_tile(dest)
+
         # Check for walls
-    if (world.query_tile(dest) == Type.Tile.WALL and not world.query_tile(tile) == Type.Tile.VOID or
+    if (query_dest == Type.Tile.WALL and not query_self == Type.Tile.VOID or
         # Check for entities
-        dest.has_entities):
+        query_dest == Type.Tile.ENTITY and not query_self == Type.Tile.ENTITY):
         return INF
 
     # Check for hazards
@@ -29,6 +32,6 @@ func _compute_cost(from_id: Vector2i, to_id: Vector2i) -> float:
     return from_id.distance_to(to_id)
 
 
-func find_path_to(pos: Vector2i, dest: Vector2i) -> Array[Vector2i]:
-    # _entity = ent
-    return get_id_path(pos, dest)
+# func find_path_to(pos: Vector2i, dest: Vector2i) -> Array[Vector2i]:
+#     # _entity = ent
+#     return get_id_path(pos, dest)

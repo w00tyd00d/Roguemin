@@ -3,7 +3,7 @@ class_name Type extends Object
 ## Global enum container.
 
 ## The types of tiles found within the world.
-enum Tile { VOID, WALL, GRASS, WATER, ENTITY }
+enum Tile { VOID, WALL, GRASS, WATER, ENTITY, UNIT }
 
 ## The types of world chunks.
 enum Chunk {

@@ -280,7 +280,8 @@ func swap_with(dest: Tile) -> bool:
 func move_towards(dest: Tile) -> bool:
     var boid_tile := _apply_boid_calculation(dest)
 
-    if boid_tile == current_tile:
+    #if boid_tile == current_tile:
+    if boid_tile.grid_position == grid_position:
         return false
 
     #var delta := boid_tile.grid_position - grid_position
@@ -310,11 +311,13 @@ func move_towards(dest: Tile) -> bool:
             elif current_tile.type == Type.Tile.VOID:
                 return _do_move_action(next_tile)
 
-        Type.Tile.ENTITY:
+        Type.Tile.UNIT:
             # Has units, but not entities
             if not next_tile.has_entities:
                 if _do_move_action(next_tile):
                     return true
+        Type.Tile.ENTITY:
+            pass
         _:
             return _do_move_action(next_tile)
 
@@ -328,14 +331,25 @@ func move_towards(dest: Tile) -> bool:
         #if (grid_position + adj_dir.vector == last_position and dist <= limit or
             #dir.orthogonal.has(last_direction)):
             #continue
+        next_tile = world.get_tile(grid_position + adj_dir.vector)
+
+        # DEBUG
+        var query := world.query_tile(next_tile)
+        if query == Type.Tile.WALL:
+            pass
+
         var res2 := _check_tile_at(grid_position + adj_dir.vector)
+        var query2 := world.query_tile(next_tile)
+
+        if res2 != query2:
+            pass
+
         match res2:
-            Type.Tile.WALL:
+            Type.Tile.WALL, Type.Tile.ENTITY:
                 continue
             Type.Tile.GRASS:
-                next_tile = world.get_tile(grid_position + adj_dir.vector)
                 return _do_move_action(next_tile)
-            Type.Tile.ENTITY:
+            Type.Tile.UNIT:
                 # Has units, but not entities
                 if not next_tile.has_entities:
                     if _do_move_action(next_tile):
@@ -349,7 +363,13 @@ func move_towards(dest: Tile) -> bool:
     for ort_dir in dir.orthogonal:
         if grid_position + ort_dir.vector == last_position:
             continue
-        if _check_tile_at(grid_position + ort_dir.vector) == Type.Tile.GRASS:
+
+        var res3 := _check_tile_at(grid_position + ort_dir.vector)
+
+        if res3 == Type.Tile.WALL:
+            continue
+
+        if res3 == Type.Tile.GRASS:
             next_tile = world.get_tile(grid_position + ort_dir.vector)
             return _do_move_action(next_tile)
 
@@ -437,7 +457,7 @@ func _go_idle() -> void:
 func _do_follow_action() -> bool:
     if not player: return false
 
-    if name == "Unit96":
+    if name == "Unit04":
         pass
 
     var tether := player.unit_tether
@@ -452,7 +472,8 @@ func _do_follow_action() -> bool:
         return move_towards(dest)
 
     if (path.is_empty() or
-        Util.chebyshev_distance(path[0], dest.grid_position) >= 5):
+        Util.chebyshev_distance(path[0], dest.grid_position) >= 5 or
+        path.size() == 1 and not _can_see_destination(path[0])):
             # We get the path in reverse to use as a stack
             path = world.astar.get_id_path(dest.grid_position, grid_position)
             _broadcast_path()
@@ -628,11 +649,16 @@ func _apply_boid_calculation(dest: Tile) -> Tile:
 
 
 func _do_move_action(dest: Tile) -> bool:
+    # DEBUG
+    if world.query_tile(dest) == Type.Tile.WALL:
+        pass
+
     # ALLOW TO BE MODIFIED BY BEING BOOSTED WITH SPICY SPRAY
     # AND RUSH BOOTS!
     var step := Globals.DEFAULT_ENERGY_STEP
     var dist := Util.chebyshev_distance(grid_position, player.grid_position)
-    var cost := step - 20 if state == State.FOLLOW and dist > 8 else step
+    #var cost := step - 20 if state == State.FOLLOW and dist > 8 else step
+    var cost := step + 10
 
     if dest.has_units and not can_stack:
         if not swap_with(dest):
@@ -661,23 +687,27 @@ func _in_range_of_tether() -> bool:
     return Util.chebyshev_distance(grid_position, dest) <= limit
 
 
-func _can_see_tether() -> bool:
-    var tail := player.unit_tether.tail
-
+func _can_see_destination(dest_pos: Vector2i) -> bool:
     var callback := func(ctx: DDARC.Context):
         var pos := ctx.grid_position
+        var query := world.query_tile_at(pos)
         if (not world.in_bounds(pos) or
-            world.query_tile_at(pos) == Type.Tile.WALL and not
-            current_tile.type == Type.Tile.VOID):
+            query == Type.Tile.ENTITY or
+            query == Type.Tile.WALL and not current_tile.type == Type.Tile.VOID):
                 return true
 
     var raycast := DDARC.to_grid_position(
         grid_position,
-        tail.grid_position,
+        dest_pos,
         callback
     )
 
-    return raycast.grid_position == tail.grid_position
+    return raycast.grid_position == dest_pos
+
+
+func _can_see_tether() -> bool:
+    var tail := player.unit_tether.tail
+    return _can_see_destination(tail.grid_position)
 
 
 func _check_tile_at(pos: Vector2i) -> Type.Tile:
@@ -685,7 +715,7 @@ func _check_tile_at(pos: Vector2i) -> Type.Tile:
     var res := world.query_tile(tile)
 
     # Cascade forward to see if we can resolve movement
-    if res == Type.Tile.ENTITY:
+    if res == Type.Tile.UNIT:
         var any := false
         for unit in tile.get_all_units():
             if unit.time < world.time and unit.update():

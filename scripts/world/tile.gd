@@ -60,7 +60,7 @@ var _units : Dictionary[Type.Unit, Dictionary] = {
 }
 
 ## The dictionary of multi-tile entities currently occupying the tile
-var _entities : Dictionary[Entity, bool] = {}
+var _entities := {}
 
 ## The weakref storage of the world to prevent memory leaks
 var _world_ref : WeakRef
