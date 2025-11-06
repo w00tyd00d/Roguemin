@@ -540,10 +540,9 @@ func _apply_boid_calculation(dest: Tile) -> Tile:
     var dest_vec := Vector2(grid_position).direction_to(Vector2(dest.grid_position))
     var cohe_vec := centroid.cohesion_vector(grid_position)
 
-    #var cohe_weight := Globals.BOID_COHESION_WEIGHT
     var bdw := Globals.BOID_DESTINATION_WEIGHT
     var dist := Util.chebyshev_distance(grid_position, target.grid_position)
-    var dest_weight := minf(bdw, bdw * dist / 4) # scale lower when within 10 tiles of target
+    var dest_weight := minf(bdw, bdw * dist / 4) # scale lower when within 4 tiles of target
 
     var boid_vector := (
         dest_vec * dest_weight +
@@ -552,98 +551,15 @@ func _apply_boid_calculation(dest: Tile) -> Tile:
     )
 
     # DEBUG
-    sightline_boid.rotation = boid_vector.angle()
+    # sightline_boid.rotation = boid_vector.angle()
 
     if boid_vector.length() < 0.2:
         return current_tile
 
-    # DEBUG
-    # var delta := dest.grid_position - grid_position
-    # var original_vector : Vector2i
-
-    # if absi(delta.x) >= absi(delta.y) * 2: original_vector = Vector2i(delta.sign().x, 0)
-    # elif absi(delta.y) >= absi(delta.x) * 2: original_vector = Vector2i(0, delta.sign().y)
-    # else: original_vector = delta.sign()
-
-    # print("Original Vector : ", original_vector)
-    # print("Normalized Vector : ", dest_vec)
-    # print("Flocking Vector : ", boid_vector.normalized())
-
     var dir := Direction.by_normalized(boid_vector.normalized())
-
-    # print("Resulting Vector : ", dir.vector, "\n")
 
     return world.get_tile(grid_position + dir.vector)
 
-
-
-# func _apply_boid_calculation_old(dest: Tile) -> Tile:
-#     var area := Util.get_square_around_pos(grid_position, 5, true)
-
-#     var cohesion_sum := Vector2i()
-#     var alignment_sum := Vector2i()
-#     var avoidance_sum := Vector2i()
-
-#     var count := 0
-
-#     for pos in area:
-#         if pos == grid_position: continue
-
-#         var tile := world.get_tile(pos)
-#         var dist := Util.chebyshev_distance(tile.grid_position, grid_position)
-
-#         if tile.has_units:
-#             var same_units := tile.get_units(type)
-
-#             if not same_units.is_empty():
-#                 cohesion_sum += tile.grid_position
-#                 alignment_sum += same_units[0].last_velocity
-#                 count += 1
-
-#                 if dist == 1:
-#                     avoidance_sum += grid_position - tile.grid_position
-
-#         if (dist == 1 and (tile.has_entities or
-#             current_tile.walkable and tile.type == Type.Tile.WALL)):
-#             avoidance_sum += grid_position - tile.grid_position
-
-#     #region
-#     var cohesion := Vector2()
-#     var alignment := Vector2()
-
-#     if count > 0:
-#         var _centroid := Vector2(cohesion_sum) / count
-#         _centroid_a = _centroid
-
-#         Vector2(_centroid - Vector2(grid_position)).normalized()
-#         Vector2(Vector2(alignment_sum) / count - Vector2(last_velocity)).normalized()
-
-#     var avoidance := Vector2(avoidance_sum).normalized()
-#     var destination := Vector2(dest.grid_position - grid_position).normalized()
-#     #endregion
-
-#     var vector := (
-#         cohesion * Globals.BOID_COHESION_WEIGHT +
-#         alignment * Globals.BOID_ALIGNMENT_WEIGHT +
-#         avoidance * Globals.BOID_AVOIDANCE_WEIGHT +
-#         destination * Globals.BOID_DESTINATION_WEIGHT
-#     ).normalized()
-
-#     var result : Tile
-
-#     if is_equal_approx(vector.x, vector.y):
-#         if is_zero_approx(vector.x):
-#             result = current_tile
-#         else:
-#             var dir := Direction.by_pattern(Vector2i(vector.sign()))
-#             var adj := dir.adjacent.pick_random() as Direction
-#             result = current_tile.get_neighbor(adj)
-
-#     else:
-#         var dir := Direction.by_pattern(Vector2i(vector.round()))
-#         result = current_tile.get_neighbor(dir)
-
-#     return result
 
 
 func _do_move_action(dest: Tile) -> bool:
