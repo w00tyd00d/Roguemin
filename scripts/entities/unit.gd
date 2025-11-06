@@ -231,8 +231,6 @@ func die() -> void:
 
 func move_to(dest: Tile) -> void:
     world.move_unit(self, dest)
-    last_position = grid_position
-    grid_position = dest.grid_position
 
 
 func swap_with(dest: Tile) -> bool:
@@ -657,8 +655,8 @@ func _do_move_action(dest: Tile) -> bool:
     # AND RUSH BOOTS!
     var step := Globals.DEFAULT_ENERGY_STEP
     var dist := Util.chebyshev_distance(grid_position, player.grid_position)
-    #var cost := step - 20 if state == State.FOLLOW and dist > 8 else step
-    var cost := step + 10
+    var cost := step - 20 if state == State.FOLLOW and dist > 8 else step
+    # var cost := step + 10
 
     if dest.has_units and not can_stack:
         if not swap_with(dest):

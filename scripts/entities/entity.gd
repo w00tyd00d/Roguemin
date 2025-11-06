@@ -51,8 +51,6 @@ var _immunities := {}
 
 func move_to(dest: Tile) -> void:
     world.move_entity(self, dest)
-    last_position = grid_position
-    grid_position = dest.grid_position
 
 
 func move_towards(target: Tile) -> bool:

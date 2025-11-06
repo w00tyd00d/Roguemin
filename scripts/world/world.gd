@@ -252,15 +252,43 @@ func query_tile_at(pos: Vector2i) -> Type.Tile:
 
 
 func move_entity(ent: Entity, dest: Tile) -> void:
-    var tile := ent.current_tile
-    tile.remove_entity(ent)
-    dest.add_entity(ent)
+    if ent is MultiTileEntity:
+        var world := ent.world
+        var area := ent.area_positions as Array[Vector2i]
+
+        for pos in area:
+            var dpos := ent.grid_position + pos
+            var tile := world.get_tile(dpos)
+            if tile: tile.remove_entity(ent)
+            world.astar.set_point_weight_scale(dpos, 1)
+
+        for pos in area:
+            var dpos := dest.grid_position + pos
+            var tile := world.get_tile(dpos)
+            tile.add_entity(ent)
+            world.astar.set_point_weight_scale(dpos, INF)
+
+        for unit: Unit in ent.carriers:
+            var pos : Vector2i = ent.carriers[unit]
+            var tile := world.get_tile(dest.grid_position + pos)
+            unit.move_to(tile)
+    else:
+        var tile := ent.current_tile
+        tile.remove_entity(ent)
+        dest.add_entity(ent)
+
+    ent.last_position = ent.grid_position
+    ent.grid_position = dest.grid_position
 
 
 func move_unit(unit: Unit, dest: Tile) -> void:
     var tile := unit.current_tile
+
     tile.remove_unit(unit)
     dest.add_unit(unit)
+
+    unit.last_position = unit.grid_position
+    unit.grid_position = dest.grid_position
 
 
 func spawn_entity(cls: GDScript, pos: Vector2i) -> void:

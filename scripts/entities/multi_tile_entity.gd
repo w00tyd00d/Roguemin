@@ -11,10 +11,6 @@ var center : Vector2
 ## The length from the center tile of the entity.
 var radius : int
 
-## The flag representing if the entity's bounding radius is even.
-var is_even : bool :
-    get: return center == Vector2()
-
 ## The local positions of the entity relative to its center.
 var area_positions : Array[Vector2i] = []
 
@@ -50,6 +46,10 @@ var carrier_count := 0
 ## carry location if located in the void
 var default_carry_location : Tile
 
+## The flag representing if the entity's bounding radius is even.
+var _is_even : bool :
+    get: return center == Vector2()
+
 
 func _init() -> void:
     _scan()
@@ -76,51 +76,26 @@ func delete() -> void:
     queue_free()
 
 
-func move_to(dest: Tile) -> void:
-    # We have to run twice since we reference the same entity
-    for pos in area_positions:
-        var tile := world.get_tile(grid_position + pos)
-        if tile: tile.remove_entity(self)
-    for pos in area_positions:
-        var tile := world.get_tile(dest.grid_position + pos)
-        tile.add_entity(self)
-
-    for unit: Unit in carriers:
-        var pos : Vector2i = carriers[unit]
-        var tile := world.get_tile(dest.grid_position + pos)
-        unit.move_to(tile)
-
-    last_position = grid_position
-    grid_position = dest.grid_position
-
-
 func move_towards(target: Tile) -> bool:
-    var delta := target.grid_position - grid_position
-    var ax := absi(delta.x)
-    var ay := absi(delta.y)
-
-    var vec : Vector2i
-
-    if ax >= ay * 2: vec = Vector2i(delta.sign().x, 0)
-    elif ay >= ax * 2: vec = Vector2i(0, delta.sign().y)
-    else: vec = delta.sign()
-
     var valid := func(tile: Tile):
         var dist := tile.distance_from_wall
-        if is_even:
+        if _is_even:
             var diff := tile.grid_position - grid_position
             dist -= 1 if diff.x < 0 or diff.y < 0 else 0
         return tile.type == Type.Tile.GRASS and dist >= radius
 
-    var dir := Direction.by_pattern(vec)
+    var dir := Direction.by_delta(grid_position, target.grid_position)
     var dest := world.get_tile(grid_position + dir.vector)
 
     if valid.call(dest):
         move_to(dest)
         return true
 
-    for _dir in dir.adjacent:
-        if grid_position + _dir.vector == last_position: continue
+    for adj in dir.adjacent:
+        if grid_position + adj.vector == last_position: continue
+
+        dest = world.get_tile(grid_position + adj.vector)
+
         if valid.call(dest):
             move_to(dest)
             return true
@@ -138,7 +113,7 @@ func get_area_tiles(from := grid_position) -> Array[Vector2i]:
 func within_radius(pos: Vector2i) -> bool:
     var dir := Direction.by_delta(grid_position, pos)
     var offset := Vector2i()
-    if is_even:
+    if _is_even:
         offset.x = -1 if dir.x < 0 else 0
         offset.y = -1 if dir.y < 0 else 0
 
@@ -231,8 +206,7 @@ func _scan() -> void:
         latch_positions[pos] = true
         set_glyph(pos, Glyph.NONE)
 
-    for pos in get_used_cells():
-        area_positions.append(pos)
+    area_positions = get_used_cells()
 
 
 func _check_for_collection() -> void:
