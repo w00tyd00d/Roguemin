@@ -6,6 +6,11 @@ static func create() -> SpottyRed:
     return preload("res://prefabs/entities/spotty_red.tscn").instantiate()
 
 
+func _init() -> void:
+    brain = InanimateBrain.new(self)
+    super()
+
+
 func _ready() -> void:
     super()
     entity_name = Strings.NAME_SPOTTY_RED

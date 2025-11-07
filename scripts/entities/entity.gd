@@ -29,21 +29,27 @@ var last_direction : Direction :
 var last_velocity : Vector2i :
     get: return last_direction.vector
 
+## The brain of the entity
+var brain : Brain
+
 ## The in-game name of the entity.
 var entity_name := "Unknown Entity"
 
-## The value of time the entity has been synced up to.
-var time := 0
+# ## The value of time the entity has been synced up to.
+var time : int :
+    set(n): brain.time = n
+    get: return brain.time
 
-## The amount of energy points the entity has accumulated.
-var action_energy := 0
+# ## The amount of energy points the entity has accumulated.
+# var action_energy := 0
 
-## The amount of posture points the entity currently has.
-# DEPRECATE THIS!
-var posture_points := 0
+# ## The amount of posture points the entity currently has.
+# # DEPRECATE THIS!
+# var posture_points := 0
 
 ## Flag for signaling if the entity can act on this turn.
-var can_act : bool : get = _get_can_act
+var can_act : bool :
+    get: return brain.can_act
 
 ## Dictionary of immunities the entity has.
 var _immunities := {}
@@ -82,31 +88,32 @@ func move_towards(target: Tile) -> bool:
 
 
 func update() -> bool:
-    var world_time := maxi(time, world.time)
-    var time_units := world_time - time
+    return brain.update()
+    # var world_time := maxi(time, world.time)
+    # var time_units := world_time - time
 
-    time = world_time
+    # time = world_time
 
-    return add_and_check_energy(time_units)
-
-
-func do_action() -> bool:
-    return false
+    # return add_and_check_energy(time_units)
 
 
-func add_and_check_energy(time_units: int) -> bool:
-    # If we can already act, don't add any more energy
-    if can_act:
-        return do_action()
-        #if do_action():
-            #return true
-        #action_energy -= time_units
-        #return false
+# func do_action() -> bool:
+#     return false
 
-    # Otherwise, we can continue to accumulate
-    action_energy += time_units
 
-    return do_action() if can_act else false
+# func add_and_check_energy(time_units: int) -> bool:
+#     # If we can already act, don't add any more energy
+#     if can_act:
+#         return do_action()
+#         #if do_action():
+#             #return true
+#         #action_energy -= time_units
+#         #return false
+
+#     # Otherwise, we can continue to accumulate
+#     action_energy += time_units
+
+#     return do_action() if can_act else false
 
 
 func add_immunity(hazard: Type.Hazard) -> void:
@@ -125,5 +132,5 @@ func reset_immunities() -> void:
     _immunities = {}
 
 
-func _get_can_act() -> bool:
-    return action_energy >= Globals.DEFAULT_ENERGY_STEP
+# func _get_can_act() -> bool:
+#     return action_energy >= Globals.DEFAULT_ENERGY_STEP

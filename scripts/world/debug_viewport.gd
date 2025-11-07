@@ -50,7 +50,8 @@ func _gui_input(event: InputEvent) -> void:
             if world.unit_count == 100:
                 break
             var unit := world.spawn_unit(grid_pos, type)
-            unit.state = Unit.State.IDLE
+            # unit.state = Unit.State.IDLE
+            unit.brain.change_state(States.Unit.IDLE)
 
     if event.is_action_pressed(&"d_right_click"):
         for unit in tile.get_all_units():

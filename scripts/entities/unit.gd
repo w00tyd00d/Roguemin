@@ -2,15 +2,6 @@ class_name Unit extends Entity
 
 ## The entity the [Player] controls to do tasks for them.
 
-enum State {
-    IDLE,
-    FOLLOW,
-    ATTACK,
-    CARRY,
-    RETURN,
-    DEAD
-}
-
 ## The boolean toggle to indicate which centroid buffer variable we're
 ## currently watching.
 static var centroid_buffer := false
@@ -22,12 +13,8 @@ var type : Type.Unit
 var upgraded : bool
 
 ## The current state of the unit.
-var state := State.DEAD :
-    set(new_state):
-        var old_state = state
-        state = new_state
-        _on_state_exit(old_state)
-        _on_state_enter(new_state)
+var state : State :
+    get: return brain.state
 
 ## The current target of the unit.
 var target
@@ -82,7 +69,8 @@ var cohesion_vector : Vector2 :
 
 ## A flag representing if the unit is idle.
 var idle : bool :
-    get: return state == State.IDLE
+    # get: return state == State.IDLE
+    get: return brain.is_idle
 
 ## A flag representing if the unit is in limbo (ie: not in the field).
 var in_limbo : bool :
@@ -90,7 +78,7 @@ var in_limbo : bool :
 
 ## A flag for whether not the unit is allowed to stack with other units
 var can_stack : bool :
-    get: return state == State.ATTACK
+    get: return brain.state_is(States.Unit.ATTACK)
 
 ## First centroid buffer slot
 var _centroid_a : Centroid
@@ -106,6 +94,10 @@ var _alignment_vector : Vector2i
 @onready var sightline_boid := $Sightline1 as ColorRect
 @onready var sightline_centroid := $Sightline2 as ColorRect
 #
+
+
+func _init() -> void:
+    brain = UnitBrain.new(self)
 
 
 func _ready() -> void:
@@ -129,45 +121,13 @@ func get_metadata() -> Dictionary:
     return Unit.metadata(type)
 
 
-func update() -> bool:
-    if in_limbo:
-        time = maxi(time, world.time)
-        return false
-
-    if centroid == null:
-        _calculate_centroid()
-
-    return super()
-
-
-func do_action() -> bool:
-    match state:
-        State.FOLLOW:
-            return _do_follow_action()
-        State.CARRY:
-            if not held_object:
-                if target.is_latch_position(grid_position):
-                    grab_object(target)
-                    return false
-                return move_towards(target.current_tile)
-        State.ATTACK:
-
-            pass
-        State.RETURN:
-            return move_towards(world.unit_ship_tile)
-
-    return false
-
-
 func reset() -> void:
     hide()
 
     modulate.a = 1
     set_background(Vector2(), Glyph.BLACK)
 
-    time = 0
-    action_energy = 0
-    posture_points = 0
+    brain.reset()
 
     if player:
         player.remove_unit(self)
@@ -175,27 +135,31 @@ func reset() -> void:
     if current_tile:
         current_tile.remove_unit(self)
 
-    if not state == State.DEAD and world:
+    # if not state == State.DEAD and world:
+    if not brain.state_is(States.Unit.DEAD) and world:
         var count := world.unit_count
         world.unit_count = maxi(count-1, 0)
 
     if held_object:
         drop_object()
 
-    target = null
-    state = State.IDLE
+    brain.change_state(States.Unit.DEAD)
+    
     grid_position = Vector2()
     last_player_tile = null
 
-    # _centroid_a = Vector2i()
-    centroid = null
+    _centroid_a = null
+    _centroid_b = null
 
 
 func spawn(pos: Vector2i, _type: Type.Unit, _upgraded := false) -> void:
     type = _type
     upgraded = true # No time to implement nectar :(
     grid_position = pos
-    state = State.FOLLOW if _in_range_of_tether() else State.IDLE
+    
+    var _state = States.Unit.FOLLOW if _in_range_of_tether() else States.Unit.IDLE
+    brain.change_state(_state)
+    
     show()
 
 
@@ -206,7 +170,7 @@ func upgrade() -> void:
 
 
 func die() -> void:
-    state = State.DEAD
+    brain.change_state(States.Unit.DEAD)
 
     player.remove_unit(self)
     current_tile.remove_unit(self)
@@ -278,21 +242,9 @@ func swap_with(dest: Tile) -> bool:
 func move_towards(dest: Tile) -> bool:
     var boid_tile := _apply_boid_calculation(dest)
 
-    #if boid_tile == current_tile:
     if boid_tile.grid_position == grid_position:
         return false
 
-    #var delta := boid_tile.grid_position - grid_position
-    #var ax := absi(delta.x)
-    #var ay := absi(delta.y)
-
-    #var vec : Vector2i
-#
-    #if ax >= ay * 2: vec = Vector2i(delta.sign().x, 0)
-    #elif ay >= ax * 2: vec = Vector2i(0, delta.sign().y)
-    #else: vec = delta.sign()
-
-    #var dir := Direction.by_pattern(dir.vector)
     var dir := Direction.by_delta(grid_position, boid_tile.grid_position)
 
     if not dir or dir == Direction.none:
@@ -303,7 +255,8 @@ func move_towards(dest: Tile) -> bool:
 
     match res:
         Type.Tile.WALL:
-            if state == State.RETURN and Tag.has(next_tile, Tags.UNIT_SHIP):
+            # if state == State.RETURN and Tag.has(next_tile, Tags.UNIT_SHIP):
+            if brain.state_is(States.Unit.RETURN) and Tag.has(next_tile, Tags.UNIT_SHIP):
                 reset()
                 return true # We reset, so no action cost needed
             elif current_tile.type == Type.Tile.VOID:
@@ -382,16 +335,16 @@ func throw_to(tile: Tile) -> void:
         if ent:
             match ent.type:
                 Type.Entity.TREASURE:
+                    target = ent
                     var latch := ent.get_open_latch_tile()
                     if latch:
-                        target_entity(ent)
                         move_to(latch)
                         grab_object(ent)
                         return
 
         tile = world.get_closest_empty_tile(tile)
 
-    action_energy = 0
+    brain.action_energy = 0
 
     move_to(tile)
     _go_idle()
@@ -399,7 +352,7 @@ func throw_to(tile: Tile) -> void:
 
 func join_squad() -> void:
     last_player_tile = null
-    state = State.FOLLOW
+    brain.change_state(States.Unit.FOLLOW)
     player.add_unit(self)
 
 
@@ -409,7 +362,7 @@ func dismiss() -> void:
 
 
 func go_home() -> void:
-    state = State.RETURN
+    brain.change_state(States.Unit.RETURN)
 
 
 func ride_enemy(enemy: Enemy) -> void:
@@ -424,13 +377,6 @@ func get_off_enemy() -> void:
 
     move_to(world.get_closest_empty_tile(riding_enemy.current_tile))
     riding_enemy = null
-
-
-func target_entity(ent: MultiTileEntity) -> void:
-    target = ent
-    match ent.type:
-        Type.Entity.TREASURE: state = State.CARRY
-        Type.Entity.ENEMY: state = State.ATTACK
 
 
 func grab_object(obj: MultiTileEntity) -> bool:
@@ -448,44 +394,7 @@ func drop_object() -> void:
 
 
 func _go_idle() -> void:
-    state = State.IDLE
-    player.remove_unit(self)
-
-
-func _do_follow_action() -> bool:
-    if not player: return false
-
-    if name == "Unit04":
-        pass
-
-    var tether := player.unit_tether
-    var dest := tether.tail.current_tile
-
-    if not _in_range_of_tether():
-        _go_idle()
-        return false
-
-    if _can_see_tether():
-        path = []
-        return move_towards(dest)
-
-    if (path.is_empty() or
-        Util.chebyshev_distance(path[0], dest.grid_position) >= 5 or
-        path.size() == 1 and not _can_see_destination(path[0])):
-            # We get the path in reverse to use as a stack
-            path = world.astar.get_id_path(dest.grid_position, grid_position)
-            _broadcast_path()
-
-    if path.is_empty():
-        return false
-
-    var dist := Util.chebyshev_distance(current_tile.grid_position, path[-1])
-    if dist < 2:
-        path.pop_back()
-    if not path.is_empty():
-        return move_towards(world.get_tile(path[-1]))
-
-    return false
+    brain.change_state(States.Unit.IDLE)
 
 
 func _calculate_centroid() -> void:
@@ -571,7 +480,8 @@ func _do_move_action(dest: Tile) -> bool:
     # AND RUSH BOOTS!
     var step := Globals.DEFAULT_ENERGY_STEP
     var dist := Util.chebyshev_distance(grid_position, player.grid_position)
-    var cost := step - 20 if state == State.FOLLOW and dist > 8 else step
+    # var cost := step - 20 if state == State.FOLLOW and dist > 8 else step
+    var cost := step - 20 if brain.state_is(States.Unit.FOLLOW) and dist > 8 else step
     # var cost := step + 10
 
     if dest.has_units and not can_stack:
@@ -582,7 +492,7 @@ func _do_move_action(dest: Tile) -> bool:
 
     # move_to(dest)
 
-    action_energy -= cost
+    brain.action_energy -= cost
     return true
 
 
@@ -591,7 +501,7 @@ func _spend_attack_action() -> bool:
     # AND POSSIBLY RUSH BOOTS!
     var cost := Globals.DEFAULT_ENERGY_STEP
 
-    action_energy -= cost
+    brain.action_energy -= cost
     return true
 
 
@@ -693,29 +603,6 @@ func _update_glyph() -> void:
                 else: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE)
             elif idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL)
-
-
-func _on_state_enter(_state: State) -> void:
-    match _state:
-        State.IDLE:
-            _update_glyph()
-        State.FOLLOW:
-            target = player.unit_tether.tail
-            player.add_unit(self)
-        State.ATTACK:
-            player.remove_unit(self)
-        State.CARRY:
-            player.remove_unit(self)
-        State.RETURN:
-            target = world.unit_ship_tile
-
-
-func _on_state_exit(_state: State) -> void:
-    match _state:
-        State.IDLE:
-            _update_glyph()
-        State.CARRY:
-            drop_object()
 
 
 class Centroid:

@@ -31,7 +31,7 @@ var state := State.IDLE :
         var old_state = state
         state = new_state
         _on_state_exit(old_state)
-        _on_state_enter(new_state)
+        # _on_state_enter(new_state)
 
 ## The current entity the enemy is targeting
 var target_entity : Entity
@@ -67,7 +67,8 @@ func get_health_percent() -> float:
 func die() -> void:
     buck_units()
     # Change to death frame
-    state = State.DEAD
+    # state = State.DEAD
+    # brain.change_state(States.DEAD
 
 
 func add_unit(unit: Unit) -> void:
@@ -128,18 +129,17 @@ func do_action() -> bool:
     match state:
         State.IDLE:
             if _check_next_to():
-                if posture_points < 4:
-                    target_entity = get_closest_target()
-                    state = State.ATTACK
-                    return true
+                target_entity = get_closest_target()
+                state = State.ATTACK
+                return true
             return false
 
         State.ATTACK:
             return _do_attack_action()
 
         State.RETURN:
-            if posture_points < 2:
-                return false
+            # if posture_points < 2:
+            #     return false
 
             var ent := get_closest_target()
             if ent:
@@ -157,9 +157,9 @@ func do_action() -> bool:
 
 
 func _do_attack_action() -> bool:
-    if (target_tile and posture_points < 1 or
-        not target_tile and posture_points < 2):
-        return false
+    # if (target_tile and posture_points < 1 or
+    #     not target_tile and posture_points < 2):
+    #     return false
 
     var dist := Util.chebyshev_distance(grid_position, spawn_position)
     if dist >= wander_distance:
@@ -170,7 +170,7 @@ func _do_attack_action() -> bool:
         attack_target()
         return true
 
-    if not target_entity or posture_points > 3:
+    if not target_entity: # or posture_points > 3:
         var ent := get_closest_target()
         if ent:
             target_entity = ent
@@ -234,4 +234,4 @@ func _on_state_exit(_state: State) -> void:
         State.ATTACK:
             target_tile = null
             target_entity = null
-            posture_points = 0
+            # posture_points = 0
