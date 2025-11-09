@@ -1,5 +1,3 @@
-# meta-description: Base template for State objects
-
 class_name _CLASS_ extends _BASE_
 
 

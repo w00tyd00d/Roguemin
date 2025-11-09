@@ -336,6 +336,7 @@ func throw_to(tile: Tile) -> void:
             match ent.type:
                 Type.Entity.TREASURE:
                     target = ent
+                    brain.change_state(States.Unit.CARRY)
                     var latch := ent.get_open_latch_tile()
                     if latch:
                         move_to(latch)

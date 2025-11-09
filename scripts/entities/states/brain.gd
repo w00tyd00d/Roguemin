@@ -58,6 +58,10 @@ func change_state(state_id: int) -> void:
     state = new_state
 
 
+func state_is(id: int) -> bool:
+    return state == _states.get(id)
+
+
 func update() -> bool:
     var world_time := maxi(time, world.time)
     var time_units := world_time - time
@@ -67,19 +71,22 @@ func update() -> bool:
     return add_and_check_energy(time_units)
 
 
-func add_and_check_energy(time_units: int) -> bool:
+func add_energy(time_units: int) -> void:
+    action_energy += time_units
+
+
+func reset_energy() -> void:
+    action_energy = 0
+
+
+func add_and_check_energy(time_units := 0) -> bool:
     # If we can already act, don't add any more energy
     if can_act:
         return _handle_action()
-
-    # Otherwise, we can continue to accumulate
-    action_energy += time_units
+        
+    add_energy(time_units)
 
     return _handle_action() if can_act else false
-
-
-func state_is(id: int) -> bool:
-    return state == _states.get(id)
 
 
 func _handle_action() -> bool:
