@@ -67,8 +67,8 @@ var cohesion_vector : Vector2 :
             return centroid.cohesion_vector(grid_position)
         return Vector2()
 
-## A flag representing if the unit is idle.
-var idle : bool :
+## A flag representing if the unit is is_idle.
+var is_idle : bool :
     # get: return state == State.IDLE
     get: return brain.is_idle
 
@@ -166,7 +166,7 @@ func spawn(pos: Vector2i, _type: Type.Unit, _upgraded := false) -> void:
 func upgrade() -> void:
     if upgraded: return
     upgraded = true
-    _update_glyph()
+    _update_glyph(is_idle)
 
 
 func die() -> void:
@@ -584,25 +584,25 @@ func _receive_path(_path: Array[Vector2i]) -> void:
         _path.pop_front()
 
 
-func _update_glyph() -> void:
+func _update_glyph(_idle := false) -> void:
     match type:
         Type.Unit.RED:
             if upgraded:
-                if idle: set_glyph(Vector2(), Glyph.UNIT_RED_LARGE_IDLE)
+                if _idle: set_glyph(Vector2(), Glyph.UNIT_RED_LARGE_IDLE)
                 else: set_glyph(Vector2(), Glyph.UNIT_RED_LARGE)
-            elif idle: set_glyph(Vector2(), Glyph.UNIT_RED_SMALL_IDLE)
+            elif _idle: set_glyph(Vector2(), Glyph.UNIT_RED_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_RED_SMALL)
         Type.Unit.YELLOW:
             if upgraded:
-                if idle: set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE_IDLE)
+                if _idle: set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE_IDLE)
                 else: set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE)
-            elif idle: set_glyph(Vector2(), Glyph.UNIT_YELLOW_SMALL_IDLE)
+            elif _idle: set_glyph(Vector2(), Glyph.UNIT_YELLOW_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_YELLOW_SMALL)
         Type.Unit.BLUE:
             if upgraded:
-                if idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE_IDLE)
+                if _idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE_IDLE)
                 else: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE)
-            elif idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL_IDLE)
+            elif _idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL)
 
 
