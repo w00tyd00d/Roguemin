@@ -18,6 +18,6 @@ func update() -> bool:
 
 
 # Used to change how the entity accumulates/uses energy over time.
-func add_and_check_energy(time_units: int) -> bool:
+func add_and_check_energy(time_units := 0) -> bool:
     return super(time_units)
 
