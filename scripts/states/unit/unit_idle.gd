@@ -7,8 +7,10 @@ func _init():
 
 func enter(ent: Entity) -> void:
     var unit := ent as Unit
+    
     unit._update_glyph(true)
-    player.remove_unit(ent)
+    player.remove_unit(unit)
+    
     super(ent)
 
 
@@ -19,5 +21,5 @@ func do_action(_ent: Entity) -> Array:
 
 func exit(ent: Entity) -> void:
     var unit := ent as Unit
-    unit._update_glyph(true)
+    unit._update_glyph(false)
     super(ent)

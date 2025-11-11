@@ -11,6 +11,7 @@ script = ExtResource("2_gjyyj")
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0)
 
 [node name="Sightline1" type="ColorRect" parent="." index="1"]
+visible = false
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 10.0

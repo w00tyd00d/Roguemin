@@ -7,10 +7,18 @@ func _init():
 
 ## Called when entering the state
 func enter(ent: Entity) -> void:
-    ent.target = null
+    var unit := ent as Unit
+    
+    if world:
+        unit.target = null
+        unit.drop_object()
+    
+        unit.current_tile.remove_unit(unit)
+        player.remove_unit(unit)
+
+        world.unit_count -= 1
+
+        unit.brain.reset()
+    
     super(ent)
 
-
-## Attempts to perform an action to consume energy
-func do_action(_ent: Entity) -> Array:
-    return [false]

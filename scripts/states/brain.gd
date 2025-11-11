@@ -10,13 +10,13 @@ var player : Player :
 
 ## Flag for signaling if the entity can act on this turn.
 var can_act : bool :
-    get: return action_energy >= Globals.DEFAULT_ENERGY_STEP
+    get: return state.can_act(entity)
 
 ## The value of time the entity has been synced up to.
 var time := 0
 
 ## The amount of energy points (time) the entity has accumulated.
-var action_energy := 0
+var energy := 0
 
 ## The entity this brain is attached to
 var entity : Entity
@@ -37,7 +37,7 @@ func _init(ent: Entity) -> void:
 
 func reset() -> void:
     time = 0
-    action_energy = 0
+    energy = 0
 
 
 func get_state_name() -> String:
@@ -72,11 +72,11 @@ func update() -> bool:
 
 
 func add_energy(time_units: int) -> void:
-    action_energy += time_units
+    energy += time_units
 
 
 func reset_energy() -> void:
-    action_energy = 0
+    energy = 0
 
 
 func add_and_check_energy(time_units := 0) -> bool:
@@ -94,5 +94,8 @@ func _handle_action() -> bool:
 
     if res.size() > 1:
         change_state(res[1])
+
+    if res[0]:
+        state.use_energy(entity)
     
     return res[0]

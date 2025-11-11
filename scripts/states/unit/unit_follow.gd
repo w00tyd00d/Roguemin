@@ -11,7 +11,14 @@ func enter(ent: Entity) -> void:
     super(ent)
 
 
-## Attempts to perform an action to consume energy
+func get_cost(ent: Entity) -> int:
+    # ALLOW TO BE MODIFIED BY BEING BOOSTED WITH SPICY SPRAY
+    # AND RUSH BOOTS!
+    var step := Globals.DEFAULT_ENERGY_STEP
+    var dist := Util.chebyshev_distance(ent.grid_position, player.grid_position)
+    return step - 20 if dist > 8 else step
+
+
 func do_action(ent: Entity) -> Array:
     if not player: return [false]
 
@@ -52,7 +59,4 @@ func do_action(ent: Entity) -> Array:
 
     return [false]
 
-
-# func exit(ent: Entity) -> void:
-#     pass
 

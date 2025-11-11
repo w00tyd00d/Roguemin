@@ -2,7 +2,7 @@ class_name Enemy extends MultiTileEntity
 
 ## Base class for all enemies in-game
 
-enum State { IDLE, ATTACK, RETURN, DEAD }
+# enum State { IDLE, ATTACK, RETURN, DEAD }
 
 ## The distance at which the enemy can see riding_units.
 @export var sight_range : int
@@ -26,12 +26,12 @@ enum State { IDLE, ATTACK, RETURN, DEAD }
 @export var current_health : int
 
 ## The current state of the unit.
-var state := State.IDLE :
-    set(new_state):
-        var old_state = state
-        state = new_state
-        _on_state_exit(old_state)
-        # _on_state_enter(new_state)
+# var state := State.IDLE :
+#     set(new_state):
+#         var old_state = state
+#         state = new_state
+#         _on_state_exit(old_state)
+#         # _on_state_enter(new_state)
 
 ## The current entity the enemy is targeting
 var target_entity : Entity
@@ -114,80 +114,80 @@ func queue_attack(tile: Tile) -> void:
 
 func attack_target() -> void:
     if not target_tile: return
-    for tile in _get_attack_area():
+    for tile in _get_attack_area(attack_indicator):
         tile.attacked(attack_damage)
 
     target_tile = null
     target_entity = null
 
 
-func return_home() -> void:
-    state = State.RETURN
+# func return_home() -> void:
+#     state = State.RETURN
 
 
-func do_action() -> bool:
-    match state:
-        State.IDLE:
-            if _check_next_to():
-                target_entity = get_closest_target()
-                state = State.ATTACK
-                return true
-            return false
+# func do_action() -> bool:
+#     match state:
+#         State.IDLE:
+#             if _check_next_to():
+#                 target_entity = get_closest_target()
+#                 state = State.ATTACK
+#                 return true
+#             return false
 
-        State.ATTACK:
-            return _do_attack_action()
+#         State.ATTACK:
+#             return _do_attack_action()
 
-        State.RETURN:
-            # if posture_points < 2:
-            #     return false
+#         State.RETURN:
+#             # if posture_points < 2:
+#             #     return false
 
-            var ent := get_closest_target()
-            if ent:
-                target_entity = ent
-                state = State.ATTACK
-                return true
+#             var ent := get_closest_target()
+#             if ent:
+#                 target_entity = ent
+#                 state = State.ATTACK
+#                 return true
 
-            if grid_position == spawn_position:
-                state = State.IDLE
-                return true
+#             if grid_position == spawn_position:
+#                 state = State.IDLE
+#                 return true
 
-            return move_towards(spawn_tile)
+#             return move_towards(spawn_tile)
 
-    return false
-
-
-func _do_attack_action() -> bool:
-    # if (target_tile and posture_points < 1 or
-    #     not target_tile and posture_points < 2):
-    #     return false
-
-    var dist := Util.chebyshev_distance(grid_position, spawn_position)
-    if dist >= wander_distance:
-        return_home()
-        return true
-
-    if target_tile:
-        attack_target()
-        return true
-
-    if not target_entity: # or posture_points > 3:
-        var ent := get_closest_target()
-        if ent:
-            target_entity = ent
-        else:
-            return_home()
-            return true
-
-    if target_entity:
-        var tile := target_entity.current_tile
-        if _target_in_attack_range():
-            queue_attack(tile)
-            return true
-
-        return move_towards(tile)
+#     return false
 
 
-    return false
+# func _do_attack_action() -> bool:
+#     # if (target_tile and posture_points < 1 or
+#     #     not target_tile and posture_points < 2):
+#     #     return false
+
+#     var dist := Util.chebyshev_distance(grid_position, spawn_position)
+#     if dist >= wander_distance:
+#         return_home()
+#         return true
+
+#     if target_tile:
+#         attack_target()
+#         return true
+
+#     if not target_entity: # or posture_points > 3:
+#         var ent := get_closest_target()
+#         if ent:
+#             target_entity = ent
+#         else:
+#             return_home()
+#             return true
+
+#     if target_entity:
+#         var tile := target_entity.current_tile
+#         if _target_in_attack_range():
+#             queue_attack(tile)
+#             return true
+
+#         return move_towards(tile)
+
+
+#     return false
 
 
 func _set_attack_position(pos: Vector2i) -> void:
@@ -199,9 +199,9 @@ func _get_attack_position() -> Vector2i:
    return attack_indicator.grid_position + grid_position
 
 
-func _get_attack_area() -> Array[Tile]:
+func _get_attack_area(attack_area: DualMapLayer) -> Array[Tile]:
     var res : Array[Tile] = []
-    for pos in attack_indicator.get_used_cells():
+    for pos in attack_area.get_used_cells():
         var apos := _get_attack_position()
         res.append(world.get_tile(pos + apos))
 
@@ -225,13 +225,13 @@ func _check_next_to() -> bool:
     return false
 
 
-func _on_state_enter(_state: State) -> void:
-    pass
+# func _on_state_enter(_state: State) -> void:
+#     pass
 
 
-func _on_state_exit(_state: State) -> void:
-    match _state:
-        State.ATTACK:
-            target_tile = null
-            target_entity = null
-            # posture_points = 0
+# func _on_state_exit(_state: State) -> void:
+#     match _state:
+#         State.ATTACK:
+#             target_tile = null
+#             target_entity = null
+#             # posture_points = 0

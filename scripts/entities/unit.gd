@@ -70,7 +70,10 @@ var cohesion_vector : Vector2 :
 ## A flag representing if the unit is is_idle.
 var is_idle : bool :
     # get: return state == State.IDLE
-    get: return brain.is_idle
+    get: return brain.state_is(States.Unit.IDLE)
+
+var is_dead : bool :
+    get: return brain.state_is(States.Unit.DEAD)
 
 ## A flag representing if the unit is in limbo (ie: not in the field).
 var in_limbo : bool :
@@ -127,24 +130,9 @@ func reset() -> void:
     modulate.a = 1
     set_background(Vector2(), Glyph.BLACK)
 
-    brain.reset()
+    if not brain.state_is(States.Unit.DEAD): #and world:
+        brain.change_state(States.Unit.DEAD)
 
-    if player:
-        player.remove_unit(self)
-
-    if current_tile:
-        current_tile.remove_unit(self)
-
-    # if not state == State.DEAD and world:
-    if not brain.state_is(States.Unit.DEAD) and world:
-        var count := world.unit_count
-        world.unit_count = maxi(count-1, 0)
-
-    if held_object:
-        drop_object()
-
-    brain.change_state(States.Unit.DEAD)
-    
     grid_position = Vector2()
     last_player_tile = null
 
@@ -171,12 +159,6 @@ func upgrade() -> void:
 
 func die() -> void:
     brain.change_state(States.Unit.DEAD)
-
-    player.remove_unit(self)
-    current_tile.remove_unit(self)
-
-    var count := world.unit_count
-    world.unit_count = maxi(count-1, 0)
 
     set_glyph(Vector2(), Glyph.UNIT_GHOST_LARGE)
     set_background(Vector2(), Glyph.NONE)
@@ -332,6 +314,7 @@ func throw_to(tile: Tile) -> void:
 
     if tile.has_entities:
         var ent := tile.get_first_entity()
+        
         if ent:
             match ent.type:
                 Type.Entity.TREASURE:
@@ -342,10 +325,11 @@ func throw_to(tile: Tile) -> void:
                         move_to(latch)
                         grab_object(ent)
                         return
+                
+                Type.Entity.ENEMY:
+                    pass
 
         tile = world.get_closest_empty_tile(tile)
-
-    brain.action_energy = 0
 
     move_to(tile)
     _go_idle()
@@ -477,12 +461,11 @@ func _do_move_action(dest: Tile) -> bool:
     if world.query_tile(dest) == Type.Tile.WALL:
         pass
 
-    # ALLOW TO BE MODIFIED BY BEING BOOSTED WITH SPICY SPRAY
-    # AND RUSH BOOTS!
-    var step := Globals.DEFAULT_ENERGY_STEP
-    var dist := Util.chebyshev_distance(grid_position, player.grid_position)
-    # var cost := step - 20 if state == State.FOLLOW and dist > 8 else step
-    var cost := step - 20 if brain.state_is(States.Unit.FOLLOW) and dist > 8 else step
+    
+    # var step := Globals.DEFAULT_ENERGY_STEP
+    # var dist := Util.chebyshev_distance(grid_position, player.grid_position)
+    # # var cost := step - 20 if state == State.FOLLOW and dist > 8 else step
+    # var cost := step - 20 if brain.state_is(States.Unit.FOLLOW) and dist > 8 else step
     # var cost := step + 10
 
     if dest.has_units and not can_stack:
@@ -493,7 +476,6 @@ func _do_move_action(dest: Tile) -> bool:
 
     # move_to(dest)
 
-    brain.action_energy -= cost
     return true
 
 
@@ -502,7 +484,7 @@ func _spend_attack_action() -> bool:
     # AND POSSIBLY RUSH BOOTS!
     var cost := Globals.DEFAULT_ENERGY_STEP
 
-    brain.action_energy -= cost
+    brain.energy -= cost
     return true
 
 

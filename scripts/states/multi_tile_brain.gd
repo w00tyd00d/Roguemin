@@ -26,4 +26,4 @@ func _do_hauling_check(time_units: int) -> void:
     var diff : float = mte.carrier_count - half_count
     var val := diff / mte.latch_point_count
 
-    action_energy += int(val * time_units)
+    energy += int(val * time_units)
