@@ -32,7 +32,7 @@ var unit_container : UnitContainer # injected upon World creation
 ## The number of [Unit] objects currently out on the field.
 var unit_count := 0 :
     set(n):
-        unit_count = n
+        unit_count = maxi(n, 0)
         GameState.update_field_count.emit(n)
 
 ## The starting position for the player.
