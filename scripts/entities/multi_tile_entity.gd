@@ -77,17 +77,10 @@ func delete() -> void:
 
 
 func move_towards(target: Tile) -> bool:
-    var valid := func(tile: Tile):
-        var dist := tile.distance_from_wall
-        if _is_even:
-            var diff := tile.grid_position - grid_position
-            dist -= 1 if diff.x < 0 or diff.y < 0 else 0
-        return tile.type == Type.Tile.GRASS and dist >= radius
-
     var dir := Direction.by_delta(grid_position, target.grid_position)
     var dest := world.get_tile(grid_position + dir.vector)
 
-    if valid.call(dest):
+    if _walkable_tile(dest):
         move_to(dest)
         return true
 
@@ -96,7 +89,7 @@ func move_towards(target: Tile) -> bool:
 
         dest = world.get_tile(grid_position + adj.vector)
 
-        if valid.call(dest):
+        if _walkable_tile(dest):
             move_to(dest)
             return true
 
@@ -192,6 +185,7 @@ func get_next_flow_field_tile() -> Tile:
 
 
 func _scan() -> void:
+    # FOR NOW, WE ASSUME ALL RECTS ARE SQUARES
     var size := get_used_rect().size
     radius = ceili(size.x / 2.0)
 
@@ -207,6 +201,14 @@ func _scan() -> void:
         set_glyph(pos, Glyph.NONE)
 
     area_positions = get_used_cells()
+
+
+func _walkable_tile(tile: Tile) -> bool:
+    var dist := tile.distance_from_wall
+    if _is_even:
+        var diff := tile.grid_position - grid_position
+        dist -= 1 if diff.x < 0 or diff.y < 0 else 0
+    return tile.type == Type.Tile.GRASS and dist >= radius
 
 
 func _check_for_collection() -> void:

@@ -2,10 +2,6 @@ class_name Unit extends Entity
 
 ## The entity the [Player] controls to do tasks for them.
 
-## The boolean toggle to indicate which centroid buffer variable we're
-## currently watching.
-static var centroid_buffer := false
-
 ## The current type of the unit.
 var type : Type.Unit
 
@@ -15,6 +11,9 @@ var upgraded : bool
 ## The current state of the unit.
 var state : State :
     get: return brain.state
+
+## The boid data of the unit.
+var boid : Boid
 
 ## The current target of the unit.
 var target
@@ -47,26 +46,6 @@ var next_destination : Vector2i :
 
         return Vector2i()
 
-## Cached location of the unit's current boid centroid
-var centroid : Centroid :
-    get: return _centroid_b if Unit.centroid_buffer else _centroid_a
-    set(cent):
-        if Unit.centroid_buffer:
-            _centroid_a = null
-            _centroid_b = cent
-        else:
-            _centroid_a = cent
-            _centroid_b = null
-        # DEBUG
-        if cent != null:
-            sightline_centroid.rotation = cent.cohesion_vector(grid_position).angle()
-
-var cohesion_vector : Vector2 :
-    get:
-        if centroid:
-            return centroid.cohesion_vector(grid_position)
-        return Vector2()
-
 ## A flag representing if the unit is is_idle.
 var is_idle : bool :
     # get: return state == State.IDLE
@@ -83,15 +62,6 @@ var in_limbo : bool :
 var can_stack : bool :
     get: return brain.state_is(States.Unit.ATTACK)
 
-## First centroid buffer slot
-var _centroid_a : Centroid
-
-## Second centroid buffer slot
-var _centroid_b : Centroid
-
-## Cached boid alignment vector
-var _alignment_vector : Vector2i
-
 
 # DEBUG
 @onready var sightline_boid := $Sightline1 as ColorRect
@@ -101,6 +71,7 @@ var _alignment_vector : Vector2i
 
 func _init() -> void:
     brain = UnitBrain.new(self)
+    boid = Boid.new(self)
 
 
 func _ready() -> void:
@@ -114,10 +85,6 @@ static func metadata(_type: Type.Unit) -> Dictionary:
         Type.Unit.BLUE: return { name = "Blue", color = Color.BLUE }
         Type.Unit.NONE: return { name = "None", color = Color.DARK_GRAY }
     return {}
-
-
-static func toggle_centroid_buffer() -> void:
-    Unit.centroid_buffer = not Unit.centroid_buffer
 
 
 func get_metadata() -> Dictionary:
@@ -135,9 +102,8 @@ func reset() -> void:
 
     grid_position = Vector2()
     last_player_tile = null
-
-    _centroid_a = null
-    _centroid_b = null
+    boid.reset()
+    
 
 
 func spawn(pos: Vector2i, _type: Type.Unit, _upgraded := false) -> void:
@@ -190,8 +156,8 @@ func swap_with(dest: Tile) -> bool:
     #var dist1 := Util.chebyshev_distance(centroid.position, grid_position)
     #var dist2 := Util.chebyshev_distance(centroid.position, dest.grid_position)
 
-    var dist1 := centroid.position.distance_to(grid_position)
-    var dist2 := centroid.position.distance_to(dest.grid_position)
+    var dist1 := boid.centroid.position.distance_to(grid_position)
+    var dist2 := boid.centroid.position.distance_to(dest.grid_position)
 
     # NOT CHECKING DISTANCE OF OTHER UNIT'S CENTROID MIGHT CAUSE OSCILLATION
     # LEAVING IT SIMPLE FOR NOW
@@ -204,13 +170,13 @@ func swap_with(dest: Tile) -> bool:
     if nbr.type == type:
         return false
 
-    if nbr.centroid and nbr.centroid.count > 1:
+    if nbr.boid.centroid and nbr.boid.centroid.count > 1:
         #var ndist1 := Util.chebyshev_distance(nbr.centroid.position, nbr.grid_position)
         #var ndist2 := Util.chebyshev_distance(nbr.centroid.position, nbr.grid_position)
 
         # Check distance from current position to neighbors centroid to see
         # what their new distance would be if they moved
-        var ndist := grid_position.distance_to(nbr.centroid.position)
+        var ndist := grid_position.distance_to(nbr.boid.centroid.position)
 
         if ndist > dist2:
             return false
@@ -222,7 +188,8 @@ func swap_with(dest: Tile) -> bool:
 
 
 func move_towards(dest: Tile) -> bool:
-    var boid_tile := _apply_boid_calculation(dest)
+    # var boid_tile := _apply_boid_calculation(dest)
+    var boid_tile := boid.get_next_tile(dest)
 
     if boid_tile.grid_position == grid_position:
         return false
@@ -382,109 +349,15 @@ func _go_idle() -> void:
     brain.change_state(States.Unit.IDLE)
 
 
-func _calculate_centroid() -> void:
-    var cent := Centroid.new()
-    var data := _dfs_centroid_scan({})
-
-    for unit: Unit in data:
-        cent.add_position(data[unit])
-        unit.centroid = cent
-
-
-func _dfs_centroid_scan(history: Dictionary[Unit, Vector2i]) -> Dictionary:
-    var res := Util.foreach_around_pos(grid_position, 5, func(pos: Vector2i, data: Dictionary):
-        var tile := world.get_tile(pos)
-
-        if tile.has_units:
-            var same_units := tile.get_units(type)
-
-            if same_units.is_empty():
-                return
-
-            if data.is_empty():
-                data.centroid_sum = Vector2i()
-                data.velocity_sum = Vector2i()
-                data.count = 0
-                data.units = []
-
-            for unit in same_units:
-                if next_destination == unit.next_destination:
-                    data.centroid_sum += tile.grid_position
-                    data.velocity_sum += unit.last_velocity
-                    data.count += 1
-                    data.units.append(unit)
-    )
-
-    if res.is_empty():
-        return history
-
-    history[self] = res.centroid_sum / res.count
-
-    # We directly assign its local alignment while we have the data handy
-    _alignment_vector = (Vector2(res.velocity_sum) / res.count)
-
-    for unit: Unit in res.units:
-        if not history.has(unit):
-            unit._dfs_centroid_scan(history)
-
-    return history
-
-
-func _apply_boid_calculation(dest: Tile) -> Tile:
-    var dest_vec := Vector2(grid_position).direction_to(Vector2(dest.grid_position))
-    var cohe_vec := centroid.cohesion_vector(grid_position)
-
-    var bdw := Globals.BOID_DESTINATION_WEIGHT
-    var dist := Util.chebyshev_distance(grid_position, target.grid_position)
-    var dest_weight := minf(bdw, bdw * dist / 4) # scale lower when within 4 tiles of target
-
-    var boid_vector := (
-        dest_vec * dest_weight +
-        cohe_vec * Globals.BOID_COHESION_WEIGHT +
-        _alignment_vector * Globals.BOID_ALIGNMENT_WEIGHT
-    )
-
-    # DEBUG
-    # sightline_boid.rotation = boid_vector.angle()
-
-    if boid_vector.length() < 0.2:
-        return current_tile
-
-    var dir := Direction.by_normalized(boid_vector.normalized())
-
-    return world.get_tile(grid_position + dir.vector)
-
-
-
 func _do_move_action(dest: Tile) -> bool:
     # DEBUG
-    if world.query_tile(dest) == Type.Tile.WALL:
-        pass
-
-    
-    # var step := Globals.DEFAULT_ENERGY_STEP
-    # var dist := Util.chebyshev_distance(grid_position, player.grid_position)
-    # # var cost := step - 20 if state == State.FOLLOW and dist > 8 else step
-    # var cost := step - 20 if brain.state_is(States.Unit.FOLLOW) and dist > 8 else step
-    # var cost := step + 10
+    # if world.query_tile(dest) == Type.Tile.WALL:
+    #     pass
 
     if dest.has_units and not can_stack:
-        if not swap_with(dest):
-            return false
-    else:
-        move_to(dest)
+        return swap_with(dest)
 
-    # move_to(dest)
-
-    return true
-
-
-func _spend_attack_action() -> bool:
-    # ALLOW TO BE MODIFIED BY BEING BOOSTED WITH SPICY SPRAY
-    # AND POSSIBLY RUSH BOOTS!
-    var cost := Globals.DEFAULT_ENERGY_STEP
-
-    brain.energy -= cost
+    move_to(dest)
     return true
 
 
@@ -494,7 +367,7 @@ func _in_range_of_tether() -> bool:
     return Util.chebyshev_distance(grid_position, dest) <= limit
 
 
-func _can_see_destination(dest_pos: Vector2i) -> bool:
+func _can_see_position(dest_pos: Vector2i) -> bool:
     var callback := func(ctx: DDARC.Context):
         var pos := ctx.grid_position
         var query := world.query_tile_at(pos)
@@ -514,7 +387,7 @@ func _can_see_destination(dest_pos: Vector2i) -> bool:
 
 func _can_see_tether() -> bool:
     var tail := player.unit_tether.tail
-    return _can_see_destination(tail.grid_position)
+    return _can_see_position(tail.grid_position)
 
 
 func _check_tile_at(pos: Vector2i) -> Type.Tile:
@@ -586,26 +459,3 @@ func _update_glyph(_idle := false) -> void:
                 else: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE)
             elif _idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL)
-
-
-class Centroid:
-    var count := 0
-    var position : Vector2 :
-        get:
-            if position == Vector2():
-                var res := Vector2()
-                for vec in _vectors:
-                    res += Vector2(vec)
-                position = res / _vectors.size()
-            return position
-
-    var _vectors : Array[Vector2i]
-
-    func add_position(vec: Vector2i) -> void:
-        _vectors.append(vec)
-        count += 1
-        # Reset grid_position so it recalculates
-        position = Vector2i()
-
-    func cohesion_vector(pos: Vector2i) -> Vector2:
-        return Vector2(pos).direction_to(position)

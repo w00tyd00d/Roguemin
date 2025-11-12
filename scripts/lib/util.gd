@@ -28,6 +28,7 @@ func get_bresenham_line(a: Vector2i, b: Vector2i) -> Array[Vector2i]:
     return res
 
 
+# DEPRECATE THIS!
 func get_square_around_pos(
         pos: Vector2i,
         face_length: int,

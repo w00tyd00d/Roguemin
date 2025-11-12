@@ -89,31 +89,6 @@ func move_towards(target: Tile) -> bool:
 
 func update() -> bool:
     return brain.update()
-    # var world_time := maxi(time, world.time)
-    # var time_units := world_time - time
-
-    # time = world_time
-
-    # return add_and_check_energy(time_units)
-
-
-# func do_action() -> bool:
-#     return false
-
-
-# func add_and_check_energy(time_units: int) -> bool:
-#     # If we can already act, don't add any more energy
-#     if can_act:
-#         return do_action()
-#         #if do_action():
-#             #return true
-#         #action_energy -= time_units
-#         #return false
-
-#     # Otherwise, we can continue to accumulate
-#     action_energy += time_units
-
-#     return do_action() if can_act else false
 
 
 func add_immunity(hazard: Type.Hazard) -> void:

@@ -15,7 +15,7 @@ func update() -> bool:
         time = maxi(time, world.time)
         return false
 
-    if unit.centroid == null and not unit.is_dead:
-        unit._calculate_centroid()
+    if unit.boid.centroid == null and not unit.is_dead:
+        unit.boid.calculate_centroid()
 
     return super()

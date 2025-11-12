@@ -42,7 +42,7 @@ func do_action(ent: Entity) -> Array:
 
     if (path.is_empty() or
         Util.chebyshev_distance(path[0], dest.grid_position) >= 5 or
-        path.size() == 1 and not unit._can_see_destination(path[0])):
+        path.size() == 1 and not unit._can_see_position(path[0])):
             # We get the path in reverse to use as a stack
             path = world.astar.get_id_path(dest.grid_position, unit.grid_position)
             unit._broadcast_path()
