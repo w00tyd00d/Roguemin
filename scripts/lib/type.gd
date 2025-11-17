@@ -21,7 +21,7 @@ enum Edge { NONE, PATH, WALL }
 enum Unit { RED, YELLOW, BLUE, NONE }
 
 ## The types of entities.
-enum Entity { TREASURE, ENEMY }
+enum Entity { PLAYER, TREASURE, ENEMY }
 
 ## The hazards that will do harm entities.
 enum Hazard { WATER, FIRE }

@@ -64,6 +64,7 @@ func move_to(dest: Tile) -> void:
     super(dest)
     camera.align()
     unit_tether.update()
+    # _draw_tether()
     
     world.update_fog_of_war(dest.grid_position, Globals.PLAYER_SIGHT_RANGE)
 
@@ -84,6 +85,7 @@ func cycle_selected_unit(left := false) -> void:
         strikes += 1
 
     selected_unit = Type.Unit.NONE
+
 
 func add_unit(unit: Unit) -> void:
     if _units[unit.type].has(unit): return

@@ -67,7 +67,6 @@ func new_game() -> void:
     GameState.toggle_hud.emit(true)
     
 
-
 func _input_handler(_dt: float) -> void:
     if not game_started:
         for inp in Globals.ACTION_INPUTS + Globals.DIRECTIONAL_INPUTS:

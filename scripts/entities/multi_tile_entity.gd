@@ -66,8 +66,9 @@ func delete() -> void:
 
     for unit: Unit in carriers.keys():
         unit.drop_object()
-        var dist := Util.chebyshev_distance(unit.grid_position, player.grid_position)
-        if dist <= Globals.UNIT_SIGHT_RANGE:
+        if unit._in_range_of_tether():
+        # var dist := Util.chebyshev_distance(unit.grid_position, player.grid_position)
+        # if dist <= Globals.UNIT_SIGHT_RANGE:
             unit.join_squad()
         else:
             unit.dismiss()
@@ -77,17 +78,10 @@ func delete() -> void:
 
 
 func move_towards(target: Tile) -> bool:
-    var valid := func(tile: Tile):
-        var dist := tile.distance_from_wall
-        if _is_even:
-            var diff := tile.grid_position - grid_position
-            dist -= 1 if diff.x < 0 or diff.y < 0 else 0
-        return tile.type == Type.Tile.GRASS and dist >= radius
-
     var dir := Direction.by_delta(grid_position, target.grid_position)
     var dest := world.get_tile(grid_position + dir.vector)
 
-    if valid.call(dest):
+    if _walkable_tile(dest):
         move_to(dest)
         return true
 
@@ -96,7 +90,7 @@ func move_towards(target: Tile) -> bool:
 
         dest = world.get_tile(grid_position + adj.vector)
 
-        if valid.call(dest):
+        if _walkable_tile(dest):
             move_to(dest)
             return true
 
@@ -179,7 +173,7 @@ func get_hauled() -> void:
         move_to(get_next_flow_field_tile())
         _check_for_collection()
 
-    action_energy -= Globals.DEFAULT_ENERGY_STEP
+    brain.energy -= Globals.DEFAULT_ENERGY_STEP
 
 
 func get_next_flow_field_tile() -> Tile:
@@ -187,11 +181,12 @@ func get_next_flow_field_tile() -> Tile:
     return world.get_tile(dest)
 
 
-func _get_can_act() -> bool:
-    return action_energy >= Globals.DEFAULT_ENERGY_STEP
+# func _get_can_act() -> bool:
+#     return action_energy >= Globals.DEFAULT_ENERGY_STEP
 
 
 func _scan() -> void:
+    # FOR NOW, WE ASSUME ALL RECTS ARE SQUARES
     var size := get_used_rect().size
     radius = ceili(size.x / 2.0)
 
@@ -207,6 +202,14 @@ func _scan() -> void:
         set_glyph(pos, Glyph.NONE)
 
     area_positions = get_used_cells()
+
+
+func _walkable_tile(tile: Tile) -> bool:
+    var dist := tile.distance_from_wall
+    if _is_even:
+        var diff := tile.grid_position - grid_position
+        dist -= 1 if diff.x < 0 or diff.y < 0 else 0
+    return tile.type == Type.Tile.GRASS and dist >= radius
 
 
 func _check_for_collection() -> void:

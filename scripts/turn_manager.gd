@@ -12,7 +12,7 @@ func process_turns(time_units: int) -> void:
     var entities := get_tree().get_nodes_in_group(&"entities")
 
     GameState.world.time += time_units
-    Unit.toggle_centroid_buffer()
+    Boid.toggle_centroid_buffer()
 
     # var _start_time := Time.get_ticks_msec()
 
