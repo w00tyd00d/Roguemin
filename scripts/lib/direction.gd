@@ -49,6 +49,17 @@ var orthogonal : Array[Direction] :
             orthogonal = [Direction.by_pattern(left), Direction.by_pattern(right)]
         return orthogonal
 
+
+var oppadjacent : Array[Direction] :
+    get:
+        if vector == Vector2i(): return [Direction.none, Direction.none]
+        if not adjacent:
+            var left := ALL_VECTORS[(_index-3 + 8) % 8]
+            var right := ALL_VECTORS[(_index+3) % 8]
+            adjacent = [Direction.by_pattern(left), Direction.by_pattern(right)]
+        return adjacent
+
+
 var opposite : Direction :
     get:
         if vector == Vector2i(): return Direction.none

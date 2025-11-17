@@ -66,8 +66,9 @@ func delete() -> void:
 
     for unit: Unit in carriers.keys():
         unit.drop_object()
-        var dist := Util.chebyshev_distance(unit.grid_position, player.grid_position)
-        if dist <= Globals.UNIT_SIGHT_RANGE:
+        if unit._in_range_of_tether():
+        # var dist := Util.chebyshev_distance(unit.grid_position, player.grid_position)
+        # if dist <= Globals.UNIT_SIGHT_RANGE:
             unit.join_squad()
         else:
             unit.dismiss()

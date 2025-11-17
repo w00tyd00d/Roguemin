@@ -236,9 +236,6 @@ func query_tile(tile: Tile) -> Type.Tile:
     if not tile: return Type.Tile.VOID
 
     if tile.has_entities:
-        # DEBUG
-        if tile.type == Type.Tile.WALL:
-            pass
         return Type.Tile.ENTITY
 
     if tile.has_units:

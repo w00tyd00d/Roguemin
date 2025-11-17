@@ -1,6 +1,13 @@
 class_name UnitContainer extends Node
 
 
+func _ready() -> void:
+    var i = 0
+    for unit: Unit in get_children():
+        unit.id = i
+        i += 1
+
+
 func reset_all() -> void:
     for unit: Unit in get_children():
         unit.reset()

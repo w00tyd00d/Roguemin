@@ -75,8 +75,6 @@ const MOVE_HOLD_SUBSEQUENT := 0.1
 const DEFAULT_ENERGY_STEP := 100
 ## The range at which the player can through the fog of war.
 const PLAYER_SIGHT_RANGE := 30
-## The range the units can see the unit tether
-const UNIT_SIGHT_RANGE := 40
 
 ## The range at which the player can reach with a command
 const PLAYER_MAX_RANGE := 16
@@ -88,6 +86,13 @@ const WHISTLE_MIN_SIZE := 1
 const WHISTLE_MAX_SIZE := 4
 
 # Units 
+
+const UNIT_DISTANCE_CLOSE := 1.5
+const UNIT_DISTANCE_MEDIUM := 8.0
+const UNIT_DISTANCE_FAR := 40.0
+
+## The range the units can see the unit tether
+const UNIT_SIGHT_RANGE := UNIT_DISTANCE_FAR
 
 var BOID_COHESION_WEIGHT := 1.0
 var BOID_ALIGNMENT_WEIGHT := 1.0

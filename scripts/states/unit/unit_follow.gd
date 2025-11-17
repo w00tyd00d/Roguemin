@@ -24,15 +24,14 @@ func do_action(ent: Entity) -> Array:
 
     var unit := ent as Unit
 
-    if unit.name == "Unit04":
+    if unit.name == "Unit63":
         pass
 
     var tether := player.unit_tether
     var dest := tether.tail.current_tile
 
     if not unit._in_range_of_tether():
-        unit._go_idle()
-        return [false]
+        return [false, States.Unit.IDLE]
 
     var path := unit.path
 
@@ -58,5 +57,3 @@ func do_action(ent: Entity) -> Array:
         return [unit.move_towards(world.get_tile(path[-1]))]
 
     return [false]
-
-
