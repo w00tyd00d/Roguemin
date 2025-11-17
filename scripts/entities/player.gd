@@ -9,7 +9,7 @@ var health := 100 :
 
 var unit_tether := UnitTether.new(self, 4)
 
-var unit_toggle := {
+var unit_toggle : Dictionary[Type.Unit, bool] = {
     Type.Unit.RED: true,
     Type.Unit.YELLOW: true,
     Type.Unit.BLUE: true,
@@ -36,7 +36,7 @@ var unit_count := 0 :
 #         size = clampi(size, 1, 5)
 
 
-var _units := {
+var _units : Dictionary[Type.Unit, Dictionary] = {
     Type.Unit.RED: {},
     Type.Unit.YELLOW: {},
     Type.Unit.BLUE: {},
@@ -64,10 +64,9 @@ func move_to(dest: Tile) -> void:
     super(dest)
     camera.align()
     unit_tether.update()
-    _update_fog_of_war()
-
-    # DEBUG
     # _draw_tether()
+    
+    world.update_fog_of_war(dest.grid_position, Globals.PLAYER_SIGHT_RANGE)
 
 
 func cycle_selected_unit(left := false) -> void:
@@ -86,6 +85,7 @@ func cycle_selected_unit(left := false) -> void:
         strikes += 1
 
     selected_unit = Type.Unit.NONE
+
 
 func add_unit(unit: Unit) -> void:
     if _units[unit.type].has(unit): return
@@ -153,10 +153,3 @@ func _draw_tether() -> void:
     var tail := unit_tether.tail
     test_layer.set_background(tail.grid_position, Glyph.BLACK)
     test_layer.set_glyph(tail.grid_position, Glyph.TEST)
-
-
-func _update_fog_of_war() -> void:
-    var world := GameState.world
-    var fow := world.fog_of_war
-
-    world.mrpas.compute_field_of_view(fow, grid_position, Globals.PLAYER_SIGHT_RANGE)

@@ -7,7 +7,7 @@ const INTERVAL := Globals.TIME_LIMIT / TOTAL_LENGTH
 
 
 func _ready() -> void:
-    GameState.update_sun_meter.connect(update)
+    GameState.world_time_changed.connect(update)
 
 
 func reset():

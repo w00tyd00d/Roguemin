@@ -20,7 +20,7 @@ extends CanvasLayer
 @onready var day_count := $DayCount as Label
 @onready var quota_count := $QuotaCount as Label
 
-@onready var debug_time := $DebugTime as Label
+@onready var debug_info := $DebugInfo as Label
 
 func _ready() -> void:
     GameState.toggle_hud.connect(func(val: bool):
@@ -42,9 +42,10 @@ func _ready() -> void:
         money_value.text = str(val)
     )
 
-    # TurnManager.update_debug_time.connect(func(time: int):
-    #     debug_time.text = "Proc: {0}ms".format([time])
-    # )
+    # DEBUG
+    GameState.update_debug_info.connect(func(info: String):
+        debug_info.text = info
+    )
 
 
 func _update_selected_unit(type: Type.Unit) -> void:

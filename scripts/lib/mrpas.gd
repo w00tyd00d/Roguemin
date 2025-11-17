@@ -47,6 +47,9 @@ extends RefCounted
 enum _MajorAxis { X_AXIS, Y_AXIS }
 
 
+# The world this map is attached to
+var world : World
+
 # The size of the map in cells.
 var _size: Vector2
 # A bool for each cell indicating whether it allows vision.
@@ -56,7 +59,8 @@ var _fov_cells: Array = []
 
 
 # Initialize the algorithm for a map of a particular size.
-func _init(size: Vector2) -> void:
+func _init(_world: World, size: Vector2) -> void:
+    world = _world
     _size = Vector2(size.x as int, size.y as int)
 
     # Build array-of-arrays for both transparency and field of view,
@@ -108,24 +112,23 @@ func clear_field_of_view() -> void:
 
 # Compute the viewable cells from a particular view position by doing
 # each of the eight octants of the view.
-func compute_field_of_view(layer: TileMapLayer, view_position: Vector2, max_distance: int) -> void:
+func compute_field_of_view(view_position: Vector2, max_distance: int) -> void:
 
-    _compute_octant(layer, _MajorAxis.Y_AXIS, -1, -1, view_position, max_distance)
-    _compute_octant(layer, _MajorAxis.Y_AXIS, -1, 1, view_position, max_distance)
+    _compute_octant(_MajorAxis.Y_AXIS, -1, -1, view_position, max_distance)
+    _compute_octant(_MajorAxis.Y_AXIS, -1, 1, view_position, max_distance)
 
-    _compute_octant(layer, _MajorAxis.Y_AXIS, 1, -1, view_position, max_distance)
-    _compute_octant(layer, _MajorAxis.Y_AXIS, 1, 1, view_position, max_distance)
+    _compute_octant(_MajorAxis.Y_AXIS, 1, -1, view_position, max_distance)
+    _compute_octant(_MajorAxis.Y_AXIS, 1, 1, view_position, max_distance)
 
-    _compute_octant(layer, _MajorAxis.X_AXIS, -1, -1, view_position, max_distance)
-    _compute_octant(layer, _MajorAxis.X_AXIS, -1, 1, view_position, max_distance)
+    _compute_octant(_MajorAxis.X_AXIS, -1, -1, view_position, max_distance)
+    _compute_octant(_MajorAxis.X_AXIS, -1, 1, view_position, max_distance)
 
-    _compute_octant(layer, _MajorAxis.X_AXIS, 1, -1, view_position, max_distance)
-    _compute_octant(layer, _MajorAxis.X_AXIS, 1, 1, view_position, max_distance)
+    _compute_octant(_MajorAxis.X_AXIS, 1, -1, view_position, max_distance)
+    _compute_octant(_MajorAxis.X_AXIS, 1, 1, view_position, max_distance)
 
 
 # Compute all visibile cells for one octant of the viewpoint.
 func _compute_octant(
-        layer: TileMapLayer,
         axis: int,
         major_sign: int,
         minor_sign: int,
@@ -168,7 +171,7 @@ func _compute_octant(
             # Check if occluders found on previous lines block this cell.
             if cell_type == Type.Tile.VOID or not _is_occluded(occluders, angle, angle_half_step, cell_type != Type.Tile.WALL):
                 
-                layer.set_cell(Vector2i(position), -1, Vector2i(-1,-1), -1)
+                world.reveal_fog_of_war(Vector2i(position))
                 
                 if cell_type != Type.Tile.WALL:
                     any_transparent = true

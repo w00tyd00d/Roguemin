@@ -1,12 +1,12 @@
 class_name DDARC extends Object
 
 #region Description
-## An abstract class of the DDA raycast algorithm for 2D grids.
+## A static class of the DDA raycast algorithm for 2D grids.
 ##
 ## In order to accommodate any arbitrary data structure, the raycast requires a
 ## callback function that will be called upon every cell traversal. This keeps
-## the framework flexible while also allowing as much control as possible over
-## how collision is handled. The callback function will provided a
+## the framework flexible and allows as much control over
+## how collision is handled as possible. The callback function will provided a
 ## [DDARC.Context] object that will have all of the properties currently being
 ## tracked by the ray.[br][br]
 ##
@@ -63,7 +63,7 @@ static func collider(obj: Variant) -> Array:
 static func by_vector(
         start: Vector2,
         direction: Vector2,
-        callback: Callable,
+        callback := func(_ctx: Context): return,
         distance := INF) -> Context:
 
     return DDARC._dda_raycast(start, direction, callback, distance)
@@ -75,13 +75,14 @@ static func by_vector(
 static func to_grid_position(
         start: Vector2,
         end: Vector2,
-        callback: Callable) -> Context:
+        callback := func(_ctx: Context): return) -> Context:
 
-    var tstart := start.floor()
-    var tend := end.floor()
+    var _start := start.floor()
+    var _end := end.floor()
 
-    var direction := tstart.direction_to(tend)
-    var distance := tstart.distance_to(tend)
+    var direction := _start.direction_to(_end)
+    var distance := _start.distance_to(_end)
+
     return DDARC._dda_raycast(start, direction, callback, distance)
 
 
@@ -165,6 +166,7 @@ static func _dda_raycast(
         # We run the passed callback function to check for collisions. If it
         # returns true, it will count as a collision and the raycast will end.
         var collided = callback.call(ctx._update_path(cell_path, current_length))
+
         if collided:
             ctx.collider = collided[0] if typeof(collided) == TYPE_ARRAY else null
             return ctx._update_path(cell_path, current_length)

@@ -3,7 +3,7 @@
 class_name MainBaseBlueprint extends RoomBlueprint
 
 
-func _run_context_procedures(world: World, start: Vector2i) -> void:
+func run_context_procedures(world: World, start: Vector2i) -> void:
     world.start_position = context_positions[0][0] + start
 
     for pos: Vector2i in context_positions[1]:

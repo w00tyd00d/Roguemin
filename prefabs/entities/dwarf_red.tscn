@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://w5k5gfelnqws"]
 
-[ext_resource type="PackedScene" uid="uid://bge48j21udel3" path="res://prefabs/enemy.tscn" id="1_qmh5x"]
+[ext_resource type="PackedScene" uid="uid://bge48j21udel3" path="res://prefabs/entities/enemy.tscn" id="1_qmh5x"]
 
 [node name="DwarfBulborb" instance=ExtResource("1_qmh5x")]
 tile_map_data = PackedByteArray(0, 0, 255, 255, 255, 255, 0, 0, 2, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 1, 0, 255, 255, 0, 0, 0, 0, 2, 0, 1, 0, 2, 0, 0, 0, 255, 255, 0, 0, 2, 0, 1, 0, 2, 0)

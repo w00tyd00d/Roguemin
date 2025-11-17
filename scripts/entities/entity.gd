@@ -2,41 +2,64 @@ class_name Entity extends DualMapLayer
 
 ## The base class for all entities in the game.
 
+var RNG : RandomNumberGenerator :
+    get: return GameState.RNG
+
+var world : World :
+    get: return GameState.world
+
+var player : Player :
+    get: return GameState.player
+
 var current_tile : Tile :
     get:
-        if not GameState.world: return null
-        return GameState.world.get_tile(grid_position)
+        if not world: return null
+        return world.get_tile(grid_position)
 
 ## The cached last position of the entity.
 var last_position : Vector2i
 
+## The last direction the entity had traveled
+var last_direction : Direction :
+    get:
+        if last_position == Vector2i(): return Direction.none
+        return Direction.by_delta(last_position, grid_position)
+
+## The last vector the entity had traveled
+var last_velocity : Vector2i :
+    get: return last_direction.vector
+
+## The brain of the entity
+var brain : Brain
+
 ## The in-game name of the entity.
 var entity_name := "Unknown Entity"
 
-## The value of time the entity has been synced up to.
-var time := 0
+# ## The value of time the entity has been synced up to.
+var time : int :
+    set(n): brain.time = n
+    get: return brain.time
 
-## The amount of energy points the entity has accumulated.
-var energy_points := 0
+# ## The amount of energy points the entity has accumulated.
+# var action_energy := 0
 
-## The amount of posture points the entity currently has.
-var posture_points := 0
+# ## The amount of posture points the entity currently has.
+# # DEPRECATE THIS!
+# var posture_points := 0
 
 ## Flag for signaling if the entity can act on this turn.
-var can_act : bool : get = _get_can_act
+var can_act : bool :
+    get: return brain.can_act
 
 ## Dictionary of immunities the entity has.
 var _immunities := {}
 
 
 func move_to(dest: Tile) -> void:
-    GameState.world.move_entity(self, dest)
-    last_position = grid_position
-    grid_position = dest.grid_position
+    world.move_entity(self, dest)
 
 
 func move_towards(target: Tile) -> bool:
-    var world := GameState.world
     var delta := target.grid_position - grid_position
     var ax := absi(delta.x)
     var ay := absi(delta.y)
@@ -57,31 +80,15 @@ func move_towards(target: Tile) -> bool:
     for _dir in dir.adjacent:
         if grid_position + _dir.vector == last_position: continue
         if world.query_tile_at(grid_position + _dir.vector) == Type.Tile.GRASS:
-            var dest = world.get_tile(grid_position + _dir.vector)
+            var dest := world.get_tile(grid_position + _dir.vector)
             move_to(dest)
             return true
 
     return false
 
 
-func update_time(world_time: int) -> bool:
-    var old_time := time
-    time = world_time
-
-    var time_units := time - old_time
-    if add_and_check_energy(time_units):
-        return do_action()
-
-    return false
-
-
-func do_action() -> bool:
-    return false
-
-
-func add_and_check_energy(amt: int) -> bool:
-    energy_points += amt
-    return can_act
+func update() -> bool:
+    return brain.update()
 
 
 func add_immunity(hazard: Type.Hazard) -> void:
@@ -100,5 +107,5 @@ func reset_immunities() -> void:
     _immunities = {}
 
 
-func _get_can_act() -> bool:
-    return energy_points >= Globals.ENERGY_CAP
+# func _get_can_act() -> bool:
+#     return action_energy >= Globals.DEFAULT_ENERGY_STEP

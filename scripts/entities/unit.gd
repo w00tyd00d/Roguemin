@@ -2,14 +2,8 @@ class_name Unit extends Entity
 
 ## The entity the [Player] controls to do tasks for them.
 
-enum State {
-    IDLE,
-    FOLLOW,
-    ATTACK,
-    CARRY,
-    RETURN,
-    DEAD
-}
+## The id # of the unit to identify which instance it is.
+var id : int
 
 ## The current type of the unit.
 var type : Type.Unit
@@ -17,19 +11,26 @@ var type : Type.Unit
 ## Returns if the unit has been upgraded or not.
 var upgraded : bool
 
-
 ## The current state of the unit.
-var state := State.DEAD :
-    set(new_state):
-        var old_state = state
-        state = new_state
-        _on_state_exit(old_state)
-        _on_state_enter(new_state)
+var state : State :
+    get: return brain.state
+
+## The boid data of the unit.
+var boid : Boid
+
 ## The current target of the unit.
 var target
 
+## The cached location which the unit last saw the player from, mainly used
+## as a means for hauling MTEs in the void where there is no flow field to
+## navigate.
+var last_player_tile : Tile
+
 ## The object the unit is currently holding on to.
 var held_object : MultiTileEntity
+
+## The enemy the unit is current on top of, if at all.
+var riding_enemy : Enemy
 
 ## A cached path to the unit's target.
 var path : Array :
@@ -38,17 +39,42 @@ var path : Array :
         if not path.is_empty():
             GameState.ASTAR_TEST.emit(arr)
 
-## A flag representing if the unit is idle.
-var idle : bool :
-    get: return state == State.IDLE
+## The location of the next point along the unit's path
+var next_destination : Vector2i :
+    get:
+        if not path.is_empty():
+            return path[0]
+        elif target:
+            return target.grid_position
+
+        return Vector2i()
+
+## A flag representing if the unit is is_idle.
+var is_idle : bool :
+    # get: return state == State.IDLE
+    get: return brain.state_is(States.Unit.IDLE)
+
+var is_dead : bool :
+    get: return brain.state_is(States.Unit.DEAD)
 
 ## A flag representing if the unit is in limbo (ie: not in the field).
 var in_limbo : bool :
     get: return grid_position == Vector2i()
 
-## The enemy the unit is current on top of, if at all.
-var riding_enemy : Enemy
+## A flag for whether not the unit is allowed to stack with other units
+var can_stack : bool :
+    get: return brain.state_is(States.Unit.ATTACK)
 
+
+# DEBUG
+@onready var sightline_boid := $Sightline1 as ColorRect
+@onready var sightline_centroid := $Sightline2 as ColorRect
+#
+
+
+func _init() -> void:
+    brain = UnitBrain.new(self)
+    boid = Boid.new(self)
 
 
 func _ready() -> void:
@@ -70,50 +96,38 @@ func get_metadata() -> Dictionary:
 
 func reset() -> void:
     hide()
+
     modulate.a = 1
     set_background(Vector2(), Glyph.BLACK)
 
-    energy_points = 0
-    posture_points = 0
+    if not brain.state_is(States.Unit.DEAD): #and world:
+        brain.change_state(States.Unit.DEAD)
 
-    var world := GameState.world
-    GameState.player.remove_unit(self)
-    current_tile.remove_unit(self)
-
-    if not state == State.DEAD and world:
-        var count := world.unit_count
-        world.unit_count = maxi(count-1, 0)
-
-    if held_object:
-        drop_object()
-
-    state = State.IDLE
     grid_position = Vector2()
+    last_player_tile = null
+    boid.reset()
+    
 
 
 func spawn(pos: Vector2i, _type: Type.Unit, _upgraded := false) -> void:
     type = _type
     upgraded = true # No time to implement nectar :(
-    state = State.FOLLOW if _in_range_of_tether() else State.IDLE
     grid_position = pos
+    
+    var _state = States.Unit.FOLLOW if _in_range_of_tether() else States.Unit.IDLE
+    brain.change_state(_state)
+    
     show()
 
 
 func upgrade() -> void:
     if upgraded: return
     upgraded = true
-    _update_glyph()
+    _update_glyph(is_idle)
 
 
 func die() -> void:
-    var world := GameState.world
-    state = State.DEAD
-
-    GameState.player.remove_unit(self)
-    current_tile.remove_unit(self)
-
-    var count := world.unit_count
-    world.unit_count = maxi(count-1, 0)
+    brain.change_state(States.Unit.DEAD)
 
     set_glyph(Vector2(), Glyph.UNIT_GHOST_LARGE)
     set_background(Vector2(), Glyph.NONE)
@@ -126,103 +140,123 @@ func die() -> void:
     tween.parallel().tween_property(self, "modulate:a", 0, 1.25)
     tween.tween_callback(func():
         z_index -= 1
-        reset())
-
+        reset()
+    )
 
 
 func move_to(dest: Tile) -> void:
-    GameState.world.move_unit(self, dest)
-    last_position = grid_position
-    grid_position = dest.grid_position
+    # DEBUG
+    if current_tile.type != Type.Tile.VOID and dest.type == Type.Tile.WALL:
+        pass
+    
+    world.move_unit(self, dest)
 
 
-func move_towards(tile: Tile) -> bool:
-    var world := GameState.world
-    var delta := tile.grid_position - grid_position
-    var ax := absi(delta.x)
-    var ay := absi(delta.y)
+func swap_with(dest: Tile) -> bool:
+    var units := dest.get_all_units()
 
-    var vec : Vector2i
+    if (units.size() > 1 or                 # Can't swap with multiple units
+        last_position == grid_position):    # Prevent oscillation
+            return false
 
-    if ax >= ay * 2: vec = Vector2i(delta.sign().x, 0)
-    elif ay >= ax * 2: vec = Vector2i(0, delta.sign().y)
-    else: vec = delta.sign()
+    # Do a centroid distance check
+    var dist1 := boid.centroid.position.distance_to(grid_position)
+    var dist2 := boid.centroid.position.distance_to(dest.grid_position)
 
-    var dir := Direction.by_pattern(vec)
-    if not dir: return false
-
-    var res := _check_tile_at(grid_position + dir.vector)
-    var dest := world.get_tile(grid_position + dir.vector)
-
-    if res == Type.Tile.WALL:
-        if state == State.RETURN and Tag.has(dest, Tags.UNIT_SHIP):
-            reset()
-            return true
-        elif current_tile.type == Type.Tile.VOID:
-            move_to(dest)
-            return true
-
-    elif res != Type.Tile.WALL and res != Type.Tile.ENTITY:
-        move_to(dest)
-        return true
-
-    var dist := grid_position.distance_to(tile.grid_position)
-    # if dist < 1.5: return false
-
-    var limit := 11
-
-    for adj_dir in dir.adjacent:
-        if (grid_position + adj_dir.vector == last_position and dist <= limit):
-            continue
-        if _check_tile_at(grid_position + adj_dir.vector) == Type.Tile.GRASS:
-            dest = world.get_tile(grid_position + adj_dir.vector)
-            move_to(dest)
-            return true
-
-    if dist < limit:
+    if dist1 <= dist2:
         return false
 
-    for ort_dir in dir.orthagonal:
-        # if grid_position + ort_dir.vector == last_position: continue
-        if _check_tile_at(grid_position + ort_dir.vector) == Type.Tile.GRASS:
-            dest = world.get_tile(grid_position + ort_dir.vector)
-            move_to(dest)
-            return true
+    var nbr := units[0]
 
-    return false
+    # Prevent swapping with units of the same type
+    # MAY NEED TO CHANGE FOR ATTACKING PURPOSES
+    if nbr.type == type:
+        return false
+
+    if nbr.boid.centroid and nbr.boid.centroid.count > 1:
+        # Check distance from current position to neighbors centroid to see
+        # what their new distance would be if they swapped
+        var ndist := grid_position.distance_to(nbr.boid.centroid.position)
+
+        if ndist > dist2:
+            return false
+
+    nbr.move_to(current_tile)
+    move_to(dest)
+
+    return true
+
+
+func move_towards(dest: Tile) -> bool:
+    if name == "Unit74":
+        pass
+    
+    var boid_tile := boid.get_next_tile(dest)
+    if boid_tile.grid_position == grid_position:
+        return false
+
+    var dir := Direction.by_delta(grid_position, boid_tile.grid_position)
+    if not dir or dir == Direction.none:
+        return false
+
+    if _check_move([dir]):
+        return true
+
+    var dist := grid_position.distance_to(target.grid_position)
+    if dist < Globals.UNIT_DISTANCE_CLOSE:
+        return false
+
+    if _check_move(dir.adjacent):
+        return true
+
+    var cheby := Util.chebyshev_distance(grid_position, target.grid_position)
+    if cheby <= Globals.UNIT_DISTANCE_MEDIUM and _can_see_position(dest.grid_position):
+        return false
+
+    if _check_move(dir.orthogonal):
+        return true
+    
+    if _can_see_position(dest.grid_position):
+        return false
+
+    return _check_move(dir.oppadjacent)
 
 
 func throw_to(tile: Tile) -> void:
-    var world := GameState.world
+    last_player_tile = player.current_tile
+
     if tile.has_entities:
         var ent := tile.get_first_entity()
+        
         if ent:
             match ent.type:
                 Type.Entity.TREASURE:
+                    target = ent
+                    brain.change_state(States.Unit.CARRY)
                     var latch := ent.get_open_latch_tile()
                     if latch:
-                        target_entity(ent)
                         move_to(latch)
                         grab_object(ent)
                         return
+                
+                Type.Entity.ENEMY:
+                    pass
 
         tile = world.get_closest_empty_tile(tile)
+
     move_to(tile)
     go_idle()
 
 
-func go_idle() -> void:
-    state = State.IDLE
-    GameState.player.remove_unit(self)
-
-
 func join_squad() -> void:
-    state = State.FOLLOW
-    GameState.player.add_unit(self)
+    last_player_tile = null
+    brain.change_state(States.Unit.FOLLOW)
+    player.add_unit(self)
 
 
-func go_home() -> void:
-    state = State.RETURN
+func dismiss() -> void:
+    last_player_tile = player.current_tile
+    go_idle()
 
 
 func ride_enemy(enemy: Enemy) -> void:
@@ -235,15 +269,8 @@ func get_off_enemy() -> void:
     if not riding_enemy: return
     riding_enemy.remove_unit(self)
 
-    move_to(GameState.world.get_closest_empty_tile(riding_enemy.current_tile))
+    move_to(world.get_closest_empty_tile(riding_enemy.current_tile))
     riding_enemy = null
-
-
-func target_entity(ent: MultiTileEntity) -> void:
-    target = ent
-    match ent.type:
-        Type.Entity.TREASURE: state = State.CARRY
-        Type.Entity.ENEMY: state = State.ATTACK
 
 
 func grab_object(obj: MultiTileEntity) -> bool:
@@ -260,108 +287,106 @@ func drop_object() -> void:
     held_object = null
 
 
-
-func update_time(world_time: int) -> bool:
-    var old_time := time
-    time = world_time
-
-    if not in_limbo:
-        var time_units := time - old_time
-        if add_and_check_energy(time_units):
-            return do_action()
-
-    return false
+func go_home() -> void:
+    brain.change_state(States.Unit.RETURN)
 
 
-func do_action() -> bool:
-    var world := GameState.world
+func go_idle() -> void:
+    brain.change_state(States.Unit.IDLE)
 
-    match state:
-        State.FOLLOW:
-            return _do_follow_action()
-        State.CARRY:
-            if not held_object:
-                if target.is_latch_position(grid_position):
-                    grab_object(target)
-                    return false
-                return move_towards(target.current_tile)
-        State.ATTACK:
 
+func _do_move_action(dest: Tile) -> bool:
+    # DEBUG
+    # if world.query_tile(dest) == Type.Tile.WALL:
+    #     pass
+
+    if dest.has_units and not can_stack:
+        return swap_with(dest)
+
+    move_to(dest)
+    return true
+
+
+func _check_move(options: Array[Direction]) -> bool:
+    for dir in options:
+        var res := _check_tile_at(grid_position + dir.vector)
+        var next_tile := world.get_tile(grid_position + dir.vector)
+        
+        if res == Type.Tile.UNIT and next_tile.type == Type.Tile.WALL:
             pass
-        State.RETURN:
-            return move_towards(GameState.world.unit_ship_tile)
 
-    return false
+        match res:
+            Type.Tile.WALL:
+                if brain.state_is(States.Unit.RETURN) and Tag.has(next_tile, Tags.UNIT_SHIP):
+                    reset()
+                    return true # We reset, so no action cost needed
+                elif current_tile.type == Type.Tile.VOID:
+                    return _do_move_action(next_tile)
+                    
+            Type.Tile.ENTITY:
+                continue
 
-
-func _do_follow_action() -> bool:
-    var player := GameState.player
-    var world := GameState.world
-
-    if not player: return false
-
-    var tether := player.unit_tether
-    var dest := tether.tail.current_tile
-
-    if not _in_range_of_tether():
-        go_idle()
-        return false
-
-    if _can_see_tether():
-        return move_towards(dest)
-    else:
-        if (path.is_empty() or
-            Util.chebyshev_distance(path[-1], target.grid_position) > 5):
-                path = world.astar.find_path_to(self, dest.grid_position)
-                _broadcast_path()
-
-        var dist := Util.chebyshev_distance(current_tile.grid_position, path[0])
-        if dist < 2:
-            path.pop_front()
-        if not path.is_empty():
-            return move_towards(world.get_tile(path[0]))
-
+            _:
+                if _do_move_action(next_tile):
+                    return true
+    
     return false
 
 
 func _in_range_of_tether() -> bool:
-    var limit := Globals.UNIT_SIGHT_RANGE
-    var dest := GameState.player.unit_tether.tail.grid_position
-    return Util.chebyshev_distance(grid_position, dest) <= limit
+    var dest := player.unit_tether.tail.grid_position
+    var dist := Util.chebyshev_distance(grid_position, dest)
+    
+    return dist <= Globals.UNIT_SIGHT_RANGE
 
 
-func _can_see_tether() -> bool:
-    var world := GameState.world
-    var tail := GameState.player.unit_tether.tail
-
+func _can_see_position(dest_pos: Vector2i) -> bool:
     var callback := func(ctx: DDARC.Context):
         var pos := ctx.grid_position
+        var query := world.query_tile_at(pos)
         if (not world.in_bounds(pos) or
-            world.query_tile_at(pos) == Type.Tile.WALL and not
-            current_tile.type == Type.Tile.VOID):
+            query == Type.Tile.ENTITY or
+            query == Type.Tile.WALL and not current_tile.type == Type.Tile.VOID):
                 return true
 
     var raycast := DDARC.to_grid_position(
         grid_position,
-        tail.grid_position,
-        callback)
+        dest_pos,
+        callback
+    )
 
-    return raycast.grid_position == tail.grid_position
+    return raycast.grid_position == dest_pos
+
+
+func _can_see_tether() -> bool:
+    var tail := player.unit_tether.tail
+    return _can_see_position(tail.grid_position)
 
 
 func _check_tile_at(pos: Vector2i) -> Type.Tile:
-    var world := GameState.world
     var tile := world.get_tile(pos)
     var res := world.query_tile(tile)
 
     # Cascade forward to see if we can resolve movement
-    if res == Type.Tile.ENTITY:
+    if res == Type.Tile.UNIT:
+        # DEBUG
+        if tile.type == Type.Tile.WALL:
+            pass
+        
+        var old_position := grid_position
         var any := false
+        
         for unit in tile.get_all_units():
-            if unit.time < GameState.world.time and unit.update_time(world.time):
+            if unit.time < world.time and unit.update():
                 any = true
         if any:
-            return _check_tile_at(pos)
+            var delta := grid_position - old_position
+            var new_pos := pos + delta
+            return _check_tile_at(new_pos)
+    
+    # DEBUG
+    if res == Type.Tile.UNIT and tile.type == Type.Tile.WALL:
+        pass
 
     return res
 
@@ -369,19 +394,16 @@ func _check_tile_at(pos: Vector2i) -> Type.Tile:
 func _broadcast_path() -> void:
     if path.is_empty(): return
 
-    var hist := {}
-    var tiles := current_tile.get_all_neighbors()
-    for _i in 2:
-        var new_tiles : Array[Tile] = []
-        for tile in tiles:
-            if hist.has(tile): continue
-            hist[tile] = true
-            for unit in tile.get_all_units():
-                if (unit.target == target and
-                    unit.path.is_empty() or
-                    unit.path[-1] != path[-1]):
-                        unit._receive_path(path)
-            new_tiles.append(tile)
+    Util.foreach_around_pos(grid_position, 5, func(pos: Vector2i, _data: Dictionary):
+        var tile := world.get_tile(pos)
+        
+        if not tile: return
+        
+        for unit in tile.get_all_units():
+            var empty_path := unit.path.is_empty()
+            if unit.target == target and (empty_path or unit.path[0] != path[0]):
+                unit._receive_path(path)
+    )
 
 
 func _receive_path(_path: Array[Vector2i]) -> void:
@@ -395,46 +417,23 @@ func _receive_path(_path: Array[Vector2i]) -> void:
         _path.pop_front()
 
 
-func _update_glyph() -> void:
+func _update_glyph(_idle := false) -> void:
     match type:
         Type.Unit.RED:
             if upgraded:
-                if idle: set_glyph(Vector2(), Glyph.UNIT_RED_LARGE_IDLE)
+                if _idle: set_glyph(Vector2(), Glyph.UNIT_RED_LARGE_IDLE)
                 else: set_glyph(Vector2(), Glyph.UNIT_RED_LARGE)
-            elif idle: set_glyph(Vector2(), Glyph.UNIT_RED_SMALL_IDLE)
+            elif _idle: set_glyph(Vector2(), Glyph.UNIT_RED_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_RED_SMALL)
         Type.Unit.YELLOW:
             if upgraded:
-                if idle: set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE_IDLE)
+                if _idle: set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE_IDLE)
                 else: set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE)
-            elif idle: set_glyph(Vector2(), Glyph.UNIT_YELLOW_SMALL_IDLE)
+            elif _idle: set_glyph(Vector2(), Glyph.UNIT_YELLOW_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_YELLOW_SMALL)
         Type.Unit.BLUE:
             if upgraded:
-                if idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE_IDLE)
+                if _idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE_IDLE)
                 else: set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE)
-            elif idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL_IDLE)
+            elif _idle: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL_IDLE)
             else: set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL)
-
-
-func _on_state_enter(_state: State) -> void:
-    var player := GameState.player
-
-    match _state:
-        State.IDLE:
-            _update_glyph()
-        State.FOLLOW:
-            target = player.unit_tether.tail
-            player.add_unit(self)
-        State.ATTACK:
-            player.remove_unit(self)
-        State.CARRY:
-            player.remove_unit(self)
-
-
-func _on_state_exit(_state: State) -> void:
-    match _state:
-        State.IDLE:
-            _update_glyph()
-        State.CARRY:
-            drop_object()

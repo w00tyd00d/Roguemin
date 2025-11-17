@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=4 uid="uid://c55oxq312dd0w"]
 
-[ext_resource type="Script" path="res://scripts/main_screen.gd" id="1_l2d4y"]
+[ext_resource type="Script" uid="uid://boh5247fi4uck" path="res://scripts/main_screen.gd" id="1_l2d4y"]
 [ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="2_tefom"]
 
 [node name="MainScreen" type="Control"]

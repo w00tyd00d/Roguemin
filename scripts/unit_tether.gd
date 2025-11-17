@@ -14,7 +14,7 @@ var tail : Link :
 
 func _init(_player: Player, count: int) -> void:
     player = _player
-    
+
     for n in count+1:
         var link := Link.new()
         if not links.is_empty():
