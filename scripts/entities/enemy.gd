@@ -190,6 +190,12 @@ func attack_target() -> void:
 #     return false
 
 
+func _handle_latch_points() -> void:
+    # LEFT OFF HERE
+    
+    super()
+
+
 func _set_attack_position(pos: Vector2i) -> void:
     var dest := pos - grid_position
     attack_indicator.grid_position = dest

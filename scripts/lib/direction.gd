@@ -14,6 +14,10 @@ const ALL_VECTORS : Array[Vector2i] = [
     Vector2i.LEFT,
 ]
 
+# Change how you want your RNG to be accessed
+static var RNG : RandomNumberGenerator : 
+    get: return GameState.RNG
+
 static var none := Direction.new(Vector2i())
 
 static var north := Direction.new(Vector2i.UP)
@@ -106,6 +110,25 @@ static func by_delta(from_pos: Vector2i, to_pos: Vector2i) -> Direction:
     if from_pos == to_pos:
         return Direction.none
     return Direction.by_normalized(Vector2(from_pos).direction_to(to_pos))
+
+
+static func by_turning(from_dir: Direction, to_dir: Direction) -> Direction:
+    if from_dir == to_dir: return from_dir
+    
+    var size := ALL_VECTORS.size()
+    var right := (to_dir._index - from_dir._index) % size
+    var left := (from_dir._index - to_dir._index) % size
+
+    var rot: int
+
+    if right < left: 
+        rot = 1  # turn right
+    elif left < right:
+        rot = 0  # turn left
+    else:
+        rot = Direction.RNG.randi_range(0,1)
+    
+    return from_dir.adjacent[rot]
 
 
 static func get_all(shuffled := false) -> Array[Direction]:

@@ -194,14 +194,18 @@ func _scan() -> void:
     var cy := 0.0 if size.y % 2 == 0 else 0.5
     center = Vector2(cx, cy)
 
-    var latch_points := get_used_cells_by_id(0, Vector2(4,0))
+    _handle_latch_points()
+
+    area_positions = get_used_cells()
+
+
+func _handle_latch_points() -> void:
+    var latch_points := get_used_cells_by_id(0, Vector2(4,0)) # The % glyph
     latch_point_count = latch_points.size()
 
     for pos in latch_points:
         latch_positions[pos] = true
         set_glyph(pos, Glyph.NONE)
-
-    area_positions = get_used_cells()
 
 
 func _walkable_tile(tile: Tile) -> bool:

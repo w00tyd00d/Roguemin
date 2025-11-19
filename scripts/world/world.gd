@@ -6,7 +6,7 @@ class_name World extends Node2D
 ## The built in [AStarGrid2D] pathfinder to the world.
 var astar := AStarTiles.new(self)
 
-## The size of the world, in nodes.
+## The size of the world, in chunks.
 var size : Vector2i :
     set(vec):
         size = vec
