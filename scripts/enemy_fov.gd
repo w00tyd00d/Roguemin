@@ -57,6 +57,15 @@ var closest_target: Vector2i
 var all_targets: Array[Vector2i] = []
 
 
+# The target-checking callback, if there is one
+var _target_cb : Callable :
+    get:
+        if _target_cb:
+            return _target_cb
+        return _default_target_callback
+
+
+
 # Initialize the algorithm for a map of a particular size.
 func _init(_ent: Enemy, _range: int) -> void:
     entity = _ent
@@ -66,6 +75,10 @@ func _init(_ent: Enemy, _range: int) -> void:
 func reset() -> void:
     closest_target = Vector2()
     all_targets = []
+
+
+func set_target_callback(cb: Callable) -> void:
+    _target_cb = cb
 
 
 # Compute the viewable cells from a particular view position by doing
@@ -82,7 +95,6 @@ func update(positions: Array[Vector2i]) -> void:
         _compute_octant(oct2, pos, hist)
 
 
-
 func turn_towards(pos: Vector2i) -> void:
     var dest_dir := Direction.by_delta(entity.grid_position, pos)
     facing = Direction.by_turning(facing, dest_dir)
@@ -91,7 +103,7 @@ func turn_towards(pos: Vector2i) -> void:
 # Compute all visibile cells for one octant of the viewpoint.
 func _compute_octant(
         octant: Array[int],
-        view_position: Vector2,
+        view_position: Vector2i,
         history: Dictionary) -> void:
 
     var axis := octant[0]
@@ -108,6 +120,7 @@ func _compute_octant(
 
         var position := view_position + _octant_to_offset(
             axis, major_sign * major, 0)
+        
         if not world.in_bounds(position):
             break
 
@@ -134,8 +147,16 @@ func _compute_octant(
                 
                 if not history.has(position):
                     history[position] = true
-
-                
+                    
+                    if _is_target(position):
+                        all_targets.append(position)
+                        
+                        # TRY TO SOLVE EVEN DIAMETER BIAS BY ROUNDING
+                        var dist1 := roundi(position.distance_to(entity.grid_position))
+                        var dist2 := roundi(closest_target.distance_to(entity.grid_position))
+                        
+                        if closest_target == Vector2i() or dist1 < dist2:
+                            closest_target = position
                 
                 if cell_type != Type.Tile.WALL:
                     any_transparent = true
@@ -219,11 +240,11 @@ func _is_angle_occluded(occluders: Array, angle: float) -> bool:
 
 # Given a major axis, and offsets along the major and minor axes, return
 # an equivalent (x, y) coordinate.
-func _octant_to_offset(axis: int, major: int, minor: int) -> Vector2:
+func _octant_to_offset(axis: int, major: int, minor: int) -> Vector2i:
     if axis == _MajorAxis.Y_AXIS:
-        return Vector2(minor, major)
+        return Vector2i(minor, major)
     else:
-        return Vector2(major, minor)
+        return Vector2i(major, minor)
 
 
 # is_transparent, but without a bounds check for use in the inner loop of
@@ -231,6 +252,14 @@ func _octant_to_offset(axis: int, major: int, minor: int) -> Vector2:
 func _get_cell_type(position: Vector2) -> Type.Tile:
     return world.get_tile(position).type
     # return _transparent_cells[position.y][position.x]
+
+
+func _is_target(pos: Vector2i) -> bool:
+    return _target_cb.call(pos)
+
+
+func _default_target_callback(pos: Vector2i) -> bool:
+    return world.get_tile(pos).has_units
 
 
 # set_in_view, but with no bounds check.  For use in the inner loop of
