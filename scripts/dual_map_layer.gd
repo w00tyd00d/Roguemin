@@ -39,8 +39,8 @@ func _set_tile(layer: TileMapLayer, pos: Vector2i, glyph: Glyph) -> void:
     layer.set_cell(
         pos,
         glyph.source,
-        glyph.atlas_coordinates,
-        glyph.alternative_tile_id)
+        glyph.atlas_pos,
+        glyph.alt_tile_id)
 
 
 func _get_tile(layer: TileMapLayer, pos: Vector2i) -> Glyph:

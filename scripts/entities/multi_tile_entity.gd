@@ -200,7 +200,9 @@ func _scan() -> void:
 
 
 func _handle_latch_points() -> void:
-    var latch_points := get_used_cells_by_id(0, Vector2(4,0)) # The % glyph
+    var glyph := Glyph.LATCH_POINT # The % glyph
+    var latch_points := get_used_cells_by_id(0, glyph.atlas_pos)
+    
     latch_point_count = latch_points.size()
 
     for pos in latch_points:

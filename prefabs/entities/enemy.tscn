@@ -5,6 +5,7 @@
 
 [node name="Enemy" instance=ExtResource("1_3srh3")]
 script = ExtResource("2_iir01")
+fov_type = 0
 sight_range = 0
 wander_distance = 0
 attack_range = 0

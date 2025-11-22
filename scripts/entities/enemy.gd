@@ -2,7 +2,8 @@ class_name Enemy extends MultiTileEntity
 
 ## Base class for all enemies in-game
 
-# enum State { IDLE, ATTACK, RETURN, DEAD }
+## The type of FOV encoding the enemy will use to assign their view positions
+@export var fov_type : Type.EnemyFov
 
 ## The distance at which the enemy can see riding_units.
 @export var sight_range : int
@@ -25,14 +26,6 @@ class_name Enemy extends MultiTileEntity
 ## The amount of health the enemy currently has.
 @export var current_health : int
 
-## The current state of the unit.
-# var state := State.IDLE :
-#     set(new_state):
-#         var old_state = state
-#         state = new_state
-#         _on_state_exit(old_state)
-#         # _on_state_enter(new_state)
-
 ## The current entity the enemy is targeting
 var target_entity : Entity
 
@@ -42,8 +35,15 @@ var target_tile : Tile
 ## The dictionary of units that are currently on top of the entity
 var riding_units := {}
 
+## The direction the enemy is currently facing
+var facing := Direction.north
+
+## The field of view object attached to the enemy
+var fov := EnemyFOV.new(self)
+
 ## The attack indicator of the enemy.
 @onready var attack_indicator := $AttackIndicator as DualMapLayer
+
 
 func _ready() -> void:
     super()
@@ -60,8 +60,18 @@ func _process(_dt: float) -> void:
     attack_indicator.visible = not GameState.glyph_blinking()
 
 
+func _handle_latch_points() -> void:
+    _assign_view_positions()
+    super()
+
+
 func get_health_percent() -> float:
     return current_health / float(maximum_health)
+
+
+func turn_towards(pos: Vector2i) -> void:
+    var dest_dir := Direction.by_delta(grid_position, pos)
+    facing = Direction.by_turning(facing, dest_dir)
 
 
 func die() -> void:
@@ -121,81 +131,6 @@ func attack_target() -> void:
     target_entity = null
 
 
-# func return_home() -> void:
-#     state = State.RETURN
-
-
-# func do_action() -> bool:
-#     match state:
-#         State.IDLE:
-#             if _check_next_to():
-#                 target_entity = get_closest_target()
-#                 state = State.ATTACK
-#                 return true
-#             return false
-
-#         State.ATTACK:
-#             return _do_attack_action()
-
-#         State.RETURN:
-#             # if posture_points < 2:
-#             #     return false
-
-#             var ent := get_closest_target()
-#             if ent:
-#                 target_entity = ent
-#                 state = State.ATTACK
-#                 return true
-
-#             if grid_position == spawn_position:
-#                 state = State.IDLE
-#                 return true
-
-#             return move_towards(spawn_tile)
-
-#     return false
-
-
-# func _do_attack_action() -> bool:
-#     # if (target_tile and posture_points < 1 or
-#     #     not target_tile and posture_points < 2):
-#     #     return false
-
-#     var dist := Util.chebyshev_distance(grid_position, spawn_position)
-#     if dist >= wander_distance:
-#         return_home()
-#         return true
-
-#     if target_tile:
-#         attack_target()
-#         return true
-
-#     if not target_entity: # or posture_points > 3:
-#         var ent := get_closest_target()
-#         if ent:
-#             target_entity = ent
-#         else:
-#             return_home()
-#             return true
-
-#     if target_entity:
-#         var tile := target_entity.current_tile
-#         if _target_in_attack_range():
-#             queue_attack(tile)
-#             return true
-
-#         return move_towards(tile)
-
-
-#     return false
-
-
-func _handle_latch_points() -> void:
-    # LEFT OFF HERE
-    
-    super()
-
-
 func _set_attack_position(pos: Vector2i) -> void:
     var dest := pos - grid_position
     attack_indicator.grid_position = dest
@@ -231,13 +166,15 @@ func _check_next_to() -> bool:
     return false
 
 
-# func _on_state_enter(_state: State) -> void:
-#     pass
+func _assign_view_positions():
+    var key := fov.key
 
-
-# func _on_state_exit(_state: State) -> void:
-#     match _state:
-#         State.ATTACK:
-#             target_tile = null
-#             target_entity = null
-#             # posture_points = 0
+    for glyph in key:
+        var cells := get_used_cells_by_id(glyph.source, glyph.atlas_pos)
+        var dirs := key[glyph]
+        
+        for pos in cells:
+            for dir: Direction in dirs:
+                fov.add_view_position(dir, pos)
+            
+            set_glyph(pos, Glyph.LATCH_POINT)

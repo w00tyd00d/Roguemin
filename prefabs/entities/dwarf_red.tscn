@@ -6,6 +6,7 @@
 [node name="DwarfBulborb" instance=ExtResource("1_qmh5x")]
 tile_map_data = PackedByteArray("AAD/////AAACAAEAAQAAAAAAAAACAAEAAQD//wAAAAACAAEAAgAAAP//AAACAAEAAgD+////AAAWAAAAAgD///7/AAAPAAAAAgAAAP7/AAAQAAAAAgABAP//AAARAAAAAgABAAAAAAASAAAAAgAAAAEAAAATAAAAAgD//wEAAAAUAAAAAgD+/wAAAAAVAAAAAgA=")
 script = ExtResource("2_krgmn")
+fov_type = 1
 
 [node name="AttackIndicator" parent="." index="0"]
 tile_map_data = PackedByteArray("AAAAAAAAAAAYAAEAAwA=")

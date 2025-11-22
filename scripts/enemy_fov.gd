@@ -14,6 +14,31 @@ const _OCTANTS : Dictionary[StringName, Array] = {
     &"ESE": [_MajorAxis.X_AXIS, 1, 1],
 }
 
+var DEFAULT_GLYPH_KEY : Dictionary[Glyph, Array] = {
+    Glyph.NORTH: [Direction.north],
+    Glyph.SOUTH: [Direction.south],
+    Glyph.WEST: [Direction.west],
+    Glyph.EAST: [Direction.east],
+    
+    # Clockwise order
+    Glyph.ZERO: [Direction.northwest],
+    Glyph.ONE: [Direction.northeast],
+    Glyph.TWO: [Direction.southeast],
+    Glyph.THREE: [Direction.southwest],
+}
+
+var COMPACT_GLYPH_KEY : Dictionary[Glyph, Array] = {
+    # Clockwise order
+    Glyph.ZERO: [Direction.northwest, Direction.north],
+    Glyph.ONE: [Direction.north, Direction.northeast],
+    Glyph.TWO: [Direction.northeast, Direction.east],
+    Glyph.THREE: [Direction.east, Direction.southeast],
+    Glyph.FOUR: [Direction.southeast, Direction.south],
+    Glyph.FIVE: [Direction.south, Direction.southwest],
+    Glyph.SIX: [Direction.southwest, Direction.west],
+    Glyph.SEVEN: [Direction.west, Direction.northwest],
+}
+
 var _fovs : Dictionary[Direction, Array] = {
     Direction.north: [_OCTANTS[&"NNW"], _OCTANTS[&"NNE"]],
     Direction.south: [_OCTANTS[&"SSW"], _OCTANTS[&"SSE"]],
@@ -44,17 +69,17 @@ var world : World :
 # The enemy entity this sightline object is attached to
 var entity: Enemy
 
-# The maximum distance an enemy can see.
-var max_distance: int
-
-# The direction the enemy is facing in
-var facing := Direction.north
-
 # The cached target location for the enemy to focus on
 var closest_target: Vector2i
 
 # The cached location of of all targets within FOV
 var all_targets: Array[Vector2i] = []
+
+var key : Dictionary[Glyph, Array] :
+    get: 
+        match entity.fov_type:
+            Type.EnemyFov.COMPACT: return COMPACT_GLYPH_KEY
+            _: return DEFAULT_GLYPH_KEY
 
 
 # The target-checking callback, if there is one
@@ -67,9 +92,8 @@ var _target_cb : Callable :
 
 
 # Initialize the algorithm for a map of a particular size.
-func _init(_ent: Enemy, _range: int) -> void:
+func _init(_ent: Enemy) -> void:
     entity = _ent
-    max_distance = _range
 
 
 func reset() -> void:
@@ -81,23 +105,22 @@ func set_target_callback(cb: Callable) -> void:
     _target_cb = cb
 
 
+func add_view_position(dir: Direction, pos: Vector2i) -> void:
+    _view_positions[dir].append(pos)
+
+
 # Compute the viewable cells from a particular view position by doing
 # each of the eight octants of the view.
-func update(positions: Array[Vector2i]) -> void:
+func update() -> void:
     reset()
 
-    var oct1 : Array[int] = _fovs[facing][0]
-    var oct2 : Array[int] = _fovs[facing][1]
+    var oct1 : Array[int] = _fovs[entity.facing][0]
+    var oct2 : Array[int] = _fovs[entity.facing][1]
     var hist := {}
 
-    for pos in positions:
+    for pos in _view_positions[entity.facing]:
         _compute_octant(oct1, pos, hist)
         _compute_octant(oct2, pos, hist)
-
-
-func turn_towards(pos: Vector2i) -> void:
-    var dest_dir := Direction.by_delta(entity.grid_position, pos)
-    facing = Direction.by_turning(facing, dest_dir)
 
 
 # Compute all visibile cells for one octant of the viewpoint.
@@ -115,7 +138,7 @@ func _compute_octant(
     var new_occluders := []
 
     # Iterate along the major axis.
-    for major in range(max_distance + 1):
+    for major in range(entity.sight_range + 1):
         var any_transparent := false
 
         var position := view_position + _octant_to_offset(
