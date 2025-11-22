@@ -59,6 +59,19 @@ func _ready() -> void:
     add_to_group(&"entities")
 
 
+func distance_to(pos: Vector2i, radial := false) -> float:
+    var cpos := grid_position
+    
+    if _is_even:
+        if pos.x < grid_position.x: cpos.x -= 1
+        if pos.y < grid_position.y: cpos.y -= 1
+
+    if radial:
+        return maxf(0, cpos.distance_to(pos) - radius)
+
+    return maxf(0, Util.chebyshev_distance(cpos, pos) - radius)
+
+
 func delete() -> void:
     for pos in area_positions:
         var tile := world.get_tile(grid_position + pos)
@@ -104,14 +117,14 @@ func get_area_tiles(from := grid_position) -> Array[Vector2i]:
     return res
 
 
-func within_radius(pos: Vector2i) -> bool:
-    var dir := Direction.by_delta(grid_position, pos)
-    var offset := Vector2i()
-    if _is_even:
-        offset.x = -1 if dir.x < 0 else 0
-        offset.y = -1 if dir.y < 0 else 0
+# func within_radius(pos: Vector2i) -> bool:
+#     var dir := Direction.by_delta(grid_position, pos)
+#     var offset := Vector2i()
+#     if _is_even:
+#         offset.x = -1 if dir.x < 0 else 0
+#         offset.y = -1 if dir.y < 0 else 0
 
-    return pos.distance_to(grid_position + offset) < radius
+#     return pos.distance_to(grid_position + offset) < radius
 
 
 func add_carrier(unit: Unit) -> bool:
@@ -188,7 +201,9 @@ func get_next_flow_field_tile() -> Tile:
 func _scan() -> void:
     # FOR NOW, WE ASSUME ALL RECTS ARE SQUARES
     var size := get_used_rect().size
-    radius = ceili(size.x / 2.0)
+    
+    @warning_ignore("integer_division")
+    radius = size.x / 2 - 1
 
     var cx := 0.0 if size.x % 2 == 0 else 0.5
     var cy := 0.0 if size.y % 2 == 0 else 0.5

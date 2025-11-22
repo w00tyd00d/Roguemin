@@ -159,7 +159,6 @@ func reveal_fog_of_war(grid_pos: Vector2i) -> void:
     return get_chunk(chunk_pos).reveal_fog_of_war(tile_pos)
 
 
-
 func get_closest_empty_tiles_at(
         pos: Vector2i,
         count: int,

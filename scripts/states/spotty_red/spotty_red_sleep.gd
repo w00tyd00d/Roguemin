@@ -1,5 +1,7 @@
 class_name SpottyRedSleep extends State
 
+const DISTURB_RADIUS := 2.0
+
 
 func _init():
     name = "spotty_red_sleep"
@@ -26,10 +28,20 @@ func use_energy(ent: Entity) -> void:
 
 
 # Attempts to perform an action to consume energy
-func do_action(ent: Entity) -> Array:
-    # Returns array of values:
-    #   [0]: bool, Result of the action
-    #   [1]: States.Enum, OPTIONAL new state
+func do_action(_ent: Entity) -> Array:
+    var ent := _ent as Enemy
+    var mgr := GameState.unit_manager
+    var unit := mgr.get_closest_unit_to(ent.grid_position, true)
+
+    if not unit:
+        return [false]
+
+    var dist := ent.distance_to(unit.grid_position, true)
+
+    if dist <= DISTURB_RADIUS:
+        ent.target_entity = unit
+        return [true, States.SpottyRed.CHASE]
+    
     return [false]
 
 

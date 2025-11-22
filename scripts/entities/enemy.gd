@@ -100,7 +100,7 @@ func buck_units() -> void:
 
 
 func get_closest_target() -> Entity:
-    var unit := world.unit_container.get_closest_unit_to(grid_position)
+    var unit := GameState.unit_manager.get_closest_unit_to(grid_position)
     if not unit:
         var dist := Util.chebyshev_distance(player.grid_position, grid_position)
         return player if dist <= sight_range + radius else null
