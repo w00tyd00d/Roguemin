@@ -3,13 +3,8 @@ class_name SpottyRedBrain extends Brain
 
 func _init(ent: Entity) -> void:
     super(ent)
-
-    # Each brain should initialize with a:
-    #   pre-defined states dictionary from States
-    #   initial current_state member
     _states = States.spotty_red
-    change_state(States.SpottyRed.IDLE)
-
+    change_state(States.SpottyRed.SLEEP)
 
 
 # Used to change how the brain updates each time a turn is made

@@ -1,5 +1,6 @@
 class_name InanimateState extends State
 
+
 func _init():
     name = "inanimate"
 

@@ -42,6 +42,9 @@ var world : World
 ## Global reference to the player object
 var player : Player
 
+## Global reference to the unit manager object
+var unit_manager : UnitManager
+
 
 ## The current money value the player has accumulated
 var money := 0 :

@@ -15,7 +15,7 @@ var navigator := WorldNavigator.new() # Nayru
 var populator := WorldPopulator.new() # Farore
 
 # Assigned by GameScreen at runtime
-var unit_container : UnitContainer
+# var unit_container : UnitManager
 var game_viewport : SubViewport 
 
 
@@ -35,5 +35,5 @@ func generate_new_world() -> World:
 
 func _create_new_world() -> World:
     var world := World.create()
-    world.unit_container = unit_container
+    # world.unit_container = unit_container
     return world

@@ -27,7 +27,7 @@ var time := 0 :
         GameState.world_time_changed.emit(n)
 
 ## The container node of all of the unit objects in-game
-var unit_container : UnitContainer # injected upon World creation
+# var unit_manager : UnitManager
 
 ## The number of [Unit] objects currently out on the field.
 var unit_count := 0 :
@@ -313,15 +313,22 @@ func spawn_unit(
         type := Type.Unit.NONE) -> Unit:
 
     if type == Type.Unit.NONE:
-        type = [Type.Unit.RED, Type.Unit.YELLOW, Type.Unit.BLUE].pick_random()
+        type = [
+            Type.Unit.RED,
+            Type.Unit.YELLOW,
+            Type.Unit.BLUE
+        ].pick_random()
 
-    var unit : Unit = unit_container.get_available_unit()
+    var unit : Unit = GameState.unit_manager.get_available_unit()
     var tile := get_tile(pos)
-    if not unit or not tile: return
+
+    if not unit or not tile:
+        return
 
     unit.spawn(pos, type, [true,false].pick_random())
     tile.add_unit(unit)
     unit_count += 1
+
     return unit
 
 

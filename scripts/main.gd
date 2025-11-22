@@ -9,7 +9,7 @@ var game_started := false
 @onready var game_screen := $GameScreen as Control
 
 @onready var game_viewport := $GameScreen/%SubViewport as SubViewport
-@onready var unit_container := $GameScreen/%UnitContainer as UnitContainer
+@onready var unit_manager := $GameScreen/%UnitManager as UnitManager
 
 func _ready() -> void:
     # Set the default background color to black at runtime
@@ -20,7 +20,8 @@ func _ready() -> void:
 
     # We keep these nodes as a children to the game screen, but we inject
     # references to them to the world factory so that it may utilize them
-    world_factory.unit_container = unit_container
+    # world_factory.unit_manager = unit_manager
+    GameState.unit_manager = unit_manager
     world_factory.game_viewport = game_viewport
 
     # FOR DEBUGGING PURPOSES, AUTOMATICALLY GO RIGHT TO GAME
@@ -33,7 +34,7 @@ func initialize_game() -> void:
     var world := world_factory.generate_new_world()
     GameState.world = world
 
-    unit_container.reset_all()
+    unit_manager.reset_all()
 
     var player : Player
     if not GameState.player:

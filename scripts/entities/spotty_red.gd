@@ -7,7 +7,7 @@ static func create() -> SpottyRed:
 
 
 func _init() -> void:
-    brain = InanimateBrain.new(self)
+    brain = SpottyRedBrain.new(self)
     super()
 
 

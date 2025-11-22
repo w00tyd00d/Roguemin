@@ -1,4 +1,4 @@
-class_name UnitContainer extends Node
+class_name UnitManager extends Node
 
 
 func _ready() -> void:
@@ -24,13 +24,23 @@ func get_available_unit() -> Unit:
     return null
 
 
-func get_closest_unit_to(pos: Vector2i) -> Unit:
-    var best := 2**31-1
+func get_closest_unit_to(pos: Vector2i, radial := false) -> Unit:
+    var best := 2**31 - 1.0
     var res: Unit = null
+    
     for unit: Unit in get_children():
-        if unit.is_dead: continue
-        var dist := Util.chebyshev_distance(unit.grid_position, pos)
+        if unit.is_dead:
+            continue
+        
+        var dist: float
+        
+        if radial:
+            dist = unit.grid_position.distance_to(pos)
+        else:
+            dist = Util.chebyshev_distance(unit.grid_position, pos)
+        
         if dist < best:
             res = unit
             best = dist
+    
     return res

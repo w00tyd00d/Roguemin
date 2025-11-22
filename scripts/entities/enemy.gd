@@ -92,10 +92,9 @@ func remove_unit(unit: Unit) -> void:
 func buck_units() -> void:
     var size := riding_units.size()
     var empty_tiles := world.get_closest_empty_tiles(current_tile, size)
-    var _units = riding_units.keys()
 
-    for i in size:
-        _units[i].move_to(empty_tiles[i])
+    for unit: Unit in riding_units:
+        unit.move_to(empty_tiles.pop_back())
 
     riding_units = {}
 

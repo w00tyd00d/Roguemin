@@ -5,7 +5,6 @@ func _init():
     name = "unit_dead"
 
 
-## Called when entering the state
 func enter(ent: Entity) -> void:
     var unit := ent as Unit
     
@@ -20,5 +19,9 @@ func enter(ent: Entity) -> void:
 
         unit.brain.reset()
     
+    super(ent)
+
+
+func exit(ent: Entity) -> void:
     super(ent)
 

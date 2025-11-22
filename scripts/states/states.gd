@@ -3,6 +3,7 @@ class_name States extends RefCounted
 
 ## Blanket state for anything that is inanimate/haulable
 static var inanimate_state := InanimateState.new()
+static var dead_state := DeadState.new()
 
 enum Unit {
     IDLE,
@@ -30,10 +31,13 @@ static var inanimate_states := {
 
 
 enum SpottyRed {
-    IDLE,
+    SLEEP,
+    CHASE,
+    ATTACK,
+    DEAD
 }
 
 static var spotty_red := {
     # DEBUG, CHANGE THIS!
-    States.SpottyRed.IDLE: UnitIdle.new()
+    States.SpottyRed.SLEEP: UnitIdle.new()
 }
