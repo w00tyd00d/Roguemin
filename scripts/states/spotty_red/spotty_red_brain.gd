@@ -1,4 +1,4 @@
-class_name SpottyRedBrain extends Brain
+class_name SpottyRedBrain extends MultiTileBrain
 
 
 func _init(ent: Entity) -> void:

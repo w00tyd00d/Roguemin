@@ -7,6 +7,6 @@ func _init():
 
 ## Attempts to perform an action to consume energy
 func do_action(ent: Entity) -> Array:
-    var mte := ent as MultiTileEntity
+    var mte := _mte(ent)
     mte.get_hauled()
     return [true]

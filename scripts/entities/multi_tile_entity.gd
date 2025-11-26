@@ -186,16 +186,10 @@ func get_hauled() -> void:
         move_to(get_next_flow_field_tile())
         _check_for_collection()
 
-    brain.energy -= Globals.DEFAULT_ENERGY_STEP
-
 
 func get_next_flow_field_tile() -> Tile:
     var dest := grid_position + current_tile.get_flow_field_vector()
     return world.get_tile(dest)
-
-
-# func _get_can_act() -> bool:
-#     return action_energy >= Globals.DEFAULT_ENERGY_STEP
 
 
 func _scan() -> void:

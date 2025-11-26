@@ -106,6 +106,3 @@ func remove_immunity(hazard: Type.Hazard) -> void:
 func reset_immunities() -> void:
     _immunities = {}
 
-
-# func _get_can_act() -> bool:
-#     return action_energy >= Globals.DEFAULT_ENERGY_STEP

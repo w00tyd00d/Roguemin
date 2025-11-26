@@ -7,16 +7,23 @@ var world : World :
 var player : Player :
     get: return GameState.player
 
-
 var name := "unknown_state"
+
+## Shorthand for the default cost of an action
+var _def_cost : int :
+    get: return Globals.DEFAULT_TURN_COST
 
 
 func enter(_ent: Entity) -> void:
     pass
 
 
+func exit(_ent: Entity) -> void:
+    pass
+
+
 func get_cost(_ent: Entity) -> int:
-    return Globals.DEFAULT_ENERGY_STEP
+    return _def_cost
 
 
 func can_act(_ent: Entity) -> bool:
@@ -34,5 +41,13 @@ func do_action(_ent: Entity) -> Array:
     return [false]
 
 
-func exit(_ent: Entity) -> void:
-    pass
+func _mte(ent: Entity) -> MultiTileEntity:
+    if ent is MultiTileEntity:
+        return ent
+    return null
+
+
+func _enemy(ent: Entity) -> Enemy:
+    if ent is Enemy:
+        return ent
+    return null

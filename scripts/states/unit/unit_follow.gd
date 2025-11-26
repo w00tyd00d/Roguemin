@@ -14,7 +14,7 @@ func enter(ent: Entity) -> void:
 func get_cost(ent: Entity) -> int:
     # ALLOW TO BE MODIFIED BY BEING BOOSTED WITH SPICY SPRAY
     # AND RUSH BOOTS!
-    var step := Globals.DEFAULT_ENERGY_STEP
+    var step := _def_cost
     var dist := Util.chebyshev_distance(ent.grid_position, player.grid_position)
     return step - 20 if dist > 8 else step
 

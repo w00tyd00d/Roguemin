@@ -2,7 +2,7 @@ class_name PlayerWalk extends PlayerState
 
 var _action_cost : int :
     # ALLOW TO BE MODIFIED BY RUSH BOOTS ITEM!
-    get: return Globals.DEFAULT_ENERGY_STEP
+    get: return Globals.DEFAULT_TURN_COST
 
 
 func enter():

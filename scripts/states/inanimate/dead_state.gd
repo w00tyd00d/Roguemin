@@ -6,6 +6,13 @@ func _init():
 
 
 func enter(_ent: Entity) -> void:
-    var ent := _ent as Enemy
+    var ent := _enemy(_ent)
     ent.self_modulate = Color(127/255.0, 127/255.0, 127/255.0)
     ent.buck_units()
+
+
+## Attempts to perform an action to consume energy
+func do_action(ent: Entity) -> Array:
+    var mte := _mte(ent)
+    mte.get_hauled()
+    return [true]

@@ -3,12 +3,12 @@ class_name MultiTileBrain extends Brain
 var mte : MultiTileEntity :
     get: return entity
 
-var is_inanimate : bool :
-    get: return state == States.inanimate_state
+var is_haulable : bool :
+    get: return state == States.inanimate_state or state == States.dead_state
 
 
 func add_energy(time_units: int) -> void:
-    if is_inanimate:
+    if is_haulable:
         return _do_hauling_check(time_units)
     
     super(time_units)

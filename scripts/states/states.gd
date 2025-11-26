@@ -32,12 +32,15 @@ static var inanimate_states := {
 
 enum SpottyRed {
     SLEEP,
+    WAKE_UP,
     CHASE,
     ATTACK,
+    RETURN,
     DEAD
 }
 
 static var spotty_red := {
     # DEBUG, CHANGE THIS!
-    States.SpottyRed.SLEEP: UnitIdle.new()
+    States.SpottyRed.SLEEP: SpottyRedSleep.new(),
+    States.SpottyRed.CHASE: SpottyRedChase.new()
 }
