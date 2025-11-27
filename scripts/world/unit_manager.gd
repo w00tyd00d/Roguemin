@@ -2,7 +2,7 @@ class_name UnitManager extends Node
 
 
 func _ready() -> void:
-    var i = 0
+    var i := 0
     for unit: Unit in get_children():
         unit.id = i
         i += 1
@@ -28,6 +28,8 @@ func get_closest_unit_to(pos: Vector2i, radial := false) -> Unit:
     var best := 2**31 - 1.0
     var res: Unit = null
     
+    # We do a naive linear check for now, may implement a quadtree or k-d tree
+    # in the future if queries become too taxing
     for unit: Unit in get_children():
         if unit.is_dead:
             continue
@@ -35,7 +37,7 @@ func get_closest_unit_to(pos: Vector2i, radial := false) -> Unit:
         var dist: float
         
         if radial:
-            dist = unit.grid_position.distance_to(pos)
+            dist = unit.grid_position.distance_squared_to(pos)
         else:
             dist = Util.chebyshev_distance(unit.grid_position, pos)
         
