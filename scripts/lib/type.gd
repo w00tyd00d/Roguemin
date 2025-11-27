@@ -31,3 +31,10 @@ enum EnemyFov {
     DEFAULT, ## Uses N,S,W,E for cardnial directions and 0-3 for diagonal (starting with NW going clockwise)
     COMPACT, ## Uses only 0-7 and combines corners, used for 2x2 enemies
 }
+
+enum Attack {
+    SQUARE, ## The attack is a square around the target point.
+    CIRCLE, ## The attack is a circle around the target point.
+    CONE, ## The attack fires a cone centered on the target point.
+    CUSTOM, ## The attack area is custom-drawn in the editor.
+}

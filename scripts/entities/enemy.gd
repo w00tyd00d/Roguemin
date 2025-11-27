@@ -42,14 +42,14 @@ var facing := Direction.north
 var fov := EnemyFOV.new(self)
 
 ## The attack indicator of the enemy.
-@onready var attack_indicator := $AttackIndicator as DualMapLayer
+@onready var attack_indicator := $AttackIndicator as AttackIndicator
 
 
 func _ready() -> void:
     super()
     type = Type.Entity.ENEMY
 
-    attack_indicator.show_behind_parent = true
+    # attack_indicator.show_behind_parent = true
 
 
 func _process(_dt: float) -> void:
