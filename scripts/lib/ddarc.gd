@@ -1,6 +1,5 @@
 class_name DDARC extends Object
 
-#region Description
 ## A static class of the DDA raycast algorithm for 2D grids.
 ##
 ## In order to accommodate any arbitrary data structure, the raycast requires a
@@ -33,7 +32,6 @@ class_name DDARC extends Object
 ## more just for debugging purposes, but it can also be helpful to have for
 ## other contextual reasons such as tracking damage fall off per tile,
 ## explosion intensity per tile, etc.
-#endregion
 
 
 ## Abstraction for setting the collider of a raycast.[br][br]Its main use is to
@@ -99,9 +97,13 @@ static func _dda_raycast(
     var ctx := Context.new(start, direction)
 
     # We establish the slope and step size for each axis.
+    # Note: Step size is based off of opposite axis' slope
     var x_slope := direction.x / direction.y
     var y_slope := direction.y / direction.x
-    var step_size := Vector2( sqrt(1 + y_slope * y_slope), sqrt(1 + x_slope * x_slope) )
+    
+    var step_size := Vector2()
+    step_size.x = sqrt(1 + y_slope ** 2)
+    step_size.y = sqrt(1 + x_slope ** 2)
 
     # The current grid position of the scan.
     var grid_position := Vector2i(start)
@@ -109,31 +111,16 @@ static func _dda_raycast(
     # The starting offset of the ray.
     var offset := start - Vector2(grid_position)
 
-    # How long the current length of each slope currently is.
-    var slope_length := Vector2()
-
+    @warning_ignore("narrowing_conversion")
     # Which direction do we step to the next cell.
-    var step_direction := Vector2i()
+    var step_direction := Vector2i(signf(direction.x), signf(direction.y))
 
-    # Assign the step direction and starting slope length based on the
-    # direction vector and starting normalized offset within the cell.
-    if direction.x < 0:
-        step_direction.x = -1
-        slope_length.x = (1 - offset.x) * step_size.x
-    else:
-        step_direction.x = 1
-        slope_length.x = (1 - offset.x) * step_size.x
-
-    if direction.y < 0:
-        step_direction.y = -1
-        slope_length.y = (1 - offset.y) * step_size.y
-    else:
-        step_direction.y = 1
-        slope_length.y = (1 - offset.y) * step_size.y
-
-    # The cached length each iteration to make sure the scan doesn't exceed
-    # the given distance.
-    # var current_length := 0.0
+    # How long the current length of each slope currently is.
+    # Assign the starting slope length based on the starting offset within
+    # the cell.
+    var slope_length := Vector2()
+    slope_length.x = (1 - offset.x) * step_size.x
+    slope_length.y = (1 - offset.y) * step_size.y
 
     # Store all the resulting cells hit along the path, including the original.
     var cell_path : Array[Vector2i] = [grid_position]
@@ -174,27 +161,20 @@ static func _dda_raycast(
     return ctx._update_path(cell_path, distance)
 
 
-## The container of data about a [DDARC] raycast.
+## The container of data pertaining to a [DDARC] raycast.
 class Context:
-
-    ## The exact starting position of the ray in grid units.
-    var start_position : Vector2
-    ## The normalized direction of the ray.
-    var direction : Vector2
-
-    ## The array of grid positions the ray has visited along its path.
-    var cell_path : Array[Vector2i]
-    ## The length of the ray in grid units.
-    var length : float
-    ## The collider object the ray has intersected with, if any.
-    var collider : Variant = null
-
+    var start_position : Vector2    ## The exact starting position of the ray in grid units.
+    var direction : Vector2         ## The normalized direction of the ray.
+    var cell_path : Array[Vector2i] ## The array of grid positions the ray has visited along its path.
+    var length : float              ## The length of the ray in grid units.
+    var collider : Variant = null   ## The collider object the ray has intersected with, if any.
+    
     ## The grid position of the head of the ray.
-    var grid_position : Vector2i :
+    var grid_position : Vector2i :  
         get: return cell_path[-1]
 
     ## The exact position of the head of the ray in grid units.
-    var exact_position : Vector2 :
+    var exact_position : Vector2 :  
         get: return start_position + direction * length
 
     func _init(start: Vector2, dir: Vector2) -> void:
