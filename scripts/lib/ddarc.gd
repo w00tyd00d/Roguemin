@@ -20,11 +20,15 @@ class_name DDARC extends Object
 ##     var cell := world.get_cell(ctx.grid_position)
 ##
 ##     if cell.entity:
-##         return DDARC.collider(cell.entity)
+##         ctx.collider = cell.entity
+##         return true
+##                                              
 ##     elif cell.wall:
-##         return DDARC.collider(cell.wall)
+##         return ctx.set_collider(cell.wall) 
+##         # Shorthand to set collider and end raycast
+##         # ALWAYS returns true, even if no value is passed
 ##
-##     return true # returning any truthy value ends the raycast, just with no reported collision
+##     return "Sure! Why not?" # returning any truthy value ends the raycast
 ## [/codeblock]
 ## This is mainly to provide the developer with any arbitrary means of collision
 ## to suit any particular data structure. Things like distance limiting already
@@ -34,30 +38,13 @@ class_name DDARC extends Object
 ## explosion intensity per tile, etc.
 
 
-## Abstraction for setting the collider of a raycast.[br][br]Its main use is to
-## be used within the callback function as a means of returning a resulting
-## collider. Since the value of the collider could result in a falsy value,
-## the internal logic is set up to register the first value of an array as the
-## collider instead of returning the collider directly. This function, albeit
-## more verbose, allows the code to be a bit more readable and inferable upon
-## first glance.
-## [codeblock]
-## func example_callback(pos: Vector2i, cell_path: Array[Vector2i], length: float):
-##     var cell := world.get_cell(pos)
-##
-##     if cell.entity:
-##         return [cell.entity] # Without abstraction
-##     elif cell.wall:
-##         return DDARC.collider(cell.wall) # With abstraction, both work
-## [/codeblock]
-static func collider(obj: Variant) -> Array:
-    return [obj]
-
-
 ## Initiates a raycast from a grid position using a given [param direction]
-## vector. Does support using an unaligned starting position value, but it must
-## be normalized to the grid (using floats of its grid position, not its
+## vector. It does support using an unaligned starting position value, but it
+## must be normalized to the grid (using floats of its grid position, not its
 ## literal global position).
+## 
+## NOTE: Be careful when not passing a distance, the default value is set
+## to `INF`!
 static func by_vector(
         start: Vector2,
         direction: Vector2,
@@ -102,8 +89,8 @@ static func _dda_raycast(
     var y_slope := direction.y / direction.x
     
     var step_size := Vector2()
-    step_size.x = sqrt(1 + y_slope ** 2)
-    step_size.y = sqrt(1 + x_slope ** 2)
+    step_size.x = sqrt(1 + y_slope * y_slope)
+    step_size.y = sqrt(1 + x_slope * x_slope)
 
     # The current grid position of the scan.
     var grid_position := Vector2i(start)
@@ -151,12 +138,10 @@ static func _dda_raycast(
         cell_path.append(grid_position)
 
         # We run the passed callback function to check for collisions. If it
-        # returns true, it will count as a collision and the raycast will end.
-        var collided = callback.call(ctx._update_path(cell_path, current_length))
-
-        if collided:
-            ctx.collider = collided[0] if typeof(collided) == TYPE_ARRAY else null
-            return ctx._update_path(cell_path, current_length)
+        # returns true (any truthy value), it will count as a collision and
+        # the raycast will end.
+        if callback.call(ctx._update_path(cell_path, current_length)):
+            return ctx
 
     return ctx._update_path(cell_path, distance)
 
@@ -165,10 +150,10 @@ static func _dda_raycast(
 class Context:
     var start_position : Vector2    ## The exact starting position of the ray in grid units.
     var direction : Vector2         ## The normalized direction of the ray.
-    var cell_path : Array[Vector2i] ## The array of grid positions the ray has visited along its path.
+    var cell_path : Array[Vector2i] ## The array of grid positions the ray touched.
     var length : float              ## The length of the ray in grid units.
-    var collider : Variant = null   ## The collider object the ray has intersected with, if any.
-    
+    var collider : Variant = null   ## The object the ray collided with, if any.
+        
     ## The grid position of the head of the ray.
     var grid_position : Vector2i :  
         get: return cell_path[-1]
@@ -180,6 +165,13 @@ class Context:
     func _init(start: Vector2, dir: Vector2) -> void:
         start_position = start
         direction = dir
+
+    ## Shorthand to set collider and end raycast in the same line.
+    ## Will ALWAYS return [code]true[/code] regardless of if [param obj] is
+    ## passed or not.
+    func set_collider(obj: Variant = null) -> bool:
+        collider = obj
+        return true
 
     func _update_path(path: Array[Vector2i], _length: float) -> Context:
         cell_path = path
