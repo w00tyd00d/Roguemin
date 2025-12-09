@@ -1,3 +1,4 @@
+@tool
 class_name Glyph extends RefCounted
 
 ## Static glyph database for abstract tileset references.
@@ -39,6 +40,9 @@ static var SHRUB := Glyph.new(0, Vector2(3,5), 1)
 static var UNIT_SUMMON_TARGET := Glyph.new(0, Vector2(8,3)) # Bullseye
 
 # Entity Glyphs
+
+static var ATTACK_FG := Glyph.new(0, Vector2(24, 1), 3)
+static var ATTACK_BG := Glyph.new(2, Vector2(1, 0))
 
 static var UNIT_RED_SMALL := Glyph.new(0, Vector2(17,2), 1)
 static var UNIT_YELLOW_SMALL := Glyph.new(0, Vector2(17,2), 2)

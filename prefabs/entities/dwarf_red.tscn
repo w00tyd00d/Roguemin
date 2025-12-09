@@ -9,10 +9,9 @@ script = ExtResource("2_krgmn")
 fov_type = 1
 
 [node name="AttackIndicator" parent="." index="0"]
-tile_map_data = PackedByteArray("AAAAAAAAAAAYAAEAAwA=")
-
-[node name="BackgroundLayer" parent="AttackIndicator" index="0"]
-tile_map_data = PackedByteArray("AAAAAAAAAgABAAAAAAA=")
+top_level = true
+attack_range = 0.0
+attack_angle = 0.0
 
 [node name="BackgroundLayer" parent="." index="1"]
 tile_map_data = PackedByteArray("AAD/////AgAAAAAAAAD//wAAAgAAAAAAAAAAAAAAAgAAAAAAAAAAAP//AgAAAAAAAAA=")

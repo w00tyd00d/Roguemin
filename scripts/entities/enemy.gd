@@ -118,6 +118,7 @@ func get_closest_target() -> Entity:
 
 func queue_attack(tile: Tile) -> void:
     target_tile =  tile
+    attack_indicator.target_tile(tile)
     _set_attack_position(tile.grid_position)
 
 

@@ -1,3 +1,4 @@
+@tool
 class_name DualMapLayer extends TileMapLayer
 
 ## Base texture object for anything that exists within the world in-game.
@@ -12,6 +13,11 @@ var grid_position : Vector2i : set = _set_grid_position
 
 static func create() -> DualMapLayer:
     return preload("res://prefabs/dual_map_layer.tscn").instantiate()
+
+
+func clear_glyphs() -> void:
+    clear()
+    background_layer.clear()
 
 
 func set_glyph(pos: Vector2i, glyph: Glyph) -> void:
