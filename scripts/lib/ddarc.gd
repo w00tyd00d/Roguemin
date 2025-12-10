@@ -28,7 +28,7 @@ class_name DDARC extends Object
 ##         # Shorthand to set collider and end raycast
 ##         # ALWAYS returns true, even if no value is passed
 ##
-##     return "Sure! Why not?" # returning any truthy value ends the raycast
+##     return "Godot" # returning any truthy value ends the raycast
 ## [/codeblock]
 ## This is mainly to provide the developer with any arbitrary means of collision
 ## to suit any particular data structure. Things like distance limiting already
@@ -44,7 +44,7 @@ class_name DDARC extends Object
 ## literal global position).
 ## 
 ## NOTE: Be careful when not passing a distance, the default value is set
-## to `INF`!
+## to [code]INF[/code]!
 static func by_vector(
         start: Vector2,
         direction: Vector2,
@@ -62,11 +62,8 @@ static func to_grid_position(
         end: Vector2,
         callback := func(_ctx: Context): return) -> Context:
 
-    var _start := start.floor()
-    var _end := end.floor()
-
-    var direction := _start.direction_to(_end)
-    var distance := _start.distance_to(_end)
+    var direction := start.direction_to(end)
+    var distance := start.distance_to(end)
 
     return DDARC._dda_raycast(start, direction, callback, distance)
 
@@ -78,7 +75,8 @@ static func _dda_raycast(
         distance := INF) -> Context:
 
     # Ensure the direction vector is normalized
-    direction = direction.normalized()
+    if not direction.is_normalized():
+        direction = direction.normalized()
 
     # Create new context object to be used for the callback/results
     var ctx := Context.new(start, direction)
