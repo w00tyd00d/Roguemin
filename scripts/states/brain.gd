@@ -92,10 +92,10 @@ func add_and_check_energy(time_units := 0) -> bool:
 func _handle_action() -> bool:
     var res := state.do_action(entity)
 
-    if res.size() > 1:
-        change_state(res[1])
+    if res.state != -1:
+        change_state(res.state)
 
-    if res[0]:
-        state.use_energy(entity)
+    if res.success:
+        state.use_energy(entity, res.energy)
     
-    return res[0]
+    return res.success

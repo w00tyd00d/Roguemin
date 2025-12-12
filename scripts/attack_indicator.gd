@@ -101,7 +101,7 @@ func _set_cone() -> void:
     var debug_cb := func(ctx: DDARC.Context):
         _set_attack_position(ctx.grid_position)
 
-    var default_cb := func(ctx: DDARC.Context):
+    var default_cb := func(_ctx: DDARC.Context):
         pass
 
     var callback := debug_cb if Engine.is_editor_hint() else default_cb

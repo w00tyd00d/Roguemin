@@ -24,7 +24,7 @@ func get_available_unit() -> Unit:
     return null
 
 
-func get_closest_unit_to(pos: Vector2i, radial := false) -> Unit:
+func get_closest_unit_to(pos: Vector2i, radial := false, outside := 0.0) -> Unit:
     var best := 2**31 - 1.0
     var res: Unit = null
     
@@ -41,7 +41,7 @@ func get_closest_unit_to(pos: Vector2i, radial := false) -> Unit:
         else:
             dist = Util.chebyshev_distance(unit.grid_position, pos)
         
-        if dist < best:
+        if dist < best and dist >= outside:
             res = unit
             best = dist
     

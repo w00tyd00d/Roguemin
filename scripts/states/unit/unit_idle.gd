@@ -14,9 +14,9 @@ func enter(ent: Entity) -> void:
     super(ent)
 
 
-func do_action(_ent: Entity) -> Array:
+func do_action(_ent: Entity) -> ActionResult:
     # Stand still and do nothing
-    return [false]
+    return result(false)
 
 
 func exit(ent: Entity) -> void:

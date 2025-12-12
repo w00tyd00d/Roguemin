@@ -11,15 +11,15 @@ func enter(ent: Entity) -> void:
 
 
 func get_cost(_ent: Entity) -> int:
-    return _def_cost * 2
+    return DEFAULT_COST * 2
 
 
-func do_action(ent: Entity) -> Array:
+func do_action(ent: Entity) -> ActionResult:
     var enemy := _enemy(ent)
     var pos := enemy.grid_position
     var unit := GameState.unit_manager.get_closest_unit_to(pos)
 
     enemy.target_entity = unit
     
-    return [true, States.SpottyRed.CHASE]
+    return result(true).new_state(States.SpottyRed.CHASE)
 

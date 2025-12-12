@@ -21,16 +21,16 @@ func can_act(ent: Entity) -> bool:
 
 
 # Changes how energy is consumed from the entity
-func use_energy(ent: Entity) -> void:
-    super(ent)
+func use_energy(ent: Entity, override := -1) -> void:
+    super(ent, override)
 
 
 # Attempts to perform an action to consume energy
-func do_action(ent: Entity) -> Array:
+func do_action(ent: Entity) -> ActionResult:
     # Returns array of values:
     #   [0]: bool, Result of the action
     #   [1]: States.Enum, OPTIONAL new state
-    return [false]
+    return result(false)
 
 
 # Called when leaving the state

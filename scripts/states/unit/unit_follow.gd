@@ -14,13 +14,13 @@ func enter(ent: Entity) -> void:
 func get_cost(ent: Entity) -> int:
     # ALLOW TO BE MODIFIED BY BEING BOOSTED WITH SPICY SPRAY
     # AND RUSH BOOTS!
-    var step := _def_cost
+    var step := DEFAULT_COST
     var dist := Util.chebyshev_distance(ent.grid_position, player.grid_position)
     return step - 20 if dist > 8 else step
 
 
-func do_action(ent: Entity) -> Array:
-    if not player: return [false]
+func do_action(ent: Entity) -> ActionResult:
+    if not player: return result(false)
 
     var unit := ent as Unit
 
@@ -31,13 +31,14 @@ func do_action(ent: Entity) -> Array:
     var dest := tether.tail.current_tile
 
     if not unit._in_range_of_tether():
-        return [false, States.Unit.IDLE]
+        # return [false, States.Unit.IDLE]
+        return result(false).new_state(States.Unit.IDLE)
 
     var path := unit.path
 
     if unit._can_see_tether():
         path = []
-        return [unit.move_towards(dest)]
+        return result(unit.move_towards(dest))
 
     if (path.is_empty() or
         Util.chebyshev_distance(path[0], dest.grid_position) >= 5 or
@@ -47,13 +48,13 @@ func do_action(ent: Entity) -> Array:
             unit._broadcast_path()
 
     if path.is_empty():
-        return [false]
+        return result(false)
 
     var dist := Util.chebyshev_distance(unit.grid_position, path[-1])
     
     if dist < 2:
         path.pop_back()
     if not path.is_empty():
-        return [unit.move_towards(world.get_tile(path[-1]))]
+        return result(unit.move_towards(world.get_tile(path[-1])))
 
-    return [false]
+    return result(false)

@@ -6,7 +6,7 @@ class_name MultiTileEntity extends Entity
 var type : Type.Entity
 
 ## The exact center point of the entity.
-var center : Vector2
+# var center : Vector2
 
 ## The length from the center tile of the entity.
 var radius : int
@@ -47,8 +47,7 @@ var carrier_count := 0
 var default_carry_location : Tile
 
 ## The flag representing if the entity's bounding radius is even.
-var _is_even : bool :
-    get: return center == Vector2()
+var _is_even : bool
 
 
 func _init() -> void:
@@ -57,19 +56,6 @@ func _init() -> void:
 
 func _ready() -> void:
     add_to_group(&"entities")
-
-
-func distance_to(pos: Vector2i, radial := false) -> float:
-    var cpos := grid_position
-    
-    if _is_even:
-        if pos.x < grid_position.x: cpos.x -= 1
-        if pos.y < grid_position.y: cpos.y -= 1
-
-    if radial:
-        return maxf(0, cpos.distance_to(pos) - radius)
-
-    return maxf(0, Util.chebyshev_distance(cpos, pos) - radius)
 
 
 func delete() -> void:
@@ -88,6 +74,15 @@ func delete() -> void:
 
     # Don't have time to set up an entity recycler, so just delete
     queue_free()
+
+
+func distance_to(pos: Vector2i, radial := false) -> float:
+    var cpos := _get_center_position_from(pos)
+
+    if radial:
+        return maxf(0, cpos.distance_to(pos) - radius)
+
+    return maxf(0, Util.chebyshev_distance(cpos, pos) - radius)
 
 
 func move_towards(target: Tile) -> bool:
@@ -117,6 +112,10 @@ func get_area_tiles(from := grid_position) -> Array[Vector2i]:
     return res
 
 
+func get_closest_unit(radial := false) -> Unit:
+    return GameState.unit_manager.get_closest_unit_to(grid_position, radial, radius)
+
+    
 # func within_radius(pos: Vector2i) -> bool:
 #     var dir := Direction.by_delta(grid_position, pos)
 #     var offset := Vector2i()
@@ -198,18 +197,29 @@ func _scan() -> void:
     
     @warning_ignore("integer_division")
     radius = size.x / 2 - 1
-
-    var cx := 0.0 if size.x % 2 == 0 else 0.5
-    var cy := 0.0 if size.y % 2 == 0 else 0.5
-    center = Vector2(cx, cy)
+    _is_even = size.x % 2 == 0
 
     _handle_latch_points()
 
     area_positions = get_used_cells()
 
 
+func _get_center_position_from(dest: Vector2i) -> Vector2i:
+    if not _is_even:
+        return grid_position
+
+    # Adjust position of grid_position based on direction
+    # of given position if the entity has an even diameter
+    var cpos := grid_position
+
+    if dest.x < grid_position.x: cpos.x -= 1
+    if dest.y < grid_position.y: cpos.y -= 1
+
+    return cpos
+
+
 func _handle_latch_points() -> void:
-    var glyph := Glyph.LATCH_POINT # The % glyph
+    var glyph := Glyph.LATCH_POINT # Glyph: %
     var latch_points := get_used_cells_by_id(0, glyph.atlas_pos)
     
     latch_point_count = latch_points.size()

@@ -10,10 +10,5 @@ func enter(ent: Entity) -> void:
     super(ent)
 
 
-func do_action(ent: Entity) -> Array:
-    return [ent.move_towards(world.unit_ship_tile)]
-
-
-# func exit(ent: Entity) -> void:
-#     super(ent)
-
+func do_action(ent: Entity) -> ActionResult:
+    return result(ent.move_towards(world.unit_ship_tile))
