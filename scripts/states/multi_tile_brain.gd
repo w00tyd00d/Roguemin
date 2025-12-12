@@ -7,7 +7,7 @@ var is_haulable : bool :
     get: return state == States.inanimate_state or state == States.dead_state
 
 
-func add_energy(time_units: int) -> void:
+func _add_energy(time_units: int) -> void:
     if is_haulable:
         return _do_hauling_check(time_units)
     

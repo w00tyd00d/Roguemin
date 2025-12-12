@@ -3,7 +3,7 @@ class_name SpottyRedBrain extends MultiTileBrain
 
 func _init(ent: Entity) -> void:
     super(ent)
-    _states = States.spotty_red
+    _states = States.spotty_red_states
     change_state(States.SpottyRed.SLEEP)
 
 

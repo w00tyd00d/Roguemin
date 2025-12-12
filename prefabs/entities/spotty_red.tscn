@@ -14,8 +14,9 @@ maximum_health = 1000
 current_health = 1000
 
 [node name="AttackIndicator" parent="." index="0"]
-tile_map_data = PackedByteArray("AAAAAAAAAAAYAAEAAwAAAAEAAAAYAAEAAwABAAAAAAAYAAEAAwD//wAAAAAYAAEAAwAAAP//AAAYAAEAAwA=")
+top_level = true
 attack_range = 0.0
+attack_angle = 0.0
 
 [node name="BackgroundLayer" parent="AttackIndicator" index="0"]
 tile_map_data = PackedByteArray("AAAAAAAAAgABAAAAAAAAAAEAAgABAAAAAAABAAAAAgABAAAAAAD//wAAAgABAAAAAAAAAP//AgABAAAAAAA=")
