@@ -10,7 +10,7 @@ func enter(ent: Entity) -> void:
     super(ent)
 
 
-# Changes what the cost of the action will be
+# Changes what the default cost of the action will be
 func get_cost(ent: Entity) -> int:
     return super(ent)
 
@@ -25,11 +25,11 @@ func use_energy(ent: Entity, override := -1) -> void:
     super(ent, override)
 
 
-# Returns ActionResult object:
+# Returns ActionResult object with result(succes[, override]):
 #   success: bool, Result of the action
 #   override: int, OPTIONAL overridden energy cost
 # Chain a .new_state(state) call to include:
-#   state: enum, OPTIONAL new state to enter
+#   state: enum, new state to enter
 func do_action(ent: Entity) -> ActionResult:
     return result(false)
 

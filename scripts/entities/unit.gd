@@ -341,18 +341,16 @@ func _in_range_of_tether() -> bool:
 
 
 func _can_see_position(dest_pos: Vector2i) -> bool:
-    var callback := func(ctx: DDARC.Context):
-        var pos := ctx.grid_position
-        var query := world.query_tile_at(pos)
-        if (not world.in_bounds(pos) or
-            query == Type.Tile.ENTITY or
-            query == Type.Tile.WALL and not current_tile.type == Type.Tile.VOID):
-                return true
-
     var raycast := DDARC.to_grid_position(
         grid_position,
         dest_pos,
-        callback
+        func(ctx: DDARC.Context):
+            var pos := ctx.grid_position
+            var query := world.query_tile_at(pos)
+            if (not world.in_bounds(pos) or
+                query == Type.Tile.ENTITY or
+                query == Type.Tile.WALL and not current_tile.type == Type.Tile.VOID):
+                    return true
     )
 
     return raycast.grid_position == dest_pos

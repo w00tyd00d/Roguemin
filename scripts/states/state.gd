@@ -6,6 +6,9 @@ class_name State extends Object
 ## ie: the default cost of an action.
 const DEFAULT_COST := Globals.DEFAULT_TURN_COST
 
+# Do not use directly, use result(bool) method instead
+static var action_result := ActionResult.new()
+
 ## The global world object.
 var world : World :
     get: return GameState.world
@@ -16,9 +19,6 @@ var player : Player :
 
 ## The name of the state.
 var name := "unknown_state"
-
-# Do not call directly, use result(bool) method instead
-var _action_result := ActionResult.new()
 
 
 ## The virtual method that's called when the state is first entered into.
@@ -72,33 +72,41 @@ func do_action(_ent: Entity) -> ActionResult:
 ## [method result] can also be chained with a [code].new_state()[/code]
 ## call in order to change the state as a result of the action.
 func result(success: bool, energy_override := -1) -> ActionResult:
-    return _action_result.update(success, energy_override)
+    return State.action_result.update(success, energy_override)
 
 
 func _mte(ent: Entity) -> MultiTileEntity:
-    if ent is MultiTileEntity:
-        return ent
-    return null
+    assert(ent is MultiTileEntity)
+    return ent
 
 
 func _enemy(ent: Entity) -> Enemy:
-    if ent is Enemy:
-        return ent
-    return null
+    assert(ent is Enemy)
+    return ent
 
 
-## The results of an action made by the state
-class ActionResult:
-    var success: bool
-    var energy: int
-    var state: int
+## A singleton object that reflects the results of an action made by a
+## state.
+##
+## NOTE: Should not be called directly. Use [method State.result] instead.
+class ActionResult extends Object:
+    var success: bool ## Whether the action executed. Determines if energy should be drained.
+    var energy: int ## The overridden energy cost of the action, if any.
+    var state: int ## The new state that should be entered due to the action, if any.
 
+    ## Updates the internals of the object and returns itself.
+    ## This is how the object should be referenced instead of referencing it
+    ## directly to ensure any residual state is cleansed.
     func update(valid: bool, energy_override: int) -> ActionResult:
         success = valid
         energy = energy_override
         state = -1
         return self
 
+    ## Used to chain together with a previous update call to add a new state
+    ## to the result. See [method State.result].[br][br]
+    ## NOTE: This method is agnostic to the enum value that's passed, so
+    ## make sure that you're passing an enum for the appropriate entity!
     func new_state(state_enum: int) -> ActionResult:
         state = state_enum
         return self

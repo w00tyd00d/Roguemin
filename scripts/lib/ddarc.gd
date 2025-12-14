@@ -81,6 +81,16 @@ static func _dda_raycast(
     # Create new context object to be used for the callback/results
     var ctx := Context.new(start, direction)
 
+    # The current grid position of the scan.
+    var grid_position := Vector2i(start)
+
+    # Store all the resulting cells hit along the path, including the original.
+    var cell_path : Array[Vector2i] = [grid_position]
+
+    # If the direction vector is (0,0), we return ctx with single result.
+    if direction.is_zero_approx() or is_zero_approx(distance):
+        return ctx._update_path(cell_path, 0.0)
+
     # We establish the slope and step size for each axis.
     # Note: Step size is based off of opposite axis' slope
     var x_slope := direction.x / direction.y
@@ -89,9 +99,6 @@ static func _dda_raycast(
     var step_size := Vector2()
     step_size.x = sqrt(1 + y_slope * y_slope)
     step_size.y = sqrt(1 + x_slope * x_slope)
-
-    # The current grid position of the scan.
-    var grid_position := Vector2i(start)
 
     # The starting offset of the ray.
     var offset := start - Vector2(grid_position)
@@ -106,9 +113,6 @@ static func _dda_raycast(
     var slope_length := Vector2()
     slope_length.x = (1 - offset.x) * step_size.x
     slope_length.y = (1 - offset.y) * step_size.y
-
-    # Store all the resulting cells hit along the path, including the original.
-    var cell_path : Array[Vector2i] = [grid_position]
 
     while true:
         var current_length : float

@@ -105,4 +105,3 @@ func remove_immunity(hazard: Type.Hazard) -> void:
 
 func reset_immunities() -> void:
     _immunities = {}
-

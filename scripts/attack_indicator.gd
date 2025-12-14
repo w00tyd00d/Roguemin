@@ -9,20 +9,23 @@ var world : World :
 @export var attack_type : Type.Attack :
     set(type):
         attack_type = type
-        update()
+        if Engine.is_editor_hint():
+            update()
 
 ## The distance of how big the attack area will be from the origin of the attack
 @export_range(0,20,1) var attack_range : float :
     set(n):
         attack_range = n
-        update()
+        if Engine.is_editor_hint():
+            update()
 
 ## For changing the angle of the attack cone.
 ## NOTE: For debugging purposes in the editor. Not used in-game.
 @export_range(0,1,0.001) var attack_angle: float :
     set(n):
         attack_angle = n
-        update()
+        if Engine.is_editor_hint():
+            update()
 
 ## The cached positions of the currently targeted area.
 var targeted_positions : Array[Vector2i] = []

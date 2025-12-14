@@ -6,7 +6,7 @@ func _init():
 
 
 ## Attempts to perform an action to consume energy
-func do_action(ent: Entity) -> Array:
+func do_action(ent: Entity) -> ActionResult:
     var mte := _mte(ent)
     mte.get_hauled()
-    return [true]
+    return result(true)

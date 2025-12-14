@@ -15,5 +15,5 @@ maximum_health = 0
 current_health = 0
 
 [node name="AttackIndicator" parent="." index="0" instance=ExtResource("3_iir01")]
-attack_type = 0
-attack_range = 1.0
+top_level = true
+attack_angle = 0.0
