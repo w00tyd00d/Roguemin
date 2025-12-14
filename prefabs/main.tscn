@@ -7,6 +7,7 @@
 
 [node name="Main" type="Node"]
 script = ExtResource("1_8yigv")
+debug_mode = true
 
 [node name="MainScreen" parent="." instance=ExtResource("3_tpkjm")]
 

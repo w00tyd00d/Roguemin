@@ -14,9 +14,9 @@ var architect := WorldArchitect.new() # Din
 var navigator := WorldNavigator.new() # Nayru
 var populator := WorldPopulator.new() # Farore
 
-# Assigned by GameScreen at runtime
-# var unit_container : UnitManager
+# Assigned by Main at runtime
 var game_viewport : SubViewport 
+var debug_mode := false
 
 
 func generate_new_world() -> World:
@@ -26,9 +26,9 @@ func generate_new_world() -> World:
     # when running it through the factory
     game_viewport.add_child(world)
 
-    architect.run(world)
-    navigator.run(world)
-    populator.run(world)
+    architect.run(world, debug_mode)
+    navigator.run(world, debug_mode)
+    populator.run(world, debug_mode)
 
     return world
 

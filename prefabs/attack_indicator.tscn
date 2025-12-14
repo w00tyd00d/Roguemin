@@ -4,11 +4,12 @@
 [ext_resource type="Script" uid="uid://bjhpd4np6ffbs" path="res://scripts/attack_indicator.gd" id="2_vx3bl"]
 
 [node name="AttackIndicator" instance=ExtResource("1_dnwwi")]
+top_level = true
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 1, 0, 3, 0)
 script = ExtResource("2_vx3bl")
 attack_type = 0
 attack_range = 0.0
-attack_angle = null
+attack_angle = 0.0
 
 [node name="BackgroundLayer" parent="." index="0"]
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0)

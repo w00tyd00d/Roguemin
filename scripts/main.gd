@@ -1,5 +1,7 @@
 extends Node
 
+@export var debug_mode := false
+
 var world_factory := WorldFactory.new()
 
 var game_started := false
@@ -19,10 +21,10 @@ func _ready() -> void:
     GameState.new_game.connect(new_game)
 
     # We keep these nodes as a children to the game screen, but we inject
-    # references to them to the world factory so that it may utilize them
-    # world_factory.unit_manager = unit_manager
+    # references to them to GameSate and WorldFactory
     GameState.unit_manager = unit_manager
     world_factory.game_viewport = game_viewport
+    world_factory.debug_mode = debug_mode
 
     # FOR DEBUGGING PURPOSES, AUTOMATICALLY GO RIGHT TO GAME
     game_started = true
@@ -52,7 +54,6 @@ func initialize_game() -> void:
 func new_game() -> void:
     if GameState.world:
         GameState.world.queue_free()
-    
     
     GameState.toggle_hud.emit(false)
     game_screen.hide()
