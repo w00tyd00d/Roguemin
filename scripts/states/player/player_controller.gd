@@ -38,12 +38,17 @@ func change_state(state_name: String) -> void:
 func input_handler(dt: float) -> void:
     # DEBUG
 
-    # \
+    # Key: \
     if Input.is_action_just_pressed(&"d_renew"):
         GameState.new_game.emit()
         return
 
     ###
+
+    if Input.is_action_pressed(&"k_shift"):
+        print("Shift is pressed!")
+
+    InputManager.shift_pressed = Input.is_action_pressed(&"k_shift")
 
     for inp in Globals.ACTION_INPUTS:
         if Input.is_action_just_pressed(inp):

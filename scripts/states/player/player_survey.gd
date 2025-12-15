@@ -20,9 +20,8 @@ func update(inp: StringName) -> Array:
     var dir := Direction.by_pattern(inp)
     if not dir: return [false]
 
-    var loops := 3 if Input.is_action_pressed(&"k_shift") else 1
-    for _n in loops:    
-        camera.offset += Vector2(dir.vector * Globals.TILE_SIZE)
+    var tiles := 5 if InputManager.shift_pressed else 2
+    camera.offset += Vector2(dir.vector * (Globals.TILE_SIZE * tiles))
     
     return [false]
 

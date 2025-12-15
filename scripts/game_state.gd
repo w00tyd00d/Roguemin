@@ -14,6 +14,8 @@ signal toggle_hud(val: bool)
 
 signal world_time_changed(time: int)
 
+signal display_quick_info(val: bool)
+
 signal display_unit_toggle(val: bool)
 signal update_unit_toggle(dict: Dictionary)
 

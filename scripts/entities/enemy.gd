@@ -69,6 +69,10 @@ func get_health_percent() -> float:
     return current_health / float(maximum_health)
 
 
+func get_health_percent_num() -> int:
+    return floori(get_health_percent() * 100)
+
+
 func turn_towards(pos: Vector2i) -> void:
     var dest_dir := Direction.by_delta(grid_position, pos)
     facing = Direction.by_turning(facing, dest_dir)
