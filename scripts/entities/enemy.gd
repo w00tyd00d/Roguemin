@@ -38,6 +38,13 @@ var riding_units := {}
 ## The direction the enemy is currently facing
 var facing := Direction.north
 
+## The current grid position of the enemy's eyes
+# NOTE: At the moment, we assume all enemies are circular
+var eye_position : Vector2i :
+    get:
+        var center := _get_center_position_from(grid_position + facing.vector)
+        return center + Vector2i(facing.normalized * radius)
+
 ## The field of view object attached to the enemy
 var fov := EnemyFOV.new(self)
 
@@ -103,21 +110,32 @@ func buck_units() -> void:
     riding_units = {}
 
 
-func get_closest_target() -> Entity:
-    var unit := GameState.unit_manager.get_closest_unit_to(grid_position)
+func get_closest_unit(radial := false) -> Unit:
+    return GameState.unit_manager.get_closest_unit_to(eye_position, radial, radius)
+
+
+func get_closest_target(radial := false) -> Entity:
+    var limit := sight_range + radius
+
+    # Since we check the square distance if radial, the limit distance must
+    # also be square
+    if radial:
+        limit = limit * limit
+    
+    var pdist := World.distance(player.grid_position, eye_position, radial, true)
+    var unit := get_closest_unit(radial)
+
     if not unit:
-        var dist := Util.chebyshev_distance(player.grid_position, grid_position)
-        return player if dist <= sight_range + radius else null
+        return player if pdist <= limit else null
 
-    var pdist := Util.chebyshev_distance(player.grid_position, grid_position)
-    var udist := Util.chebyshev_distance(unit.grid_position, grid_position)
+    var udist := World.distance(unit.grid_position, eye_position, radial, true)
 
-    @warning_ignore("incompatible_ternary") # This shouldn't be needed ¬_¬
-    var res : Entity = player if pdist < udist else unit
-    if Util.chebyshev_distance(res.grid_position, grid_position) > sight_range + radius:
-        return null
+    if pdist < udist and pdist <= limit:
+        return player
+    elif udist <= limit:
+        return unit
 
-    return res
+    return null
 
 
 func queue_attack(tile: Tile) -> void:

@@ -30,6 +30,7 @@ static var southwest := Direction.new(Vector2i(-1,1))
 static var southeast := Direction.new(Vector2i(1,1))
 
 var vector : Vector2i
+var normalized : Vector2
 
 var is_diagonal : bool
 var is_vertical : bool
@@ -161,6 +162,7 @@ static func get_cardinal(shuffled := false) -> Array[Direction]:
 
 func _init(vec: Vector2i, _diagonal := false) -> void:
     vector = vec
+    normalized = Vector2(vec).normalized()
 
     if vec == Vector2i():
         _index = -1

@@ -209,7 +209,7 @@ func move_towards(dest: Tile) -> bool:
     if _check_move(dir.adjacent):
         return true
 
-    var cheby := Util.chebyshev_distance(grid_position, target.grid_position)
+    var cheby := Util.chebyshev(grid_position, target.grid_position)
     if cheby <= Globals.UNIT_DISTANCE_MEDIUM and _can_see_position(dest.grid_position):
         return false
 
@@ -335,7 +335,7 @@ func _check_move(options: Array[Direction]) -> bool:
 
 func _in_range_of_tether() -> bool:
     var dest := player.unit_tether.tail.grid_position
-    var dist := Util.chebyshev_distance(grid_position, dest)
+    var dist := Util.chebyshev(grid_position, dest)
     
     return dist <= Globals.UNIT_SIGHT_RANGE
 
@@ -407,8 +407,8 @@ func _broadcast_path() -> void:
 func _receive_path(_path: Array[Vector2i]) -> void:
     _path = _path.duplicate()
     while not _path.is_empty():
-        var dist1 := Util.chebyshev_distance(_path[0], _path[-1])
-        var dist2 := Util.chebyshev_distance(grid_position, _path[-1])
+        var dist1 := Util.chebyshev(_path[0], _path[-1])
+        var dist2 := Util.chebyshev(grid_position, _path[-1])
         if dist1 < dist2:
             path = _path
             return

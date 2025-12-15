@@ -62,7 +62,7 @@ func get_next_tile(dest: Tile) -> Tile:
     var cohe_vec := centroid.cohesion_vector(unit.grid_position)
 
     var bdw := Globals.BOID_DESTINATION_WEIGHT
-    var dist := Util.chebyshev_distance(unit.grid_position, unit.target.grid_position)
+    var dist := Util.chebyshev(unit.grid_position, unit.target.grid_position)
     var dest_weight := minf(bdw, bdw * dist / 4) # scale lower when within 4 tiles of target
 
     var boid_vector := (

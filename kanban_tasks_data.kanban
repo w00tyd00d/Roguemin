@@ -10,20 +10,24 @@
 		{
 			"uuid": "fdf643f5-972b-4502-bc90-e8bdfb958a66",
 			"title": "Todo",
-			"tasks": []
+			"tasks": [
+				"62ca792d-2541-4484-92ac-31d2f5267a1b"
+			]
 		},
 		{
 			"uuid": "99502964-3cd9-4cf8-8e74-6053da6e5c8a",
 			"title": "Doing",
 			"tasks": [
-				"b943a33f-9c8a-4350-b0c2-dd7e00ef7078",
+				"21a8d728-f490-4a81-bd50-f77ffe663c3a",
 				"a4981929-85a9-46db-9aa9-5479f9adac4d"
 			]
 		},
 		{
 			"uuid": "d526896f-25f2-4c99-8c82-7134d390ecf8",
 			"title": "Done",
-			"tasks": []
+			"tasks": [
+				"b943a33f-9c8a-4350-b0c2-dd7e00ef7078"
+			]
 		}
 	],
 	"tasks": [
@@ -37,6 +41,20 @@
 		{
 			"uuid": "a4981929-85a9-46db-9aa9-5479f9adac4d",
 			"title": "SpottyRed AI",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "21a8d728-f490-4a81-bd50-f77ffe663c3a",
+			"title": "QuickInfo object",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "62ca792d-2541-4484-92ac-31d2f5267a1b",
+			"title": "Attach ThrowCursor to player + top level",
 			"description": "",
 			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
 			"steps": []

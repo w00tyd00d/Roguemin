@@ -18,7 +18,11 @@ func use_energy(ent: Entity, _override := -1) -> void:
 
 # Attempts to perform an action to consume energy
 func do_action(_ent: Entity) -> ActionResult:
-    var ent := _ent as Enemy
+    var ent := _enemy(_ent)
+    
+    if ent.distance_to(player.grid_position) <= DISTURB_RADIUS:
+        return result(true).new_state(States.SpottyRed.WAKE_UP)
+    
     var unit := ent.get_closest_unit(true)
 
     if not unit:
@@ -28,6 +32,6 @@ func do_action(_ent: Entity) -> ActionResult:
 
     if dist <= DISTURB_RADIUS:
         ent.target_entity = unit
-        return result(true).new_state(States.SpottyRed.CHASE)
+        return result(true).new_state(States.SpottyRed.WAKE_UP)
     
     return result(false)

@@ -89,13 +89,15 @@ func foreach_around_pos(
     return res
 
 
-func chebyshev_distance(vec1: Vector2i, vec2: Vector2i) -> int:
+## Returns the Chebyshev (aka Chess) distance between two vectors.
+func chebyshev(vec1: Vector2i, vec2: Vector2i) -> int:
     var dx := absi(vec1.x - vec2.x)
     var dy := absi(vec1.y - vec2.y)
     return maxi(dx, dy)
 
 
-func manhattan_distance(vec1: Vector2i, vec2: Vector2i) -> int:
+## Returns the Manhattan (aka taxicab) distance between two vectors.
+func manhattan(vec1: Vector2i, vec2: Vector2i) -> int:
     var dx := absi(vec1.x - vec2.x)
     var dy := absi(vec1.y - vec2.y)
     return dx + dy

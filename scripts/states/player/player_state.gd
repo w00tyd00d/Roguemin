@@ -33,5 +33,5 @@ func exit() -> void:
 
 
 func _in_range(pos: Vector2i) -> bool:
-	var dist := Util.chebyshev_distance(player.grid_position, pos)
+	var dist := Util.chebyshev(player.grid_position, pos)
 	return dist <= Globals.PLAYER_MAX_RANGE

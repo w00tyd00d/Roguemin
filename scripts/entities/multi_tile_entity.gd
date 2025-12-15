@@ -82,7 +82,7 @@ func distance_to(pos: Vector2i, radial := false) -> float:
     if radial:
         return maxf(0, cpos.distance_to(pos) - radius)
 
-    return maxf(0, Util.chebyshev_distance(cpos, pos) - radius)
+    return maxf(0, Util.chebyshev(cpos, pos) - radius)
 
 
 func move_towards(target: Tile) -> bool:
@@ -106,14 +106,15 @@ func move_towards(target: Tile) -> bool:
 
 
 func get_area_tiles(from := grid_position) -> Array[Vector2i]:
+    var size := area_positions.size()
     var res : Array[Vector2i] = []
-    for pos in area_positions:
-        res.append(from + pos)
+    
+    res.resize(size)
+    
+    for i in size:
+        res[i] = area_positions[i] + from
+    
     return res
-
-
-func get_closest_unit(radial := false) -> Unit:
-    return GameState.unit_manager.get_closest_unit_to(grid_position, radial, radius)
 
     
 # func within_radius(pos: Vector2i) -> bool:
@@ -238,6 +239,6 @@ func _walkable_tile(tile: Tile) -> bool:
 
 
 func _check_for_collection() -> void:
-    var dist := Util.chebyshev_distance(grid_position, world.salvage_return_position)
+    var dist := Util.chebyshev(grid_position, world.salvage_return_position)
     if dist < ceili(radius / 2.0):
         collect()

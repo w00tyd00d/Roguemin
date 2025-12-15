@@ -16,13 +16,6 @@ func _process(dt: float) -> void:
     _domain_stack[-1].call(dt)
 
 
-func _input(event: InputEvent) -> void:
-    # if event is InputEventWithModifiers:
-    if event is InputEventWithModifiers and event.shift_pressed:
-        print("Shift pressed!!")
-        shift_pressed = true
-
-
 ## Add an input handler callback to the domain stack
 func add(handler: Callable) -> void:
     _domain_stack.append(handler)

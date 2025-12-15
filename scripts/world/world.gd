@@ -90,6 +90,16 @@ static func create() -> World:
     return preload("uid://dl53ytlod4w2y").instantiate()
 
 
+static func distance(pos: Vector2i, dest: Vector2i, line := false, sq := false) -> float:
+    if not line:
+        return Util.chebyshev(pos, dest)
+    
+    if sq:
+        return pos.distance_squared_to(dest)
+    
+    return pos.distance_to(dest)
+
+
 func _ready() -> void:
     var _tiles := size * Globals.CHUNK_SIZE
     mrpas = MRPAS.new(self, _tiles)

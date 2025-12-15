@@ -15,7 +15,7 @@ func get_cost(ent: Entity) -> int:
     # ALLOW TO BE MODIFIED BY BEING BOOSTED WITH SPICY SPRAY
     # AND RUSH BOOTS!
     var step := DEFAULT_COST
-    var dist := Util.chebyshev_distance(ent.grid_position, player.grid_position)
+    var dist := Util.chebyshev(ent.grid_position, player.grid_position)
     return step - 20 if dist > 8 else step
 
 
@@ -41,7 +41,7 @@ func do_action(ent: Entity) -> ActionResult:
         return result(unit.move_towards(dest))
 
     if (path.is_empty() or
-        Util.chebyshev_distance(path[0], dest.grid_position) >= 5 or
+        Util.chebyshev(path[0], dest.grid_position) >= 5 or
         path.size() == 1 and not unit._can_see_position(path[0])):
             # We get the path in reverse to use as a stack
             path = world.astar.get_id_path(dest.grid_position, unit.grid_position)
@@ -50,7 +50,7 @@ func do_action(ent: Entity) -> ActionResult:
     if path.is_empty():
         return result(false)
 
-    var dist := Util.chebyshev_distance(unit.grid_position, path[-1])
+    var dist := Util.chebyshev(unit.grid_position, path[-1])
     
     if dist < 2:
         path.pop_back()

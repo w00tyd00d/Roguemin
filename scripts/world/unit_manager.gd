@@ -25,8 +25,13 @@ func get_available_unit() -> Unit:
 
 
 func get_closest_unit_to(pos: Vector2i, radial := false, outside := 0.0) -> Unit:
-    var best := 2**31 - 1.0
+    var best := INF
     var res: Unit = null
+
+    # We're checking squared distance if radial, so we have to square
+    # outside to match
+    if radial and not is_zero_approx(outside):
+        outside = outside * outside
     
     # We do a naive linear check for now, may implement a quadtree or k-d tree
     # in the future if queries become too taxing
@@ -34,12 +39,8 @@ func get_closest_unit_to(pos: Vector2i, radial := false, outside := 0.0) -> Unit
         if unit.is_dead:
             continue
         
-        var dist: float
-        
-        if radial:
-            dist = unit.grid_position.distance_squared_to(pos)
-        else:
-            dist = Util.chebyshev_distance(unit.grid_position, pos)
+        var upos := unit.grid_position
+        var dist := World.distance(pos, upos, radial, true)
         
         if dist < best and dist >= outside:
             res = unit
