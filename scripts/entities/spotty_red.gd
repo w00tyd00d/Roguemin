@@ -14,3 +14,12 @@ func _init() -> void:
 func _ready() -> void:
     super()
     entity_name = Strings.NAME_SPOTTY_RED
+
+
+func move_towards(target: Tile) -> bool:
+    var res := super(target)
+
+    if res:
+        turn_towards(target.grid_position)
+    
+    return res

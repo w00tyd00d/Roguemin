@@ -27,6 +27,9 @@ var time := 0
 ## The amount of energy points (time) the entity has accumulated.
 var energy := 0
 
+## The state the enemy reverts to when they are killed.
+var dead_state := States.dead_state
+
 # The dictionary of states the entity refers to
 var _states : Dictionary
 
@@ -54,26 +57,22 @@ func reset_energy() -> void:
     energy = 0
 
 
+func die() -> void:
+    _assign_state(dead_state)
+
+
 ## Changes the entity's state to a given [States] enum value.[br][br]
 ## NOTE: This method is agnostic to the enum value that's passed, so make sure
 ## that you're passing an enum for the appropriate entity!
 func change_state(state_id: int) -> void:
     var new_state: State = _states.get(state_id)
-    
-    if not new_state:
-        print("INVALID STATE ID FOR {0} : ID {1}".format([entity.entity_name, state_id]))
-        return
-    
-    if state:
-        state.exit(entity)
-
-    new_state.enter(entity)
-    state = new_state
+    assert(new_state)
+    _assign_state(new_state)
 
 
 ## Compares the current state with the given [States] enum value.[br][br]
 ## NOTE: This method is agnostic to the enum value that's passed, so make sure
-## that you're passing an enum for the appropriate entity!
+## that you're passing an enum for the appropriate entity.
 func state_is(id: int) -> bool:
     return state == _states.get(id)
 
@@ -107,6 +106,14 @@ func add_and_check_energy(time_units := 0) -> bool:
 # energy.
 func _add_energy(time_units: int) -> void:
     energy += time_units
+
+
+func _assign_state(new_state: State) -> void:
+    if state:
+        state.exit(entity)
+
+    new_state.enter(entity)
+    state = new_state
 
 
 func _handle_action() -> bool:

@@ -109,6 +109,10 @@ func add_view_position(dir: Direction, pos: Vector2i) -> void:
     _view_positions[dir].append(pos)
 
 
+func can_see(ent: Entity) -> bool:
+    return all_targets.has(ent.grid_position)
+
+
 # Compute the viewable cells from a particular view position by doing
 # each of the eight octants of the view.
 func update() -> void:

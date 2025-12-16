@@ -24,7 +24,11 @@ class_name Enemy extends MultiTileEntity
         current_health = n
 
 ## The amount of health the enemy currently has.
-@export var current_health : int
+var current_health : int :
+    set(n):
+        current_health = n
+        if n <= 0:
+            die()
 
 ## The current entity the enemy is targeting.
 var target_entity : Entity
@@ -82,16 +86,21 @@ func get_health_percent_num() -> int:
     return floori(get_health_percent() * 100)
 
 
-func turn_towards(pos: Vector2i) -> void:
+func turn_towards(pos: Vector2i) -> bool:
     var dest_dir := Direction.by_delta(grid_position, pos)
+    
+    if dest_dir == facing:
+        return false
+    
     facing = Direction.by_turning(facing, dest_dir)
+    return true
 
 
 func die() -> void:
     buck_units()
     # Change to death frame
     # state = State.DEAD
-    # brain.change_state(States.DEAD
+    brain.die()
 
 
 func add_unit(unit: Unit) -> void:
@@ -158,39 +167,39 @@ func center_from_facing() -> Vector2i:
     return center_from_pos(grid_position + facing.vector)
 
 
-func _set_attack_position(pos: Vector2i) -> void:
-    var dest := pos - grid_position
-    attack_indicator.grid_position = dest
+# func _set_attack_position(pos: Vector2i) -> void:
+#     var dest := pos - grid_position
+#     attack_indicator.grid_position = dest
 
 
-func _get_attack_position() -> Vector2i:
-   return attack_indicator.grid_position + grid_position
+# func _get_attack_position() -> Vector2i:
+#    return attack_indicator.grid_position + grid_position
 
 
-func _get_attack_area(attack_area: DualMapLayer) -> Array[Tile]:
-    var res : Array[Tile] = []
-    for pos in attack_area.get_used_cells():
-        var apos := _get_attack_position()
-        res.append(world.get_tile(pos + apos))
+# func _get_attack_area(attack_area: DualMapLayer) -> Array[Tile]:
+#     var res : Array[Tile] = []
+#     for pos in attack_area.get_used_cells():
+#         var apos := _get_attack_position()
+#         res.append(world.get_tile(pos + apos))
 
-    return res
-
-
-func _target_in_attack_range() -> bool:
-    if not target_entity: return false
-    var dist := grid_position.distance_to(target_entity.grid_position)
-    return dist <= attack_range + radius
+#     return res
 
 
-func _check_next_to() -> bool:
-    if riding_units.size() > 1:
-        return true
+# func _target_in_attack_range() -> bool:
+#     if not target_entity: return false
+#     var dist := grid_position.distance_to(target_entity.grid_position)
+#     return dist <= attack_range + radius
 
-    for tile in get_all_latch_tiles():
-        if tile.has_player or tile.has_units:
-            return true
 
-    return false
+# func _check_next_to() -> bool:
+#     if riding_units.size() > 0:
+#         return true
+
+#     for tile in get_all_latch_tiles():
+#         if tile.has_player or tile.has_units:
+#             return true
+
+#     return false
 
 
 func _assign_view_positions():

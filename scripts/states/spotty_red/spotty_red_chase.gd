@@ -1,6 +1,5 @@
 class_name SpottyRedChase extends State
 
-const NORMAL_COST := DEFAULT_COST * 2
 const ROTATE_COST := DEFAULT_COST
 
 
@@ -15,25 +14,13 @@ func enter(_ent: Entity) -> void:
     assert(ent.target_entity)
     
     super(_ent)
-    ent.fov.update()
 
 
 # Changes what the cost of the action will be
 func get_cost(_ent: Entity) -> int:
-    return NORMAL_COST
+    return DEFAULT_COST * 2
 
 
-# Changes the rules for when the entity can act
-# func can_act(ent: Entity) -> bool:
-#     return super(ent)
-
-
-# Changes how energy is consumed from the entity
-# func use_energy(ent: Entity, override := -1) -> void:
-#     super(ent, override)
-
-
-# Attempts to perform an action to consume energy
 func do_action(_ent: Entity) -> ActionResult:
     var ent := _enemy(_ent)
     var home_dist := World.distance(ent.grid_position, ent.spawn_position)
@@ -52,7 +39,7 @@ func do_action(_ent: Entity) -> ActionResult:
     var tar := ent.target_entity
     
     # If target not in fov, rotate towards them.
-    if not ent.fov.all_targets.has(tar.grid_position):
+    if not ent.fov.can_see(tar):
         ent.turn_towards(ent.target_entity.grid_position)
         return result(true, ROTATE_COST)
 
@@ -74,6 +61,8 @@ func do_action(_ent: Entity) -> ActionResult:
 # Used only to change target to a more convenient target, not acquire a new one.
 func _verify_target(ent: Enemy) -> Entity:
     assert(ent.target_entity)
+    
+    ent.fov.update()
     
     var fov_pos := ent.fov.closest_target
     var tar_pos := ent.target_entity.grid_position

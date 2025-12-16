@@ -37,16 +37,18 @@ enum Unit {
 
 ## States for the [SpottyRed] entity.
 static var spotty_red_states := {
-    # DEBUG, CHANGE THIS!
     States.SpottyRed.SLEEP: SpottyRedSleep.new(),
-    States.SpottyRed.CHASE: SpottyRedChase.new()
+    States.SpottyRed.WAKE_UP: SpottyRedWakeUp.new(),
+    States.SpottyRed.CHASE: SpottyRedChase.new(),
+    States.SpottyRed.ATTACK: SpottyRedAttack.new(),
+    States.SpottyRed.RETURN: SpottyRedReturn.new(),
 }
+
 enum SpottyRed {
     SLEEP,
     WAKE_UP,
     CHASE,
     ATTACK,
-    RETURN,
-    DEAD
+    RETURN
 }
 
