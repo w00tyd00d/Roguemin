@@ -30,7 +30,7 @@ class_name Enemy extends MultiTileEntity
 var target_entity : Entity
 
 ## The current tile the enemy is about to attack.
-var target_tile : Tile
+var target_tile : Tile : set = prepare_attack
 
 ## The dictionary of units that are currently on top of the entity.
 var riding_units := {}
@@ -142,10 +142,14 @@ func prepare_attack(tile: Tile) -> void:
 
 
 func attack_target() -> void:
-    if not target_tile: return
-    for tile in _get_attack_area(attack_indicator):
+    if not target_tile:
+        return
+    
+    for pos in attack_indicator.targeted_positions:
+        var tile := world.get_tile(pos)
         tile.attacked(attack_damage)
 
+    attack_indicator.hide()
     target_tile = null
     target_entity = null
 

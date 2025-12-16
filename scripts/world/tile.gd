@@ -4,6 +4,9 @@ class_name Tile extends RefCounted
 
 const DEFAULT_MAX_VALUE := 2**31-1
 
+var player : Player :
+    get: return GameState.player
+
 ## The weakref of the world object this tile is attached to.
 var world : World :
     set(_world):
@@ -161,8 +164,6 @@ func get_first_unit() -> Unit:
 
 
 func whistled() -> void:
-    var player := GameState.player
-
     for _type in player.unit_toggle:
         if player.unit_toggle[_type]:
             for unit: Unit in _units[_type]:
@@ -171,7 +172,7 @@ func whistled() -> void:
 
 func attacked(dmg: int) -> void:
     if has_player:
-        GameState.player.take_damage(dmg)
+        player.take_damage(dmg)
 
     for unit in get_all_units():
         unit.die()
