@@ -89,6 +89,27 @@ func foreach_around_pos(
     return res
 
 
+func shuffle(arr: Array, rng: RandomNumberGenerator = null) -> Array:
+    var rand := rng.randi_range if rng else randi_range
+    var size := arr.size()
+    
+    for i in size:
+        var rand_idx: int = rand.call(0, size-1)
+    
+        if rand_idx == i:
+            continue
+        
+        var temp = arr[rand_idx]
+        arr[rand_idx] = arr[i]
+        arr[i] = temp
+    
+    return arr
+
+
+func shuffled(arr: Array, rng: RandomNumberGenerator = null) -> Array:
+    return shuffle(arr.duplicate(), rng)
+
+
 ## Returns the Chebyshev (aka Chess) distance between two vectors.
 func chebyshev(vec1: Vector2i, vec2: Vector2i) -> int:
     var dx := absi(vec1.x - vec2.x)
@@ -101,3 +122,11 @@ func manhattan(vec1: Vector2i, vec2: Vector2i) -> int:
     var dx := absi(vec1.x - vec2.x)
     var dy := absi(vec1.y - vec2.y)
     return dx + dy
+
+
+## Returns [code]true[/code] if [param pos1] is closer than [param pos2] to
+## [param dest]. Otherwise returns [code]false[/code].
+func closer_than(pos1: Vector2i, pos2: Vector2i, dest: Vector2i) -> bool:
+    var dist1 := dest.distance_squared_to(pos1)
+    var dist2 := dest.distance_squared_to(pos2)
+    return dist1 < dist2

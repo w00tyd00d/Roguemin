@@ -11,8 +11,9 @@ func enter(ent: Entity) -> void:
 
 
 # Changes what the default cost of the action will be
-func get_cost(ent: Entity) -> int:
-    return super(ent)
+# Essentially represents the speed of the action
+func get_cost(_ent: Entity) -> int:
+    return DEFAULT_COST
 
 
 # Changes the rules for when the entity can act

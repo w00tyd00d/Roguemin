@@ -73,7 +73,7 @@ var entity: Enemy
 var closest_target: Vector2i
 
 # The cached location of of all targets within FOV
-var all_targets: Array[Vector2i] = []
+var all_targets: Dictionary[Vector2i, bool] = {}
 
 var key : Dictionary[Glyph, Array] :
     get: 
@@ -98,7 +98,7 @@ func _init(_ent: Enemy) -> void:
 
 func reset() -> void:
     closest_target = Vector2()
-    all_targets = []
+    all_targets = {}
 
 
 func set_target_callback(cb: Callable) -> void:
@@ -172,13 +172,12 @@ func _compute_octant(
                     history[position] = true
                     
                     if _is_target(position):
-                        all_targets.append(position)
+                        all_targets[position] = true
                         
                         var center := entity.center_from_facing()
-                        var dist1 := position.distance_squared_to(center)
-                        var dist2 := closest_target.distance_squared_to(center)
+                        var closer := Util.closer_than(position, closest_target, center)
                         
-                        if closest_target == Vector2i() or dist1 < dist2:
+                        if closest_target == Vector2i() or closer:
                             closest_target = position
                 
                 if cell_type != Type.Tile.WALL:
@@ -270,11 +269,8 @@ func _octant_to_offset(axis: int, major: int, minor: int) -> Vector2i:
         return Vector2i(major, minor)
 
 
-# is_transparent, but without a bounds check for use in the inner loop of
-# visibility computation.
 func _get_cell_type(position: Vector2) -> Type.Tile:
     return world.get_tile(position).type
-    # return _transparent_cells[position.y][position.x]
 
 
 func _is_target(pos: Vector2i) -> bool:
@@ -284,9 +280,3 @@ func _is_target(pos: Vector2i) -> bool:
 func _default_target_callback(pos: Vector2i) -> bool:
     var tile := world.get_tile(pos)
     return tile.has_units or tile.has_player
-
-
-# set_in_view, but with no bounds check.  For use in the inner loop of
-# visibility computation.
-# func _set_in_view_no_bounds(position: Vector2, in_view: bool) -> void:
-#     _fov_cells[position.y][position.x] = in_view

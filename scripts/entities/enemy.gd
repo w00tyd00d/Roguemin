@@ -136,10 +136,9 @@ func get_closest_target(radial := false) -> Entity:
     return null
 
 
-func queue_attack(tile: Tile) -> void:
-    target_tile =  tile
+func prepare_attack(tile: Tile) -> void:
+    target_tile = tile
     attack_indicator.target_tile(tile)
-    _set_attack_position(tile.grid_position)
 
 
 func attack_target() -> void:

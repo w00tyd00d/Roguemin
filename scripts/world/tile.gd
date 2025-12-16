@@ -149,9 +149,15 @@ func get_units(_type: Type.Unit) -> Array:
 
 func get_all_units() -> Array[Unit]:
     var res : Array[Unit] = []
-    for dict in _units.values():
-        res.append_array((dict.keys()))
+    
+    for dict in Util.shuffle(_units.values(), Globals.RNG):
+        res.append_array(dict.keys())
+        
     return res
+
+
+func get_first_unit() -> Unit:
+    return get_all_units()[0]
 
 
 func whistled() -> void:
