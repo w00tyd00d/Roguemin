@@ -6,8 +6,9 @@ func _init():
 
 
 func enter(ent: Entity) -> void:
-    ent.target = player.unit_tether.tail
-    player.add_unit(ent)
+    var unit := _unit(ent)
+    unit.target = player.unit_tether.tail
+    player.add_unit(unit)
     super(ent)
 
 
@@ -22,7 +23,7 @@ func get_cost(ent: Entity) -> int:
 func do_action(ent: Entity) -> ActionResult:
     if not player: return result(false)
 
-    var unit := ent as Unit
+    var unit := _unit(ent)
 
     if unit.name == "Unit63":
         pass

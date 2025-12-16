@@ -26,26 +26,27 @@ class_name Enemy extends MultiTileEntity
 ## The amount of health the enemy currently has.
 @export var current_health : int
 
-## The current entity the enemy is targeting
+## The current entity the enemy is targeting.
 var target_entity : Entity
 
-## The current tile the enemy is about to attack
+## The current tile the enemy is about to attack.
 var target_tile : Tile
 
-## The dictionary of units that are currently on top of the entity
+## The dictionary of units that are currently on top of the entity.
 var riding_units := {}
 
-## The direction the enemy is currently facing
-var facing := Direction.north
+## The direction the enemy is currently facing.
+var facing : Direction : 
+    set(dir):
+        facing = dir
+        # NOTE: At the moment, we assume all enemies are circular   
+        var center := center_from_pos(grid_position + facing.vector)
+        eye_position = center + Vector2i(facing.normalized * radius)
 
-## The current grid position of the enemy's eyes
-# NOTE: At the moment, we assume all enemies are circular
-var eye_position : Vector2i :
-    get:
-        var center := _get_center_position_from(grid_position + facing.vector)
-        return center + Vector2i(facing.normalized * radius)
+## The current cached grid position of the enemy's eyes.
+var eye_position : Vector2i 
 
-## The field of view object attached to the enemy
+## The field of view object attached to the enemy.
 var fov := EnemyFOV.new(self)
 
 ## The attack indicator of the enemy.
@@ -55,6 +56,7 @@ var fov := EnemyFOV.new(self)
 func _ready() -> void:
     super()
     type = Type.Entity.ENEMY
+    facing = Direction.north
 
     # attack_indicator.show_behind_parent = true
 
@@ -115,13 +117,9 @@ func get_closest_unit(radial := false) -> Unit:
 
 
 func get_closest_target(radial := false) -> Entity:
-    var limit := sight_range + radius
-
-    # Since we check the square distance if radial, the limit distance must
-    # also be square
-    if radial:
-        limit = limit * limit
-    
+    # Since we check the squared distance if radial, the limit distance must
+    # also be squared
+    var limit := sight_range * sight_range if radial else sight_range
     var pdist := World.distance(player.grid_position, eye_position, radial, true)
     var unit := get_closest_unit(radial)
 
@@ -151,6 +149,10 @@ func attack_target() -> void:
 
     target_tile = null
     target_entity = null
+
+
+func center_from_facing() -> Vector2i:
+    return center_from_pos(grid_position + facing.vector)
 
 
 func _set_attack_position(pos: Vector2i) -> void:

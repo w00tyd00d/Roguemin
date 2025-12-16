@@ -6,9 +6,9 @@ func _init():
 
 
 func enter(ent: Entity) -> void:
-    ent.target = world.unit_ship_tile
+    _unit(ent).target = world.unit_ship_tile
     super(ent)
 
 
 func do_action(ent: Entity) -> ActionResult:
-    return result(ent.move_towards(world.unit_ship_tile))
+    return result(_unit(ent).move_towards(world.unit_ship_tile))

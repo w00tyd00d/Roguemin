@@ -6,7 +6,7 @@ func _init():
 
 
 func enter(ent: Entity) -> void:
-    var unit := ent as Unit
+    var unit := _unit(ent)
     
     if world:
         unit.target = null

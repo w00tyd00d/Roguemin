@@ -6,8 +6,10 @@ func _init():
 
 
 # Called when entering the state
-func enter(ent: Entity) -> void:
-    super(ent)
+func enter(_ent: Entity) -> void:
+    super(_ent)
+    _enemy(_ent).fov.update()
+
 
 
 # Changes what the cost of the action will be
@@ -27,9 +29,8 @@ func use_energy(ent: Entity, override := -1) -> void:
 
 # Attempts to perform an action to consume energy
 func do_action(ent: Entity) -> ActionResult:
-    # Returns array of values:
-    #   [0]: bool, Result of the action
-    #   [1]: States.Enum, OPTIONAL new state
+    
+        
     return result(false)
 
 

@@ -77,7 +77,7 @@ func delete() -> void:
 
 
 func distance_to(pos: Vector2i, radial := false) -> float:
-    var cpos := _get_center_position_from(pos)
+    var cpos := center_from_pos(pos)
 
     if radial:
         return maxf(0, cpos.distance_to(pos) - radius)
@@ -192,20 +192,7 @@ func get_next_flow_field_tile() -> Tile:
     return world.get_tile(dest)
 
 
-func _scan() -> void:
-    # FOR NOW, WE ASSUME ALL RECTS ARE SQUARES
-    var size := get_used_rect().size
-    
-    @warning_ignore("integer_division")
-    radius = size.x / 2 - 1
-    _is_even = size.x % 2 == 0
-
-    _handle_latch_points()
-
-    area_positions = get_used_cells()
-
-
-func _get_center_position_from(dest: Vector2i) -> Vector2i:
+func center_from_pos(dest: Vector2i) -> Vector2i:
     if not _is_even:
         return grid_position
 
@@ -217,6 +204,27 @@ func _get_center_position_from(dest: Vector2i) -> Vector2i:
     if dest.y < grid_position.y: cpos.y -= 1
 
     return cpos
+
+
+func center_from_direction(dir: Direction) -> Vector2i:
+    if not _is_even:
+        return grid_position
+    
+    return center_from_pos(grid_position + dir.vector)
+    
+
+
+func _scan() -> void:
+    # FOR NOW, WE ASSUME ALL RECTS ARE SQUARES
+    var size := get_used_rect().size
+    
+    @warning_ignore("integer_division")
+    radius = size.x / 2 - 1
+    _is_even = size.x % 2 == 0
+
+    _handle_latch_points()
+
+    area_positions = get_used_cells()
 
 
 func _handle_latch_points() -> void:

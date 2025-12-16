@@ -174,9 +174,9 @@ func _compute_octant(
                     if _is_target(position):
                         all_targets.append(position)
                         
-                        # TRY TO SOLVE EVEN DIAMETER BIAS BY ROUNDING
-                        var dist1 := roundi(position.distance_to(entity.grid_position))
-                        var dist2 := roundi(closest_target.distance_to(entity.grid_position))
+                        var center := entity.center_from_facing()
+                        var dist1 := position.distance_squared_to(center)
+                        var dist2 := closest_target.distance_squared_to(center)
                         
                         if closest_target == Vector2i() or dist1 < dist2:
                             closest_target = position
@@ -282,7 +282,8 @@ func _is_target(pos: Vector2i) -> bool:
 
 
 func _default_target_callback(pos: Vector2i) -> bool:
-    return world.get_tile(pos).has_units
+    var tile := world.get_tile(pos)
+    return tile.has_units or tile.has_player
 
 
 # set_in_view, but with no bounds check.  For use in the inner loop of

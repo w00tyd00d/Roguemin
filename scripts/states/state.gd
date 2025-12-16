@@ -75,6 +75,11 @@ func result(success: bool, energy_override := -1) -> ActionResult:
     return State.action_result.update(success, energy_override)
 
 
+func _unit(ent: Entity) -> Unit:
+    assert(ent is Unit)
+    return ent
+
+
 func _mte(ent: Entity) -> MultiTileEntity:
     assert(ent is MultiTileEntity)
     return ent

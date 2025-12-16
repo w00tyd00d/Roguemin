@@ -25,6 +25,7 @@ script = ExtResource("3_6egb5")
 z_index = 2
 
 [node name="ThrowCursor" type="Node2D" parent="." index="6"]
+visible = false
 z_index = 2
 script = ExtResource("5_6f63f")
 

@@ -19,11 +19,8 @@ var current_tile : Tile :
 ## The cached last position of the entity.
 var last_position : Vector2i
 
-## The last direction the entity had traveled
-var last_direction : Direction :
-    get:
-        if last_position == Vector2i(): return Direction.none
-        return Direction.by_delta(last_position, grid_position)
+## The cached last direction the entity had traveled
+var last_direction : Direction
 
 ## The last vector the entity had traveled
 var last_velocity : Vector2i :
@@ -105,3 +102,11 @@ func remove_immunity(hazard: Type.Hazard) -> void:
 
 func reset_immunities() -> void:
     _immunities = {}
+
+
+func _set_grid_position(pos: Vector2i) -> void:
+    super(pos)
+    if last_position == Vector2i():
+        last_direction = Direction.none
+    else:
+        last_direction = Direction.by_delta(last_position, grid_position)
