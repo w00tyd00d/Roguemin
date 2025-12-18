@@ -122,7 +122,7 @@ func _handle_action() -> bool:
     if res.state != -1:
         change_state(res.state)
 
-    if res.success or res.energy >= 0:
+    if res.successful or res.energy >= 0:
         state.use_energy(entity, res.energy)
     
-    return res.success
+    return res.successful

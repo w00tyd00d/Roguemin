@@ -153,7 +153,7 @@ func get_units(_type: Type.Unit) -> Array:
 func get_all_units() -> Array[Unit]:
     var res : Array[Unit] = []
     
-    for dict in Util.shuffle(_units.values(), Globals.RNG):
+    for dict in Util.shuffle(_units.values(), GameState.RNG):
         res.append_array(dict.keys())
         
     return res

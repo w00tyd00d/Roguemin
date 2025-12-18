@@ -11,7 +11,6 @@ wander_distance = 15
 attack_range = 4
 attack_damage = 15
 maximum_health = 1000
-current_health = 1000
 
 [node name="AttackIndicator" parent="." index="0"]
 tile_map_data = PackedByteArray("AAAAAAAAAAAYAAEAAwD/////AAAYAAEAAwAAAP//AAAYAAEAAwABAP//AAAYAAEAAwD//wAAAAAYAAEAAwABAAAAAAAYAAEAAwD//wEAAAAYAAEAAwAAAAEAAAAYAAEAAwABAAEAAAAYAAEAAwA=")
@@ -19,9 +18,6 @@ attack_range = 1.0
 
 [node name="BackgroundLayer" parent="AttackIndicator" index="0"]
 tile_map_data = PackedByteArray("AAAAAAAAAgABAAAAAAD/////AgABAAAAAAAAAP//AgABAAAAAAABAP//AgABAAAAAAD//wAAAgABAAAAAAABAAAAAgABAAAAAAD//wEAAgABAAAAAAAAAAEAAgABAAAAAAABAAEAAgABAAAAAAA=")
-
-[node name="QuickInfo" parent="." index="1"]
-visible = false
 
 [node name="Health" parent="QuickInfo" index="0"]
 offset_top = -40.0

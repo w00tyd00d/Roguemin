@@ -1,6 +1,11 @@
-extends Control
+class_name QuickInfo extends Control
 
 @export var enemy: Enemy
+
+var grid_position : Vector2i :
+    set(vec):
+        grid_position = vec
+        position = grid_position * Globals.TILE_SIZE
 
 @onready var health_lbl := $Health as Label
 @onready var health_bg := $Health/BackgroundLayer as TileMapLayer
@@ -13,6 +18,7 @@ extends Control
 func _ready() -> void:
     hide()
     GameState.display_quick_info.connect(func(val: bool):
+        print("Woo!")
         if val:
             update()
             show()
@@ -40,8 +46,8 @@ func _update_health():
     
     health_lbl.text = health
 
-    set_glyph(health_bg, Vector2i(-2,0), Glyph.NONE if perc < 100 else Glyph.BLACK)
-    set_glyph(health_bg, Vector2i(1,0), Glyph.NONE if perc < 10 else Glyph.BLACK)
+    set_glyph(health_bg, Vector2i(0,0), Glyph.NONE if perc < 100 else Glyph.BLACK)
+    set_glyph(health_bg, Vector2i(3,0), Glyph.NONE if perc < 10 else Glyph.BLACK)
 
 
 func _update_direction():
@@ -57,6 +63,6 @@ func _update_direction():
     }
     var dir := key[enemy.facing]
 
-    direction_lbl.text = "{0}".format(dir)
+    direction_lbl.text = "{0}".format([dir])
 
-    set_glyph(direction_bg, Vector2i(-1,0), Glyph.BLACK if enemy.facing.is_diagonal else Glyph.NONE)
+    set_glyph(direction_bg, Vector2i(0,0), Glyph.BLACK if enemy.facing.is_diagonal else Glyph.NONE)

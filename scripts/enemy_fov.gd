@@ -118,8 +118,8 @@ func can_see(ent: Entity) -> bool:
 func update() -> void:
     reset()
 
-    var oct1 : Array[int] = _fovs[entity.facing][0]
-    var oct2 : Array[int] = _fovs[entity.facing][1]
+    var oct1 : Array = _fovs[entity.facing][0]
+    var oct2 : Array = _fovs[entity.facing][1]
     var hist := {}
 
     for pos in _view_positions[entity.facing]:
@@ -129,13 +129,13 @@ func update() -> void:
 
 # Compute all visibile cells for one octant of the viewpoint.
 func _compute_octant(
-        octant: Array[int],
+        octant: Array,
         view_position: Vector2i,
         history: Dictionary) -> void:
 
-    var axis := octant[0]
-    var major_sign := octant[1]
-    var minor_sign := octant[2]
+    var axis: int = octant[0]
+    var major_sign: int = octant[1]
+    var minor_sign: int = octant[2]
 
     # Track occluders previously encountered in this octant.
     var occluders := []

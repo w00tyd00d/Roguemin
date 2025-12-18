@@ -24,11 +24,7 @@ class_name Enemy extends MultiTileEntity
         current_health = n
 
 ## The amount of health the enemy currently has.
-var current_health : int :
-    set(n):
-        current_health = n
-        if n <= 0:
-            die()
+var current_health : int
 
 ## The current entity the enemy is targeting.
 var target_entity : Entity
@@ -56,13 +52,16 @@ var fov := EnemyFOV.new(self)
 ## The attack indicator of the enemy.
 @onready var attack_indicator := $AttackIndicator as AttackIndicator
 
+## The [QuickInfo] object attached to the enemy.
+@onready var quick_info := $QuickInfo as QuickInfo
+
 
 func _ready() -> void:
     super()
     type = Type.Entity.ENEMY
-    facing = Direction.north
+    facing = Direction.northwest
 
-    # attack_indicator.show_behind_parent = true
+    quick_info.grid_position = grid_position
 
 
 func _process(_dt: float) -> void:
@@ -84,6 +83,12 @@ func get_health_percent() -> float:
 
 func get_health_percent_num() -> int:
     return floori(get_health_percent() * 100)
+
+
+func take_damage(dmg: int) -> void:
+    current_health -= maxi(0, dmg)
+    if current_health <= 0:
+        die()
 
 
 func turn_towards(pos: Vector2i) -> bool:
@@ -200,6 +205,13 @@ func center_from_facing() -> Vector2i:
 #             return true
 
 #     return false
+
+
+func _set_grid_position(pos: Vector2i) -> void:
+    super(pos)
+    if quick_info:
+        quick_info.grid_position = pos
+    
 
 
 func _assign_view_positions():

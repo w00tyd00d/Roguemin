@@ -7,7 +7,7 @@ class_name State extends Object
 const DEFAULT_COST := Globals.DEFAULT_TURN_COST
 
 # Do not use directly, use result(bool) method instead
-static var action_result := ActionResult.new()
+# static var action_result := ActionResult.new()
 
 ## The global world object.
 var world : World :
@@ -72,7 +72,7 @@ func do_action(_ent: Entity) -> ActionResult:
 ## [method result] can also be chained with a [code].new_state()[/code]
 ## call in order to change the state as a result of the action.
 func result(success: bool, energy_override := -1) -> ActionResult:
-    return State.action_result.update(success, energy_override)
+    return ActionResult.new(success, energy_override)
 
 
 func _unit(ent: Entity) -> Unit:
@@ -90,23 +90,15 @@ func _enemy(ent: Entity) -> Enemy:
     return ent
 
 
-## A singleton object that reflects the results of an action made by a
-## state.
-##
-## NOTE: Should not be called directly. Use [method State.result] instead.
-class ActionResult extends Object:
-    var success: bool ## Whether the action executed. Determines if energy should be drained.
+## Reflects the results of an action made by a [State].
+class ActionResult:
+    var successful: bool ## Whether the action executed. Determines if energy should be drained.
     var energy: int ## The overridden energy cost of the action, if any.
-    var state: int ## The new state that should be entered due to the action, if any.
+    var state := -1 ## The new state that should be entered due to the action, if any.
 
-    ## Updates the internals of the object and returns itself.
-    ## This is how the object should be referenced instead of referencing it
-    ## directly to ensure any residual state is cleansed.
-    func update(valid: bool, energy_override: int) -> ActionResult:
-        success = valid
+    func _init(success: bool, energy_override := -1) -> void:
+        successful = success
         energy = energy_override
-        state = -1
-        return self
 
     ## Used to chain together with a previous update call to add a new state
     ## to the result. See [method State.result].[br][br]
