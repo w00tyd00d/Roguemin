@@ -16,17 +16,7 @@ func enter(_ent: Entity) -> void:
 
 # Changes what the cost of the action will be
 func get_cost(_ent: Entity) -> int:
-    return DEFAULT_COST * 2
-
-
-# Changes the rules for when the entity can act
-# func can_act(ent: Entity) -> bool:
-#     return super(ent)
-
-
-# # Changes how energy is consumed from the entity
-# func use_energy(ent: Entity, override := -1) -> void:
-#     super(ent, override)
+    return SpottyRed.ATTACK_SPEED
 
 
 func do_action(_ent: Entity) -> ActionResult:
@@ -44,9 +34,3 @@ func do_action(_ent: Entity) -> ActionResult:
             return result(true).new_state(States.SpottyRed.CHASE)
     
     return result(true).new_state(States.SpottyRed.RETURN)
-
-
-# Called when leaving the state
-# func exit(ent: Entity) -> void:
-#     super(ent)
-

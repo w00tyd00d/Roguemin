@@ -2,6 +2,11 @@ class_name SpottyRed extends Enemy
 
 ## The most iconic main enemy of the franchise.
 
+const MOVE_SPEED := STEP_COST * 3
+const ROTATE_SPEED := STEP_COST * 2
+const ATTACK_SPEED := STEP_COST * 2
+
+
 static func create() -> SpottyRed:
     return preload("uid://623fckoivhv6").instantiate()
 
@@ -17,9 +22,5 @@ func _ready() -> void:
 
 
 func move_towards(target: Tile) -> bool:
-    var res := super(target)
-
-    if res:
-        turn_towards(target.grid_position)
-    
-    return res
+    turn_towards(target.grid_position)
+    return super(target)

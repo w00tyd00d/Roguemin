@@ -42,8 +42,8 @@ func _init(ent: Entity) -> void:
 
 
 ## Returns the name of the current state.
-func get_state_name() -> String:
-    return state.name
+# func get_state_name() -> String:
+#     return state.name
 
 
 ## Resets [member time] and [member energy] back to 0.
@@ -119,10 +119,10 @@ func _assign_state(new_state: State) -> void:
 func _handle_action() -> bool:
     var res := state.do_action(entity)
 
-    if res.state != -1:
-        change_state(res.state)
-
     if res.successful or res.energy >= 0:
         state.use_energy(entity, res.energy)
+
+    if res.state != -1:
+        change_state(res.state)
     
     return res.successful

@@ -2,6 +2,8 @@ class_name Entity extends DualMapLayer
 
 ## The base class for all entities in the game.
 
+const STEP_COST := Globals.DEFAULT_TURN_COST
+
 var RNG : RandomNumberGenerator :
     get: return GameState.RNG
 
@@ -34,8 +36,8 @@ var entity_name := "Unknown Entity"
 
 # ## The value of time the entity has been synced up to.
 var time : int :
-    set(n): brain.time = n
-    get: return brain.time
+    set(n): if brain: brain.time = n
+    get: return brain.time if brain else 0
 
 # ## The amount of energy points the entity has accumulated.
 # var action_energy := 0
@@ -46,7 +48,7 @@ var time : int :
 
 ## Flag for signaling if the entity can act on this turn.
 var can_act : bool :
-    get: return brain.can_act
+    get: return brain.can_act if brain else true
 
 ## Dictionary of immunities the entity has.
 var _immunities := {}

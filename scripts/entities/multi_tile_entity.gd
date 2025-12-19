@@ -217,13 +217,12 @@ func center_from_direction(dir: Direction) -> Vector2i:
 func _scan() -> void:
     # FOR NOW, WE ASSUME ALL RECTS ARE SQUARES
     var size := get_used_rect().size
-    
-    @warning_ignore("integer_division")
-    radius = size.x / 2 - 1
+
+    radius = ceili(size.x / 2.0) - 2
     _is_even = size.x % 2 == 0
 
     _handle_latch_points()
-
+    
     area_positions = get_used_cells()
 
 

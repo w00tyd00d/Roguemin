@@ -18,13 +18,15 @@ var grid_position : Vector2i :
 func _ready() -> void:
     hide()
     GameState.display_quick_info.connect(func(val: bool):
-        print("Woo!")
         if val:
             update()
             show()
             return
         hide()
     )
+
+    enemy.health_changed.connect(_update_health)
+    enemy.facing_changed.connect(_update_direction)
 
 
 func update():

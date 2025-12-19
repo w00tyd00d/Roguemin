@@ -6,7 +6,7 @@ func _init():
 
 
 func get_cost(_ent: Entity) -> int:
-    return DEFAULT_COST * 3
+    return SpottyRed.MOVE_SPEED
 
 
 func do_action(_ent: Entity) -> ActionResult:
@@ -19,4 +19,3 @@ func do_action(_ent: Entity) -> ActionResult:
     ent.target_entity = target
 
     return result(true).new_state(States.SpottyRed.CHASE)
-

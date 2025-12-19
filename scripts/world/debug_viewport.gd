@@ -15,17 +15,17 @@ func _gui_input(event: InputEvent) -> void:
 
     ])
 
+    # Add mouse coordinates
     debug_string += "\n({0},{1})\n({2},{3})\n({4},{5})".format([
         chunk_pos.x, chunk_pos.y,
         grid_pos.x % Globals.CHUNK_SIZE.x, grid_pos.y % Globals.CHUNK_SIZE.y,
         grid_pos.x, grid_pos.y
     ])
 
-    # if room: debug_str += "\nRoom {0}".format([room.id])
-    # if tile:
-    #     debug_str += "\n{0}".format([tile.flow_field_value])
-    #     debug_str += "\n{0}".format([tile.distance_from_wall])
-
+    var ent := tile.get_first_entity()
+    if ent:
+        debug_string += "\n{0}".format([ent.brain.state.name])
+    
     GameState.update_debug_info.emit(debug_string)
 
     var spawn_commands : Array[StringName] = [

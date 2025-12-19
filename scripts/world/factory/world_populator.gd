@@ -26,6 +26,8 @@ func generate_enemies(world: World) -> void:
 
 
 func generate_treasure(world: World) -> void:
+    if debug_mode: return
+   
     _verify_treasure_placement(world, LargeTreasure, 20)
     _verify_treasure_placement(world, MediumTreasure, 5)
     _verify_treasure_placement(world, SmallTreasure, 10)

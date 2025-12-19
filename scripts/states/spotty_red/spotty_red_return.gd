@@ -10,7 +10,7 @@ func _init():
 
 # Changes what the cost of the action will be
 func get_cost(_ent: Entity) -> int:
-    return DEFAULT_COST * 2
+    return SpottyRed.MOVE_SPEED
 
 
 # Attempts to perform an action to consume energy
@@ -34,8 +34,6 @@ func do_action(_ent: Entity) -> ActionResult:
 
     # Turn in place if aren't facing the direction of home
     if ent.turn_towards(ent.spawn_position):
-        return result(true, ROTATE_COST)
+        return result(true, SpottyRed.ROTATE_SPEED)
 
-    return result(ent.move_toward(ent.spawn_tile))
-
-
+    return result(ent.move_towards(ent.spawn_tile))

@@ -117,8 +117,14 @@ static func by_turning(from_dir: Direction, to_dir: Direction) -> Direction:
     if from_dir == to_dir: return from_dir
     
     var size := ALL_VECTORS.size()
-    var right := (to_dir._index - from_dir._index) % size
-    var left := (from_dir._index - to_dir._index) % size
+    var fidx := from_dir._index
+    var tidx := to_dir._index
+    
+    var rdest := tidx + size if fidx > tidx else tidx
+    var lstart := fidx + size if fidx < tidx else fidx
+    
+    var right := rdest - fidx
+    var left := lstart - tidx
 
     var rot: int
 

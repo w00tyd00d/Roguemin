@@ -109,6 +109,10 @@ func add_view_position(dir: Direction, pos: Vector2i) -> void:
     _view_positions[dir].append(pos)
 
 
+func get_view_positions(dir: Direction) -> Array:
+    return _view_positions[dir]
+
+
 func can_see(ent: Entity) -> bool:
     return all_targets.has(ent.grid_position)
 
@@ -122,9 +126,9 @@ func update() -> void:
     var oct2 : Array = _fovs[entity.facing][1]
     var hist := {}
 
-    for pos in _view_positions[entity.facing]:
-        _compute_octant(oct1, pos, hist)
-        _compute_octant(oct2, pos, hist)
+    for pos: Vector2i in _view_positions[entity.facing]:
+        _compute_octant(oct1, entity.grid_position + pos, hist)
+        _compute_octant(oct2, entity.grid_position + pos, hist)
 
 
 # Compute all visibile cells for one octant of the viewpoint.

@@ -1,7 +1,5 @@
 class_name SpottyRedChase extends State
 
-const ROTATE_COST := DEFAULT_COST
-
 
 func _init():
     name = "spotty_red_chase"
@@ -18,7 +16,7 @@ func enter(_ent: Entity) -> void:
 
 # Changes what the cost of the action will be
 func get_cost(_ent: Entity) -> int:
-    return DEFAULT_COST * 2
+    return SpottyRed.MOVE_SPEED
 
 
 func do_action(_ent: Entity) -> ActionResult:
@@ -41,21 +39,14 @@ func do_action(_ent: Entity) -> ActionResult:
     # If target not in fov, rotate towards them.
     if not ent.fov.can_see(tar):
         ent.turn_towards(ent.target_entity.grid_position)
-        return result(true, ROTATE_COST)
-
-    var tar_dist := World.distance(ent.grid_position, tar.grid_position, true)
+        return result(true, SpottyRed.ROTATE_SPEED)
 
     # If target within attack range, we attack.
-    if tar_dist <= ent.attack_range:
+    if ent.can_attack(tar.grid_position, true):
         ent.prepare_attack(tar.current_tile)
-        result(true).new_state(States.SpottyRed.ATTACK)
+        return result(true).new_state(States.SpottyRed.ATTACK)
     
     return result(ent.move_towards(tar.current_tile))
-
-
-# Called when leaving the state
-# func exit(ent: Entity) -> void:
-#     super(ent)
 
 
 # Used only to change target to a more convenient target, not acquire a new one.
