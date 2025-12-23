@@ -39,7 +39,11 @@ var current_health : int :
 var target_entity : Entity
 
 ## The current tile the enemy is about to attack.
-var target_tile : Tile
+var target_tile : Tile :
+    set(tile):
+        target_tile = tile
+        if not tile: # failsafe
+            attack_indicator.hide()
 
 ## The dictionary of units that are currently on top of the entity.
 var riding_units := {}
@@ -73,12 +77,12 @@ func _ready() -> void:
     quick_info.grid_position = grid_position
 
 
-func _process(_dt: float) -> void:
-    if not target_tile:
-        attack_indicator.hide()
-        return
+# func _process(_dt: float) -> void:
+#     if not target_tile:
+#         attack_indicator.hide()
+#         return
 
-    attack_indicator.visible = not GameState.glyph_blinking()
+#     attack_indicator.visible = not GameState.glyph_blinking()
 
 
 func _handle_latch_points() -> void:
@@ -159,7 +163,7 @@ func get_closest_target(radial := false) -> Entity:
 
 func can_attack(pos: Vector2i, radial := false) -> bool:
     var limit := attack_range * attack_range if radial else attack_range
-    for dpos in fov.get_view_positions(facing):
+    for dpos: Vector2i in fov.get_view_positions(facing):
         var vpos := grid_position + dpos
         if World.distance(vpos, pos, radial, true) <= limit:
             return true
@@ -181,7 +185,7 @@ func attack_target() -> void:
         var tile := world.get_tile(pos)
         tile.attacked(attack_damage)
 
-    attack_indicator.hide()
+    attack_indicator.deactivate()
     target_tile = null
     target_entity = null
 
@@ -208,11 +212,9 @@ func _update_eye_position() -> void:
 
 
 func _assign_view_positions():
-    var key := fov.key
-
-    for glyph in key:
+    for glyph in fov.key:
         var cells := get_used_cells_by_id(glyph.source, glyph.atlas_pos)
-        var dirs := key[glyph]
+        var dirs := fov.key[glyph]
         
         for pos in cells:
             for dir: Direction in dirs:

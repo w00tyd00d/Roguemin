@@ -30,9 +30,29 @@ var world : World :
 ## The cached positions of the currently targeted area.
 var targeted_positions : Array[Vector2i] = []
 
+## Whether the attack indicator is activated or not.
+var active := false :
+    set(val):
+        active = val
+        if val:
+            process_mode = Node.PROCESS_MODE_ALWAYS
+            show()
+        else:
+            process_mode = Node.PROCESS_MODE_DISABLED
+            hide()
 
 func _ready() -> void:
+    super()
+    process_mode = Node.PROCESS_MODE_ALWAYS
     top_level = true # Desyncs transform properties from parent
+
+
+func _process(_dt: float) -> void:
+    # if not active:
+    #     hide()
+    #     return
+    
+    visible = not GameState.glyph_blinking()
 
 
 func reset() -> void:
@@ -48,6 +68,11 @@ func target_position(pos: Vector2i) -> void:
 
 func target_tile(tile: Tile) -> void:
     target_position(tile.grid_position)
+    active = true
+
+
+func deactivate() -> void:
+    active = false
 
 
 func update() -> void:

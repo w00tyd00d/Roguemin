@@ -15,6 +15,10 @@ static func create() -> DualMapLayer:
     return preload("res://prefabs/dual_map_layer.tscn").instantiate()
 
 
+func _ready() -> void:
+    process_mode = Node.PROCESS_MODE_DISABLED
+
+
 func clear_glyphs() -> void:
     clear()
     background_layer.clear()

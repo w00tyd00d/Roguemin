@@ -56,6 +56,7 @@ func _init() -> void:
 
 func _ready() -> void:
     add_to_group(&"entities")
+    super()
 
 
 func delete() -> void:
@@ -86,19 +87,26 @@ func distance_to(pos: Vector2i, radial := false) -> float:
 
 
 func move_towards(target: Tile) -> bool:
-    var dir := Direction.by_delta(grid_position, target.grid_position)
+    var cpos := center_from_pos(target.grid_position)
+    var dir := Direction.by_delta(cpos, target.grid_position)
+    
+    # We have to keep dest relative to grid_position, not the virtual center
     var dest := world.get_tile(grid_position + dir.vector)
+    
+    # We keep track of the virtual destination via the center offset
+    var delta := cpos - grid_position
 
-    if _walkable_tile(dest):
+    if _walkable_position(dest.grid_position + delta):
         move_to(dest)
         return true
 
     for adj in dir.adjacent:
-        if grid_position + adj.vector == last_position: continue
+        if grid_position + adj.vector == last_position:
+            continue
 
         dest = world.get_tile(grid_position + adj.vector)
 
-        if _walkable_tile(dest):
+        if _walkable_position(dest.grid_position + delta):
             move_to(dest)
             return true
 
@@ -237,12 +245,10 @@ func _handle_latch_points() -> void:
         set_glyph(pos, Glyph.NONE)
 
 
-func _walkable_tile(tile: Tile) -> bool:
+func _walkable_position(pos: Vector2i) -> bool:
+    var tile := world.get_tile(pos)
     var dist := tile.distance_from_wall
-    if _is_even:
-        var diff := tile.grid_position - grid_position
-        dist -= 1 if diff.x < 0 or diff.y < 0 else 0
-    return tile.type == Type.Tile.GRASS and dist >= radius
+    return tile.type == Type.Tile.GRASS and dist > radius + 1
 
 
 func _check_for_collection() -> void:

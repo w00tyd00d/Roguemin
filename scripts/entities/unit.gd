@@ -79,6 +79,7 @@ func _init() -> void:
 
 func _ready() -> void:
     add_to_group(&"units")
+    super()
 
 
 static func metadata(_type: Type.Unit) -> Dictionary:
@@ -96,7 +97,7 @@ func get_metadata() -> Dictionary:
 
 func reset() -> void:
     hide()
-
+    
     modulate.a = 1
     set_background(Vector2(), Glyph.BLACK)
 
@@ -106,6 +107,9 @@ func reset() -> void:
     grid_position = Vector2()
     last_player_tile = null
     boid.reset()
+    
+    process_mode = Node.PROCESS_MODE_DISABLED
+    
     
 
 
@@ -135,6 +139,8 @@ func die() -> void:
 
     var end_pos := position + Vector2(Direction.north.vector * Globals.TILE_SIZE * 2)
 
+    process_mode = Node.PROCESS_MODE_ALWAYS
+    
     var tween := create_tween()
     tween.tween_property(self, "position", end_pos, 1.5)
     tween.parallel().tween_property(self, "modulate:a", 0, 1.25)

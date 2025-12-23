@@ -54,6 +54,7 @@ static func create() -> Player:
 
 func _ready() -> void:
     unit_tether.reset()
+    super()
 
 
 func finish_turn(_time_units: int) -> void:

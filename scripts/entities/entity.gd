@@ -39,19 +39,16 @@ var time : int :
     set(n): if brain: brain.time = n
     get: return brain.time if brain else 0
 
-# ## The amount of energy points the entity has accumulated.
-# var action_energy := 0
-
-# ## The amount of posture points the entity currently has.
-# # DEPRECATE THIS!
-# var posture_points := 0
-
 ## Flag for signaling if the entity can act on this turn.
 var can_act : bool :
     get: return brain.can_act if brain else true
 
 ## Dictionary of immunities the entity has.
 var _immunities := {}
+
+
+func _ready() -> void:
+    super()
 
 
 func move_to(dest: Tile) -> void:

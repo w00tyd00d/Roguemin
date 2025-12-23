@@ -2,11 +2,6 @@ extends Node
 
 ## The global constants used throughout the game.
 
-# General
-
-## The blink threshold of a blinking icon. (0 - 1000ms)
-const GLYPH_BLINK_THRESHOLD := 750
-
 # Geometery
 
 ## The size of a tile in pixels.
