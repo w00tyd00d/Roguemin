@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://bhgy5jwpqpd4y" path="res://scripts/dual_map_layer.gd" id="2_c11hl"]
 
 [node name="DualMapLayer" type="TileMapLayer"]
+process_mode = 4
 tile_set = ExtResource("1_x8b3s")
 script = ExtResource("2_c11hl")
 

@@ -38,10 +38,6 @@ var latch_point_count : int
 ## A cached value of how many carriers the entity has.
 var carrier_count := 0
 
-# ## A percentage value of energy built up from being carried. A value of
-# ## [code]1.0[/code] allows the entity to act (move).
-# var carry_energy := 0.0
-
 ## The location of where the last unit attached was thrown from to provide a
 ## carry location if located in the void
 var default_carry_location : Tile
@@ -66,14 +62,12 @@ func delete() -> void:
 
     for unit: Unit in carriers.keys():
         unit.drop_object()
+        
         if unit._in_range_of_tether():
-        # var dist := Util.chebyshev_distance(unit.grid_position, player.grid_position)
-        # if dist <= Globals.UNIT_SIGHT_RANGE:
             unit.join_squad()
         else:
             unit.dismiss()
 
-    # Don't have time to set up an entity recycler, so just delete
     queue_free()
 
 

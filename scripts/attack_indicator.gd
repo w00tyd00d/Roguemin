@@ -48,10 +48,6 @@ func _ready() -> void:
 
 
 func _process(_dt: float) -> void:
-    # if not active:
-    #     hide()
-    #     return
-    
     visible = not GameState.glyph_blinking()
 
 

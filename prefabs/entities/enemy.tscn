@@ -15,6 +15,7 @@ attack_damage = 0
 maximum_health = 0
 
 [node name="AttackIndicator" parent="." index="0" instance=ExtResource("3_iir01")]
+process_mode = 3
 
 [node name="QuickInfo" parent="." index="1" node_paths=PackedStringArray("enemy") instance=ExtResource("4_wpb4g")]
 enemy = NodePath("..")
