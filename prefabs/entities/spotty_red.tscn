@@ -10,10 +10,11 @@ sight_range = 30
 wander_distance = 40
 attack_range = 3
 attack_damage = 15
+maximum_target_count = 3
 maximum_health = 1000
 
 [node name="AttackIndicator" parent="." index="0"]
-tile_map_data = PackedByteArray("AAAAAAAAAAAYAAEAAwD/////AAAYAAEAAwAAAP//AAAYAAEAAwABAP//AAAYAAEAAwD//wAAAAAYAAEAAwABAAAAAAAYAAEAAwD//wEAAAAYAAEAAwAAAAEAAAAYAAEAAwABAAEAAAAYAAEAAwA=")
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAQD/////AAAAAAAAAQAAAP//AAAAAAAAAQABAP//AAAAAAAAAQD//wAAAAAAAAAAAQABAAAAAAAAAAAAAQD//wEAAAAAAAAAAQAAAAEAAAAAAAAAAQABAAEAAAAAAAAAAQA=")
 attack_range = 1.0
 
 [node name="BackgroundLayer" parent="AttackIndicator" index="0"]

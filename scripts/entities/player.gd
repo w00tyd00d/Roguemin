@@ -139,8 +139,10 @@ func get_all_units() -> Array[Unit]:
     return res
 
 
-func take_damage(dmg: int) -> void:
+func take_damage(dmg: int, type: Type.Element) -> void:
+    # ADD IN DIFFERENT EFFECTS/IMMUNITIES FOR ELEMENTAL TYPE DAMAGE
     health -= dmg
+
     if health <= 0:
         # ADD GAME OVER
         pass

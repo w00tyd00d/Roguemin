@@ -6,7 +6,7 @@ var world : World :
     get: return GameState.world
 
 ## The attack shape of this indicator.
-@export var attack_type : Type.Attack :
+@export var attack_type : Type.AttackArea :
     set(type):
         attack_type = type
         if Engine.is_editor_hint():
@@ -43,11 +43,14 @@ var active := false :
 
 func _ready() -> void:
     super()
-    process_mode = Node.PROCESS_MODE_ALWAYS
+    process_mode = Node.PROCESS_MODE_DISABLED
     top_level = true # Desyncs transform properties from parent
 
 
 func _process(_dt: float) -> void:
+    if Engine.is_editor_hint():
+        return
+    
     visible = not GameState.glyph_blinking()
 
 
@@ -59,7 +62,6 @@ func reset() -> void:
 func target_position(pos: Vector2i) -> void:
     grid_position = pos
     update()
-    show()
 
 
 func target_tile(tile: Tile) -> void:
@@ -74,13 +76,13 @@ func deactivate() -> void:
 func update() -> void:
     reset()
     match attack_type:
-        Type.Attack.SQUARE: _set_area()
-        Type.Attack.CIRCLE: _set_area(true)
-        Type.Attack.CONE: _set_cone()
+        Type.AttackArea.SQUARE: _set_area()
+        Type.AttackArea.CIRCLE: _set_area(true)
+        Type.AttackArea.CONE: _set_cone()
 
 
 func _valid_tile(pos: Vector2i) -> bool:
-    if Engine.is_editor_hint:
+    if Engine.is_editor_hint():
         return true
     
     match world.query_tile_at(pos):
@@ -104,12 +106,16 @@ func _set_area(circle := false) -> void:
     for y in range(-r, r+1):
         for x in range(-r, r+1):
             var pos := Vector2i(x,y)
-            if _valid_tile(pos + grid_position):
-                if circle:
-                    var dist := grid_position.distance_squared_to(pos + grid_position)
-                    if dist > (r + 0.5) ** 2:
-                        continue
-                _set_attack_position(pos)
+            
+            if not _valid_tile(pos + grid_position):
+                continue 
+            
+            if circle:
+                var dist := grid_position.distance_squared_to(pos + grid_position)
+                if dist > (r + 0.5) * (r + 0.5):
+                    continue
+            
+            _set_attack_position(pos)
 
 
 func _set_cone() -> void:

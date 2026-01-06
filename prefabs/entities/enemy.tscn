@@ -12,10 +12,11 @@ sight_range = 0
 wander_distance = 0
 attack_range = 0
 attack_damage = 0
+maximum_target_count = 0
 maximum_health = 0
 
 [node name="AttackIndicator" parent="." index="0" instance=ExtResource("3_iir01")]
-process_mode = 3
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0)
 
 [node name="QuickInfo" parent="." index="1" node_paths=PackedStringArray("enemy") instance=ExtResource("4_wpb4g")]
 enemy = NodePath("..")

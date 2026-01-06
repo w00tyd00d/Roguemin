@@ -4,9 +4,8 @@
 [ext_resource type="Script" uid="uid://bjhpd4np6ffbs" path="res://scripts/attack_indicator.gd" id="2_vx3bl"]
 
 [node name="AttackIndicator" instance=ExtResource("1_dnwwi")]
-process_mode = 3
 top_level = true
-tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 1, 0, 3, 0)
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0)
 script = ExtResource("2_vx3bl")
 attack_type = 0
 attack_range = 0.0

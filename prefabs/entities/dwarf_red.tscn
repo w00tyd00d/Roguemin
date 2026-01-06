@@ -8,6 +8,9 @@ tile_map_data = PackedByteArray("AAD/////AAACAAEAAQAAAAAAAAACAAEAAQD//wAAAAACAAE
 script = ExtResource("2_krgmn")
 fov_type = 1
 
+[node name="QuickInfo" parent="." index="1"]
+visible = false
+
 [node name="Health" parent="QuickInfo" index="0"]
 offset_top = -16.0
 offset_bottom = -8.0

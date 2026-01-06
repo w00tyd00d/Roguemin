@@ -170,9 +170,12 @@ func whistled() -> void:
                 unit.join_squad()
 
 
-func attacked(dmg: int) -> void:
+func attacked(dmg: int, type := Type.Element.PHYSICAL) -> void:
     if has_player:
-        player.take_damage(dmg)
+        player.take_damage(dmg, type)
+
+    ## ADD IN DIFFERENT INTERACTIONS BASED ON THE TYPE OF ATTACK
+    ## eg: Units will run around on fire before they die from a fire attack
 
     for unit in get_all_units():
         unit.die()

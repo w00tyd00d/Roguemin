@@ -113,8 +113,12 @@ func get_view_positions(dir: Direction) -> Array:
     return _view_positions[dir]
 
 
-func can_see(ent: Entity) -> bool:
-    return all_targets.has(ent.grid_position)
+func is_target_position(pos: Vector2i) -> bool:
+    return all_targets.has(pos)
+
+
+func can_see_entity(ent: Entity) -> bool:
+    return is_target_position(ent.grid_position)
 
 
 # Compute the viewable cells from a particular view position by doing

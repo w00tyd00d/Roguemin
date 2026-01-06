@@ -87,15 +87,15 @@ func update() -> bool:
     return brain.update()
 
 
-func add_immunity(hazard: Type.Hazard) -> void:
+func add_immunity(hazard: Type.Element) -> void:
     _immunities[hazard] = true
 
 
-func has_immunity(hazard: Type.Hazard) -> bool:
+func has_immunity(hazard: Type.Element) -> bool:
     return _immunities.has(hazard)
 
 
-func remove_immunity(hazard: Type.Hazard) -> void:
+func remove_immunity(hazard: Type.Element) -> void:
     _immunities.erase(hazard)
 
 
