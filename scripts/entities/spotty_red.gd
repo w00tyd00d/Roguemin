@@ -38,4 +38,4 @@ func bite_attack(tile: Tile) -> Attack:
             if attacks == 0:
                 break
     
-    return Attack.new(tile, Type.Attack.BODY, 3, action)
+    return Attack.new(tile, Type.Attack.SQUARE, 1, action)
