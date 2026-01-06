@@ -27,7 +27,7 @@ func move_towards(target: Tile) -> bool:
 
 
 func bite_attack(tile: Tile) -> Attack:
-    return Attack.new(tile, func():
+    var action := func():
         var targets := Util.shuffled(attack_indicator.targeted_positions, GameState.RNG)
         var attacks := maximum_target_count
         
@@ -37,4 +37,5 @@ func bite_attack(tile: Tile) -> Attack:
             
             if attacks == 0:
                 break
-    )
+    
+    return Attack.new(tile, Type.Attack.BODY, 3, action)

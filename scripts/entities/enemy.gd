@@ -43,13 +43,6 @@ var current_health : int :
 ## The current entity the enemy is targeting.
 var target_entity : Entity
 
-## The current tile the enemy is about to attack.
-# var target_tile : Tile :
-#     set(tile):
-#         target_tile = tile
-#         if not tile: # failsafe
-#             attack_indicator.hide()
-
 ## The queued attack command if the entity has prepared an attack.
 ## See [method prepare_attack].
 var queued_attack : Attack
@@ -83,15 +76,8 @@ func _ready() -> void:
     type = Type.Entity.ENEMY
     facing = Direction.northwest
 
+    attack_indicator.entity = self
     quick_info.grid_position = grid_position
-
-
-# func _process(_dt: float) -> void:
-#     if not target_tile:
-#         attack_indicator.hide()
-#         return
-
-#     attack_indicator.visible = not GameState.glyph_blinking()
 
 
 func _handle_latch_points() -> void:
@@ -180,25 +166,16 @@ func can_attack(pos: Vector2i, radial := false) -> bool:
 
 
 func prepare_attack(attack: Attack) -> void:
-    # target_tile = tile
-    # attack_indicator.target_tile(tile)
-
     queued_attack = attack
-    attack_indicator.target_tile(attack.tile)
-    
-    # We compensate energy equivalent to 1 step to ensure that target is seen
-    #brain.energy -= STEP_COST
+    attack_indicator.prepare_attack(attack)
 
 
 func attack_target() -> void:
     assert(queued_attack)
-    
-    # Customized action by the enemy
-    # _attack_action()
+
     queued_attack.run()
 
     attack_indicator.deactivate()
-    # target_tile = null
     queued_attack = null
     target_entity = null
 
@@ -239,14 +216,23 @@ func _assign_view_positions():
 ## A command pattern object that handles the details of an attack.
 class Attack:
     var tile : Tile
+    var type: Type.Attack
+    var size: int
     var action : Callable
+    var angle: float
 
     func _init(
         _tile: Tile,
-        _action: Callable) -> void:
+        _type: Type.Attack,
+        _size: int,
+        _action: Callable,
+        _angle := 0.0) -> void:
         
         tile = _tile
+        type = _type
+        size = _size
         action = _action
+        angle = _angle
         
     func run() -> void:
         action.call()

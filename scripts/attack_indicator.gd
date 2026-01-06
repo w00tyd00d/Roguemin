@@ -27,6 +27,9 @@ var world : World :
         if Engine.is_editor_hint():
             update()
 
+## The [Enemy] entity this indicator is attached to.
+var entity : Enemy
+
 ## The cached positions of the currently targeted area.
 var targeted_positions : Array[Vector2i] = []
 
@@ -40,6 +43,7 @@ var active := false :
         else:
             process_mode = Node.PROCESS_MODE_DISABLED
             hide()
+
 
 func _ready() -> void:
     super()
@@ -59,13 +63,9 @@ func reset() -> void:
     clear_glyphs()
 
 
-func target_position(pos: Vector2i) -> void:
-    grid_position = pos
-    update()
-
-
-func target_tile(tile: Tile) -> void:
-    target_position(tile.grid_position)
+func prepare_attack(attack: Enemy.Attack) -> void:
+    grid_position = attack.tile.grid_position
+    update(attack)
     active = true
 
 
@@ -73,11 +73,18 @@ func deactivate() -> void:
     active = false
 
 
-func update() -> void:
+func update(attack: Enemy.Attack = null) -> void:
     reset()
+
+    if attack:
+        attack_type = attack.type
+        area_size = attack.size
+        attack_angle = attack.angle
+    
     match attack_type:
         Type.Attack.SQUARE: _set_area()
         Type.Attack.CIRCLE: _set_area(true)
+        Type.Attack.BODY: _set_body()
         Type.Attack.CONE: _set_cone()
 
 
@@ -118,6 +125,13 @@ func _set_area(circle := false) -> void:
             _set_attack_position(pos)
 
 
+func _set_body() -> void:
+    for pos in entity.get_used_cells():
+        if not _valid_tile(pos + grid_position):
+            continue
+        _set_attack_position(pos)
+
+
 func _set_cone() -> void:
     # FIND CLOSEST LATCH POINT TO TARGET
     # FOR NOW JUST GO FROM 0,0
@@ -125,7 +139,6 @@ func _set_cone() -> void:
     # GET VECTOR TOWARDS DIRECTION OF TARGET
     # ALSO FOR NOW, JUST TARGET RIGHT
 
-    
     _set_attack_position(Vector2())
     
     var debug_cb := func(ctx: DDARC.Context):

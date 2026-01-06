@@ -36,6 +36,7 @@ enum EnemyFov {
 enum Attack {
     SQUARE, ## The attack is a square around the target point.
     CIRCLE, ## The attack is a circle around the target point.
+    BODY, ## The attack uses the shape of the enemy as the area.
     CONE, ## The attack fires a cone centered on the target point.
     CUSTOM, ## The attack area is custom-drawn in the editor.
 }

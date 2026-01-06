@@ -8,7 +8,7 @@ top_level = true
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0)
 script = ExtResource("2_vx3bl")
 attack_type = 0
-attack_range = 0.0
+area_size = null
 attack_angle = 0.0
 
 [node name="BackgroundLayer" parent="." index="0"]

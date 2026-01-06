@@ -15,7 +15,7 @@ maximum_health = 1000
 
 [node name="AttackIndicator" parent="." index="0"]
 tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAQD/////AAAAAAAAAQAAAP//AAAAAAAAAQABAP//AAAAAAAAAQD//wAAAAAAAAAAAQABAAAAAAAAAAAAAQD//wEAAAAAAAAAAQAAAAEAAAAAAAAAAQABAAEAAAAAAAAAAQA=")
-attack_range = 1.0
+area_size = 1.0
 
 [node name="BackgroundLayer" parent="AttackIndicator" index="0"]
 tile_map_data = PackedByteArray("AAAAAAAAAgABAAAAAAD/////AgABAAAAAAAAAP//AgABAAAAAAABAP//AgABAAAAAAD//wAAAgABAAAAAAABAAAAAgABAAAAAAD//wEAAgABAAAAAAAAAAEAAgABAAAAAAABAAEAAgABAAAAAAA=")

@@ -8,6 +8,9 @@ tile_map_data = PackedByteArray("AAD/////AAACAAEAAQAAAAAAAAACAAEAAQD//wAAAAACAAE
 script = ExtResource("2_krgmn")
 fov_type = 1
 
+[node name="AttackIndicator" parent="." index="0"]
+area_size = null
+
 [node name="QuickInfo" parent="." index="1"]
 visible = false
 
