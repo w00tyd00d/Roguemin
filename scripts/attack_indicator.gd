@@ -6,16 +6,16 @@ var world : World :
     get: return GameState.world
 
 ## The attack shape of this indicator.
-@export var attack_type : Type.AttackArea :
+@export var attack_type : Type.Attack :
     set(type):
         attack_type = type
         if Engine.is_editor_hint():
             update()
 
 ## The distance of how big the attack area will be from the origin of the attack
-@export_range(0,20,1) var attack_range : float :
+@export_range(0,20,1) var area_size : float :
     set(n):
-        attack_range = n
+        area_size = n
         if Engine.is_editor_hint():
             update()
 
@@ -76,9 +76,9 @@ func deactivate() -> void:
 func update() -> void:
     reset()
     match attack_type:
-        Type.AttackArea.SQUARE: _set_area()
-        Type.AttackArea.CIRCLE: _set_area(true)
-        Type.AttackArea.CONE: _set_cone()
+        Type.Attack.SQUARE: _set_area()
+        Type.Attack.CIRCLE: _set_area(true)
+        Type.Attack.CONE: _set_cone()
 
 
 func _valid_tile(pos: Vector2i) -> bool:
@@ -101,7 +101,7 @@ func _set_attack_position(pos: Vector2i) -> void:
 
 
 func _set_area(circle := false) -> void:
-    var r := attack_range
+    var r := area_size
 
     for y in range(-r, r+1):
         for x in range(-r, r+1):
@@ -143,6 +143,6 @@ func _set_cone() -> void:
             start_pos,
             aim_vector.rotated(deg_to_rad(deg)),
             callback,
-            attack_range
+            area_size
         )
     

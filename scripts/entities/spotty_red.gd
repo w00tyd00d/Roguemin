@@ -24,3 +24,17 @@ func _ready() -> void:
 func move_towards(target: Tile) -> bool:
     turn_towards(target.grid_position)
     return super(target)
+
+
+func bite_attack(tile: Tile) -> Attack:
+    return Attack.new(tile, func():
+        var targets := Util.shuffled(attack_indicator.targeted_positions, GameState.RNG)
+        var attacks := maximum_target_count
+        
+        for pos: Vector2i in targets:
+            if world.get_tile(pos).attacked(attack_damage):
+                attacks -= 1
+            
+            if attacks == 0:
+                break
+    )

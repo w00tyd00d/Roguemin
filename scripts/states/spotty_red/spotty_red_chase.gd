@@ -37,13 +37,17 @@ func do_action(_ent: Entity) -> ActionResult:
     var tar := ent.target_entity
     
     # If target not in fov, rotate towards them.
-    if not ent.fov.can_see(tar):
+    if not ent.fov.can_see_entity(tar):
         ent.turn_towards(ent.target_entity.grid_position)
         return result(true, SpottyRed.ROTATE_SPEED)
 
     # If target within attack range, we attack.
     if ent.can_attack(tar.grid_position, true):
-        ent.prepare_attack(tar.current_tile)
+        var spotty_red := ent as SpottyRed
+        var attack := spotty_red.bite_attack(tar.current_tile)
+        
+        ent.prepare_attack(attack)
+
         return result(true).new_state(States.SpottyRed.ATTACK)
     
     return result(ent.move_towards(tar.current_tile))

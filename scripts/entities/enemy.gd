@@ -11,17 +11,22 @@ signal facing_changed
 ## The type of FOV encoding the enemy will use to assign their view positions
 @export var fov_type : Type.EnemyFov
 
-## The distance at which the enemy can see riding_units.
+## The distance at which the enemy can see targets.
 @export var sight_range : int
 
 ## The amount of distance the enemy is tethered to its spawn point.
 @export var wander_distance : int
 
-## The distance at which the enemy can attack riding_units.
+## The distance at which the enemy can attack targets.
 @export var attack_range : int
 
-## The amount of attack_damage the enemy will do to the player.
+## The amount of attack damage the enemy will do to the player.
 @export var attack_damage : int
+
+## The maximum number of targets the enemy can attack in a single attack.
+## If set to [code]0[/code], will target the entirety of the area.
+@export var maximum_target_count := 0 :
+    get: return 999 if maximum_target_count <= 0 else maximum_target_count
 
 ## The amount of max health the enemy.
 @export var maximum_health : int :
@@ -39,11 +44,15 @@ var current_health : int :
 var target_entity : Entity
 
 ## The current tile the enemy is about to attack.
-var target_tile : Tile :
-    set(tile):
-        target_tile = tile
-        if not tile: # failsafe
-            attack_indicator.hide()
+# var target_tile : Tile :
+#     set(tile):
+#         target_tile = tile
+#         if not tile: # failsafe
+#             attack_indicator.hide()
+
+## The queued attack command if the entity has prepared an attack.
+## See [method prepare_attack].
+var queued_attack : Attack
 
 ## The dictionary of units that are currently on top of the entity.
 var riding_units := {}
@@ -170,23 +179,27 @@ func can_attack(pos: Vector2i, radial := false) -> bool:
     return false
 
 
-func prepare_attack(tile: Tile) -> void:
-    target_tile = tile
-    attack_indicator.target_tile(tile)
+func prepare_attack(attack: Attack) -> void:
+    # target_tile = tile
+    # attack_indicator.target_tile(tile)
+
+    queued_attack = attack
+    attack_indicator.target_tile(attack.tile)
+    
     # We compensate energy equivalent to 1 step to ensure that target is seen
     #brain.energy -= STEP_COST
 
 
 func attack_target() -> void:
-    if not target_tile:
-        return
+    assert(queued_attack)
     
-    for pos in attack_indicator.targeted_positions:
-        var tile := world.get_tile(pos)
-        tile.attacked(attack_damage)
+    # Customized action by the enemy
+    # _attack_action()
+    queued_attack.run()
 
     attack_indicator.deactivate()
-    target_tile = null
+    # target_tile = null
+    queued_attack = null
     target_entity = null
 
 
@@ -221,3 +234,19 @@ func _assign_view_positions():
                 fov.add_view_position(dir, pos)
             
             set_glyph(pos, Glyph.LATCH_POINT)
+
+
+## A command pattern object that handles the details of an attack.
+class Attack:
+    var tile : Tile
+    var action : Callable
+
+    func _init(
+        _tile: Tile,
+        _action: Callable) -> void:
+        
+        tile = _tile
+        action = _action
+        
+    func run() -> void:
+        action.call()

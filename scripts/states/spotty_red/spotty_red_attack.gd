@@ -9,7 +9,7 @@ func enter(_ent: Entity) -> void:
     var ent := _enemy(_ent)
     
     # We should only ever enter this state when we already have a target tile.
-    assert(ent.target_tile)
+    assert(ent.queued_attack)
 
     super(_ent)
 

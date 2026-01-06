@@ -170,15 +170,21 @@ func whistled() -> void:
                 unit.join_squad()
 
 
-func attacked(dmg: int, type := Type.Element.PHYSICAL) -> void:
+func attacked(dmg: int, type := Type.Element.PHYSICAL) -> bool:
+    var did_damage := false
+    
     if has_player:
         player.take_damage(dmg, type)
+        did_damage = true
 
     ## ADD IN DIFFERENT INTERACTIONS BASED ON THE TYPE OF ATTACK
     ## eg: Units will run around on fire before they die from a fire attack
 
     for unit in get_all_units():
         unit.die()
+        did_damage = true
+    
+    return did_damage
 
 
 func get_flow_field_vector(exclude_water := false) -> Vector2i:
