@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://cq22puxfuec4w"]
+[gd_scene format=3 uid="uid://cq22puxfuec4w"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_dnwwi"]
 [ext_resource type="Script" uid="uid://bjhpd4np6ffbs" path="res://scripts/attack_indicator.gd" id="2_vx3bl"]

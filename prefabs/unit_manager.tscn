@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://77dxilf67abv"]
+[gd_scene format=3 uid="uid://77dxilf67abv"]
 
 [ext_resource type="Script" uid="uid://dhcf1aaqkb5wj" path="res://scripts/world/unit_manager.gd" id="1_aks25"]
 [ext_resource type="PackedScene" uid="uid://dtou5u2oxkeus" path="res://prefabs/entities/unit.tscn" id="1_scmr8"]
