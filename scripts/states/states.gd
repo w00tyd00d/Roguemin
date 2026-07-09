@@ -43,7 +43,6 @@ static var spotty_red_states := {
     States.SpottyRed.ATTACK: SpottyRedAttack.new(),
     States.SpottyRed.RETURN: SpottyRedReturn.new(),
 }
-
 enum SpottyRed {
     SLEEP,
     WAKE_UP,

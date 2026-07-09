@@ -277,8 +277,7 @@ func _is_angle_occluded(occluders: Array, angle: float) -> bool:
 func _octant_to_offset(axis: int, major: int, minor: int) -> Vector2i:
     if axis == _MajorAxis.Y_AXIS:
         return Vector2i(minor, major)
-    else:
-        return Vector2i(major, minor)
+    return Vector2i(major, minor)
 
 
 func _get_cell_type(position: Vector2) -> Type.Tile:

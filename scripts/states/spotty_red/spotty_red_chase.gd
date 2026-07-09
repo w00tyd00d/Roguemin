@@ -6,11 +6,8 @@ func _init():
 
 
 func enter(_ent: Entity) -> void:
-    var ent := _enemy(_ent)
-    
     # We should only be entering this state if we already have a target.
-    assert(ent.target_entity)
-    
+    assert(_enemy(_ent).target_entity)
     super(_ent)
 
 

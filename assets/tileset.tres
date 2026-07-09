@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=9 format=3 uid="uid://bbcj0verus68b"]
+[gd_resource type="TileSet" format=3 uid="uid://bbcj0verus68b"]
 
 [ext_resource type="Texture2D" uid="uid://kkcnof5gyi1j" path="res://assets/images/pixelchunk.png" id="1_wsjmh"]
 [ext_resource type="Texture2D" uid="uid://d3waoploxdxnv" path="res://assets/images/whistle.png" id="2_r0geu"]
