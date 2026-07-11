@@ -150,9 +150,9 @@ func take_damage(dmg: int, type: Type.Element) -> void:
 
 func _draw_tether() -> void:
 	for pos in test_layer.get_used_cells():
-		test_layer.set_background(pos, Glyph.NONE)
-		test_layer.set_glyph(pos, Glyph.NONE)
+		test_layer.set_background(pos, Glyphs.NONE)
+		test_layer.set_glyph(pos, Glyphs.NONE)
 
 	var tail := unit_tether.tail
-	test_layer.set_background(tail.grid_position, Glyph.BLACK)
-	test_layer.set_glyph(tail.grid_position, Glyph.TEST)
+	test_layer.set_background(tail.grid_position, Glyphs.BLACK)
+	test_layer.set_glyph(tail.grid_position, Glyphs.TEST)

@@ -321,8 +321,8 @@ func _construct_room(world: World, chunk_pos: Vector2i, blueprint: RoomBlueprint
         var glyph : Glyph = blueprint.tile_data[dpos]
         var tile_pos := world.get_chunk(chunk_pos).start + dpos
 
-        if glyph.matches(Glyph.GRASS):
-            var choices := [Glyph.GRASS, Glyph.SHRUB]
+        if glyph.matches(Glyphs.GRASS):
+            var choices := [Glyphs.GRASS, Glyphs.SHRUB]
             var weights := PackedFloat32Array([1, .01])
             var idx := RNG.rand_weighted(weights)
 
@@ -409,7 +409,7 @@ func _draw_path(
             for pos in vecs:
                 if world.get_tile(pos).type != Type.Tile.VOID:
                     continue
-                world.set_glyph(pos, Glyph.WALL)
+                world.set_glyph(pos, Glyphs.WALL)
                 world.set_tile_type(pos, Type.Tile.WALL)
                 world.astar.set_point_solid(pos, true)
                 world.mrpas.set_transparent(pos, Type.Tile.WALL)
@@ -419,12 +419,12 @@ func _draw_path(
             var center := path[i-2] + half
             var vecs := Util.get_square_around_pos(center, 15, true)
             for pos in vecs:
-                # if (world.get_glyph(pos).matches(Glyph.WALL) or
-                #     world.get_glyph(pos).matches(Glyph.NONE)):
+                # if (world.get_glyph(pos).matches(Glyphs.WALL) or
+                #     world.get_glyph(pos).matches(Glyphs.NONE)):
                 if world.get_tile(pos).type == Type.Tile.GRASS:
                     continue
 
-                var choices := [Glyph.GRASS, Glyph.SHRUB]
+                var choices := [Glyphs.GRASS, Glyphs.SHRUB]
                 var weights := PackedFloat32Array([1, .01])
                 var idx := RNG.rand_weighted(weights)
                 world.set_glyph(pos, choices[idx])

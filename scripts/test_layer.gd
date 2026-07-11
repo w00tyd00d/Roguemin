@@ -7,9 +7,9 @@ extends DualMapLayer
 
 func _draw_points(arr: Array[Vector2i]) -> void:
     for pos in get_used_cells():
-        set_background(pos, Glyph.NONE)
-        set_glyph(pos, Glyph.NONE)
+        set_background(pos, Glyphs.NONE)
+        set_glyph(pos, Glyphs.NONE)
 
     for pos in arr:
-        set_background(pos, Glyph.BLACK)
-        set_glyph(pos, Glyph.TEST)
+        set_background(pos, Glyphs.BLACK)
+        set_glyph(pos, Glyphs.TEST)

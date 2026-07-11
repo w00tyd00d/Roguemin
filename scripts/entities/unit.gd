@@ -107,7 +107,7 @@ func reset() -> void:
 	hide()
 
 	modulate.a = 1
-	set_background(Vector2(), Glyph.BLACK)
+	set_background(Vector2(), Glyphs.BLACK)
 
 	if not brain.state_is(States.Unit.DEAD):  #and world:
 		brain.change_state(States.Unit.DEAD)
@@ -140,8 +140,8 @@ func upgrade() -> void:
 func die() -> void:
 	brain.change_state(States.Unit.DEAD)
 
-	set_glyph(Vector2(), Glyph.UNIT_GHOST_LARGE)
-	set_background(Vector2(), Glyph.NONE)
+	set_glyph(Vector2(), Glyphs.UNIT_GHOST_LARGE)
+	set_background(Vector2(), Glyphs.NONE)
 	z_index += 1
 
 	var end_pos := position + Vector2(Direction.north.vector * Globals.TILE_SIZE * 2)
@@ -443,30 +443,30 @@ func _update_glyph(_idle := false) -> void:
 		Type.Unit.RED:
 			if upgraded:
 				if _idle:
-					set_glyph(Vector2(), Glyph.UNIT_RED_LARGE_IDLE)
+					set_glyph(Vector2(), Glyphs.UNIT_RED_LARGE_IDLE)
 				else:
-					set_glyph(Vector2(), Glyph.UNIT_RED_LARGE)
+					set_glyph(Vector2(), Glyphs.UNIT_RED_LARGE)
 			elif _idle:
-				set_glyph(Vector2(), Glyph.UNIT_RED_SMALL_IDLE)
+				set_glyph(Vector2(), Glyphs.UNIT_RED_SMALL_IDLE)
 			else:
-				set_glyph(Vector2(), Glyph.UNIT_RED_SMALL)
+				set_glyph(Vector2(), Glyphs.UNIT_RED_SMALL)
 		Type.Unit.YELLOW:
 			if upgraded:
 				if _idle:
-					set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE_IDLE)
+					set_glyph(Vector2(), Glyphs.UNIT_YELLOW_LARGE_IDLE)
 				else:
-					set_glyph(Vector2(), Glyph.UNIT_YELLOW_LARGE)
+					set_glyph(Vector2(), Glyphs.UNIT_YELLOW_LARGE)
 			elif _idle:
-				set_glyph(Vector2(), Glyph.UNIT_YELLOW_SMALL_IDLE)
+				set_glyph(Vector2(), Glyphs.UNIT_YELLOW_SMALL_IDLE)
 			else:
-				set_glyph(Vector2(), Glyph.UNIT_YELLOW_SMALL)
+				set_glyph(Vector2(), Glyphs.UNIT_YELLOW_SMALL)
 		Type.Unit.BLUE:
 			if upgraded:
 				if _idle:
-					set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE_IDLE)
+					set_glyph(Vector2(), Glyphs.UNIT_BLUE_LARGE_IDLE)
 				else:
-					set_glyph(Vector2(), Glyph.UNIT_BLUE_LARGE)
+					set_glyph(Vector2(), Glyphs.UNIT_BLUE_LARGE)
 			elif _idle:
-				set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL_IDLE)
+				set_glyph(Vector2(), Glyphs.UNIT_BLUE_SMALL_IDLE)
 			else:
-				set_glyph(Vector2(), Glyph.UNIT_BLUE_SMALL)
+				set_glyph(Vector2(), Glyphs.UNIT_BLUE_SMALL)

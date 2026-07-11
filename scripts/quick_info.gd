@@ -48,8 +48,8 @@ func _update_health():
     
     health_lbl.text = health
 
-    set_glyph(health_bg, Vector2i(0,0), Glyph.NONE if perc < 100 else Glyph.BLACK)
-    set_glyph(health_bg, Vector2i(3,0), Glyph.NONE if perc < 10 else Glyph.BLACK)
+    set_glyph(health_bg, Vector2i(0,0), Glyphs.NONE if perc < 100 else Glyphs.BLACK)
+    set_glyph(health_bg, Vector2i(3,0), Glyphs.NONE if perc < 10 else Glyphs.BLACK)
 
 
 func _update_direction():
@@ -67,4 +67,4 @@ func _update_direction():
 
     direction_lbl.text = "{0}".format([dir])
 
-    set_glyph(direction_bg, Vector2i(0,0), Glyph.BLACK if enemy.facing.is_diagonal else Glyph.NONE)
+    set_glyph(direction_bg, Vector2i(0,0), Glyphs.BLACK if enemy.facing.is_diagonal else Glyphs.NONE)

@@ -210,7 +210,7 @@ func _assign_view_positions():
             for dir: Direction in dirs:
                 fov.add_view_position(dir, pos)
             
-            set_glyph(pos, Glyph.LATCH_POINT)
+            set_glyph(pos, Glyphs.LATCH_POINT)
 
 
 ## A command pattern object that handles the details of an attack.

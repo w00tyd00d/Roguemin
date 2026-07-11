@@ -39,9 +39,9 @@ func _check_for_entity_collision(world: World, ent: MultiTileEntity, pos: Vector
         var tile := world.get_tile(dpos)
         if not tile: return true
         var glyph := world.get_glyph(dpos)
-        if (not glyph.matches(Glyph.NONE) and
-            not glyph.matches(Glyph.GRASS) and
-            not glyph.matches(Glyph.SHRUB)):
+        if (not glyph.matches(Glyphs.NONE) and
+            not glyph.matches(Glyphs.GRASS) and
+            not glyph.matches(Glyphs.SHRUB)):
                 return true
         if tile._entities.size() > 1:
             return true

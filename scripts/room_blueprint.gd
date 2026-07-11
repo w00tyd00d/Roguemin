@@ -130,7 +130,7 @@ func _scan() -> void:
         var ctx_id := _get_context_id(glyph)
         if ctx_id > -1:
             context_positions.get_or_add(ctx_id, []).append(vec)
-            tile_data[vec] = Glyph.GRASS
+            tile_data[vec] = Glyphs.GRASS
         else:
             tile_data[vec] = glyph
 

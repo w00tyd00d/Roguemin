@@ -229,14 +229,14 @@ func _scan() -> void:
 
 
 func _handle_latch_points() -> void:
-    var glyph := Glyph.LATCH_POINT # Glyph: %
+    var glyph := Glyphs.LATCH_POINT # Glyph: %
     var latch_points := get_used_cells_by_id(0, glyph.atlas_pos)
     
     latch_point_count = latch_points.size()
 
     for pos in latch_points:
         latch_positions[pos] = true
-        set_glyph(pos, Glyph.NONE)
+        set_glyph(pos, Glyphs.NONE)
 
 
 func _walkable_position(pos: Vector2i) -> bool:

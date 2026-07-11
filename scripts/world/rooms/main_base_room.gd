@@ -8,7 +8,7 @@ func run_context_procedures(world: World, start: Vector2i) -> void:
 
     for pos: Vector2i in context_positions[1]:
         var dpos := start + pos
-        world.set_glyph(dpos, Glyph.UNIT_SUMMON_TARGET)
+        world.set_glyph(dpos, Glyphs.UNIT_SUMMON_TARGET)
         world.unit_summon_targets.append(dpos)
 
     for pos in context_positions[2]:
@@ -30,4 +30,4 @@ func run_context_procedures(world: World, start: Vector2i) -> void:
     world.set_glyph(flag_pos, Glyph.new(0, Vector2(19,3)))
     for pos in Util.get_square_around_pos(flag_pos, 15, true):
         if pos == flag_pos: continue
-        world.set_glyph(pos, Glyph.GRASS)
+        world.set_glyph(pos, Glyphs.GRASS)

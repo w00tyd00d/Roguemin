@@ -102,8 +102,8 @@ func _valid_tile(pos: Vector2i) -> bool:
 
 
 func _set_attack_position(pos: Vector2i) -> void:
-    set_glyph(pos, Glyph.ATTACK_FG)
-    set_background(pos, Glyph.ATTACK_BG)
+    set_glyph(pos, Glyphs.ATTACK_FG)
+    set_background(pos, Glyphs.ATTACK_BG)
     targeted_positions.append(pos + grid_position)
 
 

@@ -12,7 +12,7 @@ var grid_position : Vector2i : set = _set_grid_position
 
 
 static func create() -> DualMapLayer:
-	return preload("res://prefabs/dual_map_layer.tscn").instantiate()
+	return preload("uid://be46f0movhp5e").instantiate()
 
 
 func _init() -> void:

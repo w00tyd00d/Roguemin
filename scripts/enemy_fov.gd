@@ -15,28 +15,28 @@ const _OCTANTS : Dictionary[StringName, Array] = {
 }
 
 var DEFAULT_GLYPH_KEY : Dictionary[Glyph, Array] = {
-    Glyph.NORTH: [Direction.north],
-    Glyph.SOUTH: [Direction.south],
-    Glyph.WEST: [Direction.west],
-    Glyph.EAST: [Direction.east],
+    Glyphs.NORTH: [Direction.north],
+    Glyphs.SOUTH: [Direction.south],
+    Glyphs.WEST: [Direction.west],
+    Glyphs.EAST: [Direction.east],
     
     # Clockwise order
-    Glyph.ZERO: [Direction.northwest],
-    Glyph.ONE: [Direction.northeast],
-    Glyph.TWO: [Direction.southeast],
-    Glyph.THREE: [Direction.southwest],
+    Glyphs.ZERO: [Direction.northwest],
+    Glyphs.ONE: [Direction.northeast],
+    Glyphs.TWO: [Direction.southeast],
+    Glyphs.THREE: [Direction.southwest],
 }
 
 var COMPACT_GLYPH_KEY : Dictionary[Glyph, Array] = {
     # Clockwise order
-    Glyph.ZERO: [Direction.northwest, Direction.north],
-    Glyph.ONE: [Direction.north, Direction.northeast],
-    Glyph.TWO: [Direction.northeast, Direction.east],
-    Glyph.THREE: [Direction.east, Direction.southeast],
-    Glyph.FOUR: [Direction.southeast, Direction.south],
-    Glyph.FIVE: [Direction.south, Direction.southwest],
-    Glyph.SIX: [Direction.southwest, Direction.west],
-    Glyph.SEVEN: [Direction.west, Direction.northwest],
+    Glyphs.ZERO: [Direction.northwest, Direction.north],
+    Glyphs.ONE: [Direction.north, Direction.northeast],
+    Glyphs.TWO: [Direction.northeast, Direction.east],
+    Glyphs.THREE: [Direction.east, Direction.southeast],
+    Glyphs.FOUR: [Direction.southeast, Direction.south],
+    Glyphs.FIVE: [Direction.south, Direction.southwest],
+    Glyphs.SIX: [Direction.southwest, Direction.west],
+    Glyphs.SEVEN: [Direction.west, Direction.northwest],
 }
 
 var _fovs : Dictionary[Direction, Array] = {
