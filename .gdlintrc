@@ -6,3 +6,4 @@ disable:
   - enum-name
   - function-variable-name
   - max-returns
+  - max-public-methods
