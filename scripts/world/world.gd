@@ -365,6 +365,7 @@ func add_to_salvage_path(start: Vector2i, end: Vector2i) -> void:
 
 func _create_tiles() -> Array[Array]:
 	var res : Array[Array] = []
+	
 	for y in size.y * Globals.CHUNK_SIZE.y:
 		var row := []
 		for x in size.x * Globals.CHUNK_SIZE.x:
@@ -376,6 +377,7 @@ func _create_tiles() -> Array[Array]:
 
 func _create_chunks() -> Array[Array]:
 	var res : Array[Array] = []
+	
 	for y in size.y:
 		var row := []
 		for x in size.x:
