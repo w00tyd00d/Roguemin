@@ -150,7 +150,9 @@ static func get_all(shuffled := false) -> Array[Direction]:
         southeast,
     ]
 
-    if shuffled: res.shuffle()
+    if shuffled:
+        return Util.shuffled(res, GameState.RNG)
+
     return res
 
 
@@ -162,7 +164,9 @@ static func get_cardinal(shuffled := false) -> Array[Direction]:
         east
     ]
 
-    if shuffled: res.shuffle()
+    if shuffled:
+        return Util.shuffled(res, GameState.RNG)
+        
     return res
 
 
