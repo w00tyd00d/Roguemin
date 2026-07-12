@@ -336,7 +336,8 @@ func _check_move(options: Array[Direction]) -> bool:
 				if brain.state_is(States.Unit.RETURN) and Tag.has(next_tile, Tags.UNIT_SHIP):
 					reset()
 					return true  # We reset, so no action cost needed
-				elif current_tile.type == Type.Tile.VOID:
+				
+				if current_tile.type == Type.Tile.VOID:
 					return _do_move_action(next_tile)
 
 			Type.Tile.ENTITY:
