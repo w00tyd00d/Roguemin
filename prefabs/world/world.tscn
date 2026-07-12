@@ -11,11 +11,11 @@
 z_index = -1
 script = ExtResource("2_ejma5")
 
-[node name="Chunks" type="Node" parent="." index="1" unique_id=239598093]
+[node name="Chunks" type="Node2D" parent="." index="1" unique_id=1274209024]
 
-[node name="Treasures" type="Node" parent="." index="2" unique_id=1447078978]
+[node name="Treasures" type="Node2D" parent="." index="2" unique_id=2068363417]
 
-[node name="Enemies" type="Node" parent="." index="3" unique_id=1096174514]
+[node name="Enemies" type="Node2D" parent="." index="3" unique_id=431106709]
 
 [node name="TEST" parent="." index="4" unique_id=260987032 instance=ExtResource("1_ejma5")]
 z_index = 3
