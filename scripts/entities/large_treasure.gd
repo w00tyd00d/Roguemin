@@ -2,7 +2,7 @@ class_name LargeTreasure extends Treasure
 
 
 static func create() -> LargeTreasure:
-    return preload("res://prefabs/entities/large_treasure.tscn").instantiate()
+    return preload("uid://bg13ui55262v").instantiate()
 
 
 func _ready() -> void:

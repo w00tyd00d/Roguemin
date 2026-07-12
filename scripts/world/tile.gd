@@ -170,11 +170,11 @@ func whistled() -> void:
                 unit.join_squad()
 
 
-func attacked(dmg: int, type := Type.Element.PHYSICAL) -> bool:
+func attacked(dmg: int, _type := Type.Element.PHYSICAL) -> bool:
     var did_damage := false
     
     if has_player:
-        player.take_damage(dmg, type)
+        player.take_damage(dmg, _type)
         did_damage = true
 
     ## ADD IN DIFFERENT INTERACTIONS BASED ON THE TYPE OF ATTACK
