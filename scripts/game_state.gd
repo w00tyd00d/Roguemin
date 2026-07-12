@@ -14,6 +14,8 @@ signal toggle_hud(val: bool)
 
 signal world_time_changed(time: int)
 
+signal display_quick_info(val: bool)
+
 signal display_unit_toggle(val: bool)
 signal update_unit_toggle(dict: Dictionary)
 
@@ -42,6 +44,9 @@ var world : World
 ## Global reference to the player object
 var player : Player
 
+## Global reference to the unit manager object
+var unit_manager : UnitManager
+
 
 ## The current money value the player has accumulated
 var money := 0 :
@@ -58,6 +63,7 @@ func is_valid_object(obj) -> bool:
 
 ## Returns if a blinking glyph is currently invisible or not.
 func glyph_blinking() -> bool:
-    var msecs := Time.get_ticks_msec() % 1000
-    return msecs > Globals.GLYPH_BLINK_THRESHOLD
+    const GLYPH_BLINK_THRESHOLD := 500
+    var msecs := Time.get_ticks_msec() % 850
+    return msecs > GLYPH_BLINK_THRESHOLD
 

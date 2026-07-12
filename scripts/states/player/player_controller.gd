@@ -38,13 +38,27 @@ func change_state(state_name: String) -> void:
 func input_handler(dt: float) -> void:
     # DEBUG
 
-    # \
+    # Key: \
     if Input.is_action_just_pressed(&"d_renew"):
         GameState.new_game.emit()
         return
 
     ###
 
+    _check_for_quick_info()
+    _check_for_action_inputs(dt)
+    _check_for_directional_inputs()
+
+
+func _check_for_quick_info() -> void:
+    if Input.is_action_just_pressed(&"k_control"):
+        GameState.display_quick_info.emit(true)
+    
+    if Input.is_action_just_released(&"k_control"):
+        GameState.display_quick_info.emit(false)
+
+
+func _check_for_action_inputs(dt: float) -> void:
     for inp in Globals.ACTION_INPUTS:
         if Input.is_action_just_pressed(inp):
             _update_state(inp)
@@ -59,11 +73,12 @@ func input_handler(dt: float) -> void:
         direction_held = ""
         time_held = 0
 
+
+func _check_for_directional_inputs() -> void:
     for inp in Globals.DIRECTIONAL_INPUTS:
         if Input.is_action_just_pressed(inp):
             direction_held = inp
             _update_state(inp)
-
 
 
 func _update_state(inp: StringName) -> void:

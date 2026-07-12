@@ -10,10 +10,14 @@ const OFF_PATH_PENALTY := 10000
 
 const WALL_STEP_LIMIT := 7
 
+var debug_mode: bool
+
 var _wall_tiles : Dictionary[Tile, int] = {}
 
 
-func run(world: World) -> void:
+func run(world: World, debug: bool) -> void:
+    debug_mode = debug
+    
     _wall_tiles = {}
     await generate_salvage_paths(world)
 

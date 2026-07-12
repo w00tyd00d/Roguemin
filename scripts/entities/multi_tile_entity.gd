@@ -6,7 +6,7 @@ class_name MultiTileEntity extends Entity
 var type : Type.Entity
 
 ## The exact center point of the entity.
-var center : Vector2
+# var center : Vector2
 
 ## The length from the center tile of the entity.
 var radius : int
@@ -38,17 +38,12 @@ var latch_point_count : int
 ## A cached value of how many carriers the entity has.
 var carrier_count := 0
 
-# ## A percentage value of energy built up from being carried. A value of
-# ## [code]1.0[/code] allows the entity to act (move).
-# var carry_energy := 0.0
-
 ## The location of where the last unit attached was thrown from to provide a
 ## carry location if located in the void
 var default_carry_location : Tile
 
 ## The flag representing if the entity's bounding radius is even.
-var _is_even : bool :
-    get: return center == Vector2()
+var _is_even : bool
 
 
 func _init() -> void:
@@ -57,6 +52,7 @@ func _init() -> void:
 
 func _ready() -> void:
     add_to_group(&"entities")
+    super()
 
 
 func delete() -> void:
@@ -66,31 +62,45 @@ func delete() -> void:
 
     for unit: Unit in carriers.keys():
         unit.drop_object()
+        
         if unit._in_range_of_tether():
-        # var dist := Util.chebyshev_distance(unit.grid_position, player.grid_position)
-        # if dist <= Globals.UNIT_SIGHT_RANGE:
             unit.join_squad()
         else:
             unit.dismiss()
 
-    # Don't have time to set up an entity recycler, so just delete
     queue_free()
 
 
-func move_towards(target: Tile) -> bool:
-    var dir := Direction.by_delta(grid_position, target.grid_position)
-    var dest := world.get_tile(grid_position + dir.vector)
+func distance_to(pos: Vector2i, radial := false) -> float:
+    var cpos := center_from_pos(pos)
 
-    if _walkable_tile(dest):
+    if radial:
+        return maxf(0, cpos.distance_to(pos) - radius)
+
+    return maxf(0, Util.chebyshev(cpos, pos) - radius)
+
+
+func move_towards(target: Tile) -> bool:
+    var cpos := center_from_pos(target.grid_position)
+    var dir := Direction.by_delta(cpos, target.grid_position)
+    
+    # We have to keep dest relative to grid_position, not the virtual center
+    var dest := world.get_tile(grid_position + dir.vector)
+    
+    # We keep track of the virtual destination via the center offset
+    var delta := cpos - grid_position
+
+    if _walkable_position(dest.grid_position + delta):
         move_to(dest)
         return true
 
     for adj in dir.adjacent:
-        if grid_position + adj.vector == last_position: continue
+        if grid_position + adj.vector == last_position:
+            continue
 
         dest = world.get_tile(grid_position + adj.vector)
 
-        if _walkable_tile(dest):
+        if _walkable_position(dest.grid_position + delta):
             move_to(dest)
             return true
 
@@ -98,20 +108,25 @@ func move_towards(target: Tile) -> bool:
 
 
 func get_area_tiles(from := grid_position) -> Array[Vector2i]:
+    var size := area_positions.size()
     var res : Array[Vector2i] = []
-    for pos in area_positions:
-        res.append(from + pos)
+    
+    res.resize(size)
+    
+    for i in size:
+        res[i] = area_positions[i] + from
+    
     return res
 
+    
+# func within_radius(pos: Vector2i) -> bool:
+#     var dir := Direction.by_delta(grid_position, pos)
+#     var offset := Vector2i()
+#     if _is_even:
+#         offset.x = -1 if dir.x < 0 else 0
+#         offset.y = -1 if dir.y < 0 else 0
 
-func within_radius(pos: Vector2i) -> bool:
-    var dir := Direction.by_delta(grid_position, pos)
-    var offset := Vector2i()
-    if _is_even:
-        offset.x = -1 if dir.x < 0 else 0
-        offset.y = -1 if dir.y < 0 else 0
-
-    return pos.distance_to(grid_position + offset) < radius
+#     return pos.distance_to(grid_position + offset) < radius
 
 
 func add_carrier(unit: Unit) -> bool:
@@ -173,46 +188,64 @@ func get_hauled() -> void:
         move_to(get_next_flow_field_tile())
         _check_for_collection()
 
-    brain.energy -= Globals.DEFAULT_ENERGY_STEP
-
 
 func get_next_flow_field_tile() -> Tile:
     var dest := grid_position + current_tile.get_flow_field_vector()
     return world.get_tile(dest)
 
 
-# func _get_can_act() -> bool:
-#     return action_energy >= Globals.DEFAULT_ENERGY_STEP
+func center_from_pos(dest: Vector2i) -> Vector2i:
+    if not _is_even:
+        return grid_position
+
+    # Adjust position of grid_position based on direction
+    # of given position if the entity has an even diameter
+    var cpos := grid_position
+
+    if dest.x < grid_position.x: cpos.x -= 1
+    if dest.y < grid_position.y: cpos.y -= 1
+
+    return cpos
+
+
+func center_from_direction(dir: Direction) -> Vector2i:
+    if not _is_even:
+        return grid_position
+    
+    return center_from_pos(grid_position + dir.vector)
+    
 
 
 func _scan() -> void:
     # FOR NOW, WE ASSUME ALL RECTS ARE SQUARES
     var size := get_used_rect().size
-    radius = ceili(size.x / 2.0)
 
-    var cx := 0.0 if size.x % 2 == 0 else 0.5
-    var cy := 0.0 if size.y % 2 == 0 else 0.5
-    center = Vector2(cx, cy)
+    radius = ceili(size.x / 2.0) - 2
+    _is_even = size.x % 2 == 0
 
-    var latch_points := get_used_cells_by_id(0, Vector2(4,0))
+    _handle_latch_points()
+    
+    area_positions = get_used_cells()
+
+
+func _handle_latch_points() -> void:
+    var glyph := Glyphs.LATCH_POINT # Glyph: %
+    var latch_points := get_used_cells_by_id(0, glyph.atlas_pos)
+    
     latch_point_count = latch_points.size()
 
     for pos in latch_points:
         latch_positions[pos] = true
-        set_glyph(pos, Glyph.NONE)
-
-    area_positions = get_used_cells()
+        set_glyph(pos, Glyphs.NONE)
 
 
-func _walkable_tile(tile: Tile) -> bool:
+func _walkable_position(pos: Vector2i) -> bool:
+    var tile := world.get_tile(pos)
     var dist := tile.distance_from_wall
-    if _is_even:
-        var diff := tile.grid_position - grid_position
-        dist -= 1 if diff.x < 0 or diff.y < 0 else 0
-    return tile.type == Type.Tile.GRASS and dist >= radius
+    return tile.type == Type.Tile.GRASS and dist > radius + 1
 
 
 func _check_for_collection() -> void:
-    var dist := Util.chebyshev_distance(grid_position, world.salvage_return_position)
+    var dist := Util.chebyshev(grid_position, world.salvage_return_position)
     if dist < ceili(radius / 2.0):
         collect()

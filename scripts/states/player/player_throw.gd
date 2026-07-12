@@ -1,6 +1,5 @@
 class_name PlayerThrow extends PlayerState
 
-
 var grid_position : Vector2i :
     set(vec):
         grid_position = vec
@@ -8,6 +7,10 @@ var grid_position : Vector2i :
 
         var tile := world.get_tile(grid_position)
         GameState.update_info_box.emit(tile.get_first_entity())
+
+var _action_cost : int :
+    # ALLOW TO BE MODIFIED BY RUSH BOOTS ITEM!
+    get: return Globals.DEFAULT_TURN_COST / 4
 
 
 func enter() -> void:
@@ -61,7 +64,7 @@ func update(inp: StringName) -> Array:
                 if player.selected_unit == Type.Unit.NONE:
                     state_changed.emit("walk")
 
-                return [true, 1]
+                return [true, _action_cost]
 
 
     var dir := Direction.by_pattern(inp)

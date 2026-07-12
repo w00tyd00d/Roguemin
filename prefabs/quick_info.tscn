@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://cebmwelg60lhe"]
+
+[ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="1_o23lc"]
+[ext_resource type="Script" uid="uid://drutd0u5j17oj" path="res://scripts/quick_info.gd" id="1_y06y4"]
+
+[node name="QuickInfo" type="Control"]
+top_level = true
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_y06y4")
+
+[node name="Health" type="Label" parent="."]
+modulate = Color(0.215686, 0.862745, 0.192157, 1)
+custom_minimum_size = Vector2(32, 8)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -16.0
+offset_top = -8.0
+offset_right = 16.0
+theme_override_constants/line_spacing = 1
+theme_override_font_sizes/font_size = 8
+text = "100%"
+horizontal_alignment = 2
+
+[node name="BackgroundLayer" type="TileMapLayer" parent="Health"]
+show_behind_parent = true
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0)
+tile_set = ExtResource("1_o23lc")
+
+[node name="Direction" type="Label" parent="."]
+modulate = Color(0, 1, 1, 1)
+custom_minimum_size = Vector2(16, 8)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+theme_override_constants/line_spacing = 1
+theme_override_font_sizes/font_size = 8
+text = "NW"
+horizontal_alignment = 2
+
+[node name="BackgroundLayer" type="TileMapLayer" parent="Direction"]
+show_behind_parent = true
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0)
+tile_set = ExtResource("1_o23lc")

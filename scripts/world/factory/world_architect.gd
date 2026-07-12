@@ -10,12 +10,16 @@ var RNG := GameState.RNG
 # The astar grid to navigate the chunks
 var astar : AStarChunks
 
+var debug_mode: bool
+
 # Marked chunks to spawn walkers at when ready to make paths (outside of room)
 # The bool represents if the walker is connected to the main path or not
 var _marked_exit_chunks : Dictionary[Chunk, bool] = {}
 
 
-func run(world: World) -> void:
+func run(world: World, debug: bool) -> void:
+    debug_mode = debug
+    
     generate_infrastructure(world)
     generate_rooms(world)
     generate_exits(world)
@@ -179,8 +183,18 @@ func generate_paths(world: World) -> void:
 
 func _place_home_base(world: World) -> void:
     # Establish the home base room location and four initial exits
-    var base_x := RNG.randi_range(2, world.size.x-5)
-    var base_y := RNG.randi_range(2, world.size.y-4)
+    var base_x: int
+    var base_y: int
+
+    if debug_mode:
+        @warning_ignore("integer_division")
+        base_x = Globals.WORLD_SIZE.x / 2 - 1
+        @warning_ignore("integer_division")
+        base_y = Globals.WORLD_SIZE.y / 2
+    else:
+        base_x = RNG.randi_range(2, world.size.x-5)
+        base_y = RNG.randi_range(2, world.size.y-4)
+
 
     _place_room(world, Vector2i(base_x, base_y), Rooms.HOME_BASE)
     var base_room := world.rooms[0]
@@ -204,6 +218,11 @@ func _place_home_base(world: World) -> void:
 
 
 func _place_world_rooms(world: World) -> void:
+    if debug_mode:
+        # Place combat room
+        _place_room(world, Vector2i(5,2), Rooms.ROOM_3X4)
+        return
+    
     var room_total := RNG.randi_range(5,6)
     var room_count := 1 # Home base is already created
     var loops := 0
@@ -302,8 +321,8 @@ func _construct_room(world: World, chunk_pos: Vector2i, blueprint: RoomBlueprint
         var glyph : Glyph = blueprint.tile_data[dpos]
         var tile_pos := world.get_chunk(chunk_pos).start + dpos
 
-        if glyph.matches(Glyph.GRASS):
-            var choices := [Glyph.GRASS, Glyph.SHRUB]
+        if glyph.matches(Glyphs.GRASS):
+            var choices := [Glyphs.GRASS, Glyphs.SHRUB]
             var weights := PackedFloat32Array([1, .01])
             var idx := RNG.rand_weighted(weights)
 
@@ -390,7 +409,7 @@ func _draw_path(
             for pos in vecs:
                 if world.get_tile(pos).type != Type.Tile.VOID:
                     continue
-                world.set_glyph(pos, Glyph.WALL)
+                world.set_glyph(pos, Glyphs.WALL)
                 world.set_tile_type(pos, Type.Tile.WALL)
                 world.astar.set_point_solid(pos, true)
                 world.mrpas.set_transparent(pos, Type.Tile.WALL)
@@ -400,12 +419,12 @@ func _draw_path(
             var center := path[i-2] + half
             var vecs := Util.get_square_around_pos(center, 15, true)
             for pos in vecs:
-                # if (world.get_glyph(pos).matches(Glyph.WALL) or
-                #     world.get_glyph(pos).matches(Glyph.NONE)):
+                # if (world.get_glyph(pos).matches(Glyphs.WALL) or
+                #     world.get_glyph(pos).matches(Glyphs.NONE)):
                 if world.get_tile(pos).type == Type.Tile.GRASS:
                     continue
 
-                var choices := [Glyph.GRASS, Glyph.SHRUB]
+                var choices := [Glyphs.GRASS, Glyphs.SHRUB]
                 var weights := PackedFloat32Array([1, .01])
                 var idx := RNG.rand_weighted(weights)
                 world.set_glyph(pos, choices[idx])

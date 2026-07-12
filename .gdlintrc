@@ -1,0 +1,9 @@
+disable:
+  - max-line-length
+  - class-definitions-order
+  - trailing-whitespace
+  - class-variable-name
+  - enum-name
+  - function-variable-name
+  - max-returns
+  - max-public-methods

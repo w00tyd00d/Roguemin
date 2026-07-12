@@ -1,19 +1,25 @@
-[gd_scene load_steps=3 format=3 uid="uid://bge48j21udel3"]
+[gd_scene load_steps=5 format=3 uid="uid://bge48j21udel3"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_3srh3"]
 [ext_resource type="Script" uid="uid://dxoxtpt6pls20" path="res://scripts/entities/enemy.gd" id="2_iir01"]
+[ext_resource type="PackedScene" uid="uid://cq22puxfuec4w" path="res://prefabs/attack_indicator.tscn" id="3_iir01"]
+[ext_resource type="PackedScene" uid="uid://cebmwelg60lhe" path="res://prefabs/quick_info.tscn" id="4_wpb4g"]
 
 [node name="Enemy" instance=ExtResource("1_3srh3")]
 script = ExtResource("2_iir01")
+fov_type = 0
 sight_range = 0
 wander_distance = 0
 attack_range = 0
 attack_damage = 0
+maximum_target_count = 0
 maximum_health = 0
-current_health = 0
 
-[node name="AttackIndicator" parent="." index="0" instance=ExtResource("1_3srh3")]
-show_behind_parent = true
-z_index = 1
+[node name="AttackIndicator" parent="." index="0" instance=ExtResource("3_iir01")]
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0)
+area_size = null
 
-[editable path="AttackIndicator"]
+[node name="QuickInfo" parent="." index="1" node_paths=PackedStringArray("enemy") instance=ExtResource("4_wpb4g")]
+enemy = NodePath("..")
+
+[editable path="QuickInfo"]

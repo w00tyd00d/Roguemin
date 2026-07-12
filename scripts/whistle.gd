@@ -60,6 +60,10 @@ var _acc := 0.0
 ]
 
 
+func _ready() -> void:
+    process_mode = Node.PROCESS_MODE_ALWAYS
+
+
 func _process(dt: float) -> void:
     if preview_view.visible:
         var idx := _key[_preview_size-1] - 1

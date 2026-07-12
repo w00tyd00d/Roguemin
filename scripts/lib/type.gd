@@ -23,5 +23,20 @@ enum Unit { RED, YELLOW, BLUE, NONE }
 ## The types of entities.
 enum Entity { PLAYER, TREASURE, ENEMY }
 
-## The hazards that will do harm entities.
-enum Hazard { WATER, FIRE }
+## The elemental hazards that will do harm entities.
+enum Element { PHYSICAL, WATER, FIRE }
+
+## The types of FOV an enemy can have.
+enum EnemyFov { 
+    DEFAULT, ## Uses N,S,W,E for cardnial directions and 0-3 for diagonal (starting with NW going clockwise)
+    COMPACT, ## Uses only 0-7 and combines corners, used for 2x2 enemies
+}
+
+## The types of attack shapes an enemy can produce.
+enum Attack {
+    SQUARE, ## The attack is a square around the target point.
+    CIRCLE, ## The attack is a circle around the target point.
+    BODY, ## The attack uses the shape of the enemy as the area.
+    CONE, ## The attack fires a cone centered on the target point.
+    CUSTOM, ## The attack area is custom-drawn in the editor.
+}

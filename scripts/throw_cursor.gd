@@ -14,6 +14,10 @@ var current_tile : Tile :
 @onready var layer := $Cursor as TileMapLayer
 
 
+func _ready() -> void:
+    process_mode = Node.PROCESS_MODE_ALWAYS
+
+
 func _process(_dt) -> void:
     layer.visible = not GameState.glyph_blinking()
 

@@ -1,11 +1,6 @@
 extends Node
 
-# General
-
-
-
-## The blink threshold of a blinking icon. (0 - 1000ms)
-const GLYPH_BLINK_THRESHOLD := 750
+## The global constants used throughout the game.
 
 # Geometery
 
@@ -24,11 +19,14 @@ const WORLD_SIZE := Vector2i(12,12)
 
 # Time
 
-## The amount of time units that make up one second.
-const TIME_VALUE := 500
+## The default amount of time units incremented per turn
+const DEFAULT_TURN_COST := 100
+
+## The amount of time units equal to one second
+const TIME_SECOND := DEFAULT_TURN_COST * 5
 
 ## The amount of time units within a single day.
-const TIME_LIMIT := (13 * 60 + 30) * TIME_VALUE # 13 min 30 sec
+const TIME_LIMIT := 13 * 60 * TIME_SECOND # 13 min
 
 # Controls
 
@@ -71,8 +69,6 @@ const MOVE_HOLD_SUBSEQUENT := 0.1
 
 # Gameplay
 
-## The default amount of energy needed to make a turn.
-const DEFAULT_ENERGY_STEP := 100
 ## The range at which the player can through the fog of war.
 const PLAYER_SIGHT_RANGE := 30
 

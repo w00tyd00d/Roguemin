@@ -8,13 +8,17 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="Roguemin"
 config/description="Pikmin re-imagined as a traditional roguelike."
 config/version="ALPHA 0.1"
 run/main_scene="res://prefabs/main.tscn"
-config/features=PackedStringArray("4.4", "GL Compatibility")
+config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -29,6 +33,9 @@ Tag="*res://scripts/lib/tag.gd"
 [debug]
 
 gdscript/warnings/unused_signal=0
+gdscript/warnings/incompatible_ternary=0
+gdscript/warnings/missing_tool=0
+gdscript/warnings/integer_division=0
 gdscript/warnings/int_as_enum_without_cast=0
 
 [display]
@@ -42,7 +49,7 @@ window/stretch/scale_mode="integer"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/editor_button/plugin.cfg")
+enabled=PackedStringArray("res://addons/editor_button/plugin.cfg", "res://addons/kanban_tasks/plugin.cfg")
 
 [file_customization]
 
@@ -55,8 +62,8 @@ folder_colors={
 
 [gui]
 
-theme/custom_font="res://assets/pixelchunk.ttf"
 theme/default_font_antialiasing=0
+theme/custom_font="res://assets/pixelchunk.ttf"
 
 [input]
 

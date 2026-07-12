@@ -14,26 +14,17 @@ var architect := WorldArchitect.new() # Din
 var navigator := WorldNavigator.new() # Nayru
 var populator := WorldPopulator.new() # Farore
 
-# Assigned by GameScreen at runtime
-var unit_container : UnitContainer
+# Assigned by Main at runtime
 var game_viewport : SubViewport 
+var debug_mode := false
 
 
 func generate_new_world() -> World:
-    var world := _create_new_world()
-    
-    # We add the world as a child first so we can reference its children
-    # when running it through the factory
-    game_viewport.add_child(world)
-
-    architect.run(world)
-    navigator.run(world)
-    populator.run(world)
-
-    return world
-
-
-func _create_new_world() -> World:
     var world := World.create()
-    world.unit_container = unit_container
+    game_viewport.add_child(world) # Factory must reference world's child nodes
+
+    architect.run(world, debug_mode)
+    navigator.run(world, debug_mode)
+    populator.run(world, debug_mode)
+
     return world

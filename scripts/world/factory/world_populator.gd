@@ -4,20 +4,30 @@ class_name WorldPopulator extends RefCounted
 
 var RNG := GameState.RNG
 
+var debug_mode: bool
 
-func run(world: World) -> void:
+
+func run(world: World, debug: bool) -> void:
+    debug_mode = debug
+
     generate_enemies(world)
     generate_treasure(world)
 
 
 func generate_enemies(world: World) -> void:
     # Place Spotty Red enemy at specific location for now
-    var pos := world.get_chunk(Vector2i(2,1)).center
+    var pos: Vector2i
+    if debug_mode:
+        pos = world.get_chunk(Vector2i(6,4)).center
+    else:
+        pos = world.get_chunk(Vector2i(2,1)).center
 
     world.spawn_entity(SpottyRed, pos)
 
 
 func generate_treasure(world: World) -> void:
+    if debug_mode: return
+   
     _verify_treasure_placement(world, LargeTreasure, 20)
     _verify_treasure_placement(world, MediumTreasure, 5)
     _verify_treasure_placement(world, SmallTreasure, 10)
@@ -29,9 +39,9 @@ func _check_for_entity_collision(world: World, ent: MultiTileEntity, pos: Vector
         var tile := world.get_tile(dpos)
         if not tile: return true
         var glyph := world.get_glyph(dpos)
-        if (not glyph.matches(Glyph.NONE) and
-            not glyph.matches(Glyph.GRASS) and
-            not glyph.matches(Glyph.SHRUB)):
+        if (not glyph.matches(Glyphs.NONE) and
+            not glyph.matches(Glyphs.GRASS) and
+            not glyph.matches(Glyphs.SHRUB)):
                 return true
         if tile._entities.size() > 1:
             return true

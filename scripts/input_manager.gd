@@ -2,6 +2,10 @@ extends Node
 
 ## Manages all input within the game
 
+## Global reference to check if shift key is currently pressed
+var shift_pressed := false
+
+
 ## Used to manage which domain is in charge of the current input
 var _domain_stack : Array[Callable] = []
 

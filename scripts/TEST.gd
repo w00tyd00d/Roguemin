@@ -35,7 +35,7 @@ func _draw_path(layer: TileMapLayer, vec1: Vector2i, vec2: Vector2i) -> void:
             var center := path[i-2] + half + path_offset
             var vecs := Util.get_square_around_pos(center, 15, true)
             for pos in vecs:
-                var choices := [Glyph.GRASS, Glyph.SHRUB]
+                var choices := [Glyphs.GRASS, Glyphs.SHRUB]
                 var weights := PackedFloat32Array([1, .01])
                 var idx := RNG.rand_weighted(weights)
                 # layer.set_glyph(pos, choices[idx])

@@ -3,29 +3,29 @@ class_name Player extends Entity
 ## The player object.
 
 var health := 100 :
-    set(n):
-        health = clampi(n, 0, 100)
-        GameState.update_player_health.emit(health)
+	set(n):
+		health = clampi(n, 0, 100)
+		GameState.update_player_health.emit(health)
 
 var unit_tether := UnitTether.new(self, 4)
 
 var unit_toggle : Dictionary[Type.Unit, bool] = {
-    Type.Unit.RED: true,
-    Type.Unit.YELLOW: true,
-    Type.Unit.BLUE: true,
+	Type.Unit.RED: true,
+	Type.Unit.YELLOW: true,
+	Type.Unit.BLUE: true,
 }
 
 var selected_unit := Type.Unit.NONE :
-    set(type):
-        selected_unit = type
-        GameState.update_selected_unit.emit(type)
+	set(type):
+		selected_unit = type
+		GameState.update_selected_unit.emit(type)
 
 ## The number of units within the player's squad
 var unit_count := 0 :
-    set(n):
-        unit_count = n
-        GameState.update_squad_count.emit(unit_count)
-        GameState.update_selected_unit.emit(selected_unit)
+	set(n):
+		unit_count = n
+		GameState.update_squad_count.emit(unit_count)
+		GameState.update_selected_unit.emit(selected_unit)
 
 # var whistle_size : int :
 #     set(size):
@@ -37,9 +37,9 @@ var unit_count := 0 :
 
 
 var _units : Dictionary[Type.Unit, Dictionary] = {
-    Type.Unit.RED: {},
-    Type.Unit.YELLOW: {},
-    Type.Unit.BLUE: {},
+	Type.Unit.RED: {},
+	Type.Unit.YELLOW: {},
+	Type.Unit.BLUE: {},
 }
 
 @onready var camera := $Camera2D as Camera2D
@@ -49,107 +49,110 @@ var _units : Dictionary[Type.Unit, Dictionary] = {
 
 
 static func create() -> Player:
-    return preload("res://prefabs/entities/player.tscn").instantiate()
+	return preload("res://prefabs/entities/player.tscn").instantiate()
 
 
 func _ready() -> void:
-    unit_tether.reset()
+	unit_tether.reset()
+	super()
 
 
 func finish_turn(_time_units: int) -> void:
-    pass
+	pass
 
 
 func move_to(dest: Tile) -> void:
-    super(dest)
-    camera.align()
-    unit_tether.update()
-    # _draw_tether()
-    
-    world.update_fog_of_war(dest.grid_position, Globals.PLAYER_SIGHT_RANGE)
+	super(dest)
+	camera.align()
+	unit_tether.update()
+	# _draw_tether()
+	
+	world.update_fog_of_war(dest.grid_position, Globals.PLAYER_SIGHT_RANGE)
 
 
 func cycle_selected_unit(left := false) -> void:
-    var strikes := 0
-    var type := selected_unit
-    while strikes < 3:
+	var strikes := 0
+	var type := selected_unit
+	while strikes < 3:
 
-        if left: type = (4 + type - 1) % 4
-        else: type = (type + 1) % 4
+		if left: type = (4 + type - 1) % 4
+		else: type = (type + 1) % 4
 
-        if type == Type.Unit.NONE: continue
-        if get_unit_count(type) > 0:
-            selected_unit = type
-            return
+		if type == Type.Unit.NONE: continue
+		if get_unit_count(type) > 0:
+			selected_unit = type
+			return
 
-        strikes += 1
+		strikes += 1
 
-    selected_unit = Type.Unit.NONE
+	selected_unit = Type.Unit.NONE
 
 
 func add_unit(unit: Unit) -> void:
-    if _units[unit.type].has(unit): return
+	if _units[unit.type].has(unit): return
 
-    _units[unit.type][unit] = true
-    unit_count += 1
+	_units[unit.type][unit] = true
+	unit_count += 1
 
-    if selected_unit == Type.Unit.NONE:
-        selected_unit = unit.type
+	if selected_unit == Type.Unit.NONE:
+		selected_unit = unit.type
 
 
 func remove_unit(unit: Unit) -> void:
-    if not _units[unit.type].has(unit): return
+	if not _units[unit.type].has(unit): return
 
-    _units[unit.type].erase(unit)
-    unit_count -= 1
+	_units[unit.type].erase(unit)
+	unit_count -= 1
 
-    if unit_count == 0:
-        selected_unit = Type.Unit.NONE
+	if unit_count == 0:
+		selected_unit = Type.Unit.NONE
 
 
 func toggle_unit(type: Type.Unit) -> void:
-    if type == Type.Unit.NONE: return
-    unit_toggle[type] = not unit_toggle[type]
-    GameState.update_unit_toggle.emit(unit_toggle)
+	if type == Type.Unit.NONE: return
+	unit_toggle[type] = not unit_toggle[type]
+	GameState.update_unit_toggle.emit(unit_toggle)
 
 
 func get_unit_count(type := Type.Unit.NONE) -> int:
-    if type == Type.Unit.NONE:
-        return 0
-    return _units[type].size()
+	if type == Type.Unit.NONE:
+		return 0
+	return _units[type].size()
 
 
 func grab_unit(type: Type.Unit) -> Unit:
-    if get_unit_count(type) == 0:
-        return null
-    return _units[type].keys()[0]
+	if get_unit_count(type) == 0:
+		return null
+	return _units[type].keys()[0]
 
 
 func throw_unit(unit: Unit, tile: Tile) -> void:
-    if not unit: return
-    unit.throw_to(tile)
-    remove_unit(unit)
+	if not unit: return
+	unit.throw_to(tile)
+	remove_unit(unit)
 
 
 func get_all_units() -> Array[Unit]:
-    var res : Array[Unit] = []
-    for dict in _units.values():
-        res.append_array((dict.keys()))
-    return res
+	var res : Array[Unit] = []
+	for dict in _units.values():
+		res.append_array((dict.keys()))
+	return res
 
 
-func take_damage(dmg: int) -> void:
-    health -= dmg
-    if health <= 0:
-        # ADD GAME OVER
-        pass
+func take_damage(dmg: int, type: Type.Element) -> void:
+	# ADD IN DIFFERENT EFFECTS/IMMUNITIES FOR ELEMENTAL TYPE DAMAGE
+	health -= dmg
+
+	if health <= 0:
+		# ADD GAME OVER
+		pass
 
 
 func _draw_tether() -> void:
-    for pos in test_layer.get_used_cells():
-        test_layer.set_background(pos, Glyph.NONE)
-        test_layer.set_glyph(pos, Glyph.NONE)
+	for pos in test_layer.get_used_cells():
+		test_layer.set_background(pos, Glyphs.NONE)
+		test_layer.set_glyph(pos, Glyphs.NONE)
 
-    var tail := unit_tether.tail
-    test_layer.set_background(tail.grid_position, Glyph.BLACK)
-    test_layer.set_glyph(tail.grid_position, Glyph.TEST)
+	var tail := unit_tether.tail
+	test_layer.set_background(tail.grid_position, Glyphs.BLACK)
+	test_layer.set_glyph(tail.grid_position, Glyphs.TEST)

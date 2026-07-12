@@ -14,6 +14,10 @@ const ALL_VECTORS : Array[Vector2i] = [
     Vector2i.LEFT,
 ]
 
+# Change how you want your RNG to be accessed
+static var RNG : RandomNumberGenerator : 
+    get: return GameState.RNG
+
 static var none := Direction.new(Vector2i())
 
 static var north := Direction.new(Vector2i.UP)
@@ -26,6 +30,7 @@ static var southwest := Direction.new(Vector2i(-1,1))
 static var southeast := Direction.new(Vector2i(1,1))
 
 var vector : Vector2i
+var normalized : Vector2
 
 var is_diagonal : bool
 var is_vertical : bool
@@ -108,6 +113,31 @@ static func by_delta(from_pos: Vector2i, to_pos: Vector2i) -> Direction:
     return Direction.by_normalized(Vector2(from_pos).direction_to(to_pos))
 
 
+static func by_turning(from_dir: Direction, to_dir: Direction) -> Direction:
+    if from_dir == to_dir: return from_dir
+    
+    var size := ALL_VECTORS.size()
+    var fidx := from_dir._index
+    var tidx := to_dir._index
+    
+    var rdest := tidx + size if fidx > tidx else tidx
+    var lstart := fidx + size if fidx < tidx else fidx
+    
+    var right := rdest - fidx
+    var left := lstart - tidx
+
+    var rot: int
+
+    if right < left: 
+        rot = 1  # turn right
+    elif left < right:
+        rot = 0  # turn left
+    else:
+        rot = Direction.RNG.randi_range(0,1)
+    
+    return from_dir.adjacent[rot]
+
+
 static func get_all(shuffled := false) -> Array[Direction]:
     var res : Array[Direction] = [
         north,
@@ -120,7 +150,9 @@ static func get_all(shuffled := false) -> Array[Direction]:
         southeast,
     ]
 
-    if shuffled: res.shuffle()
+    if shuffled:
+        return Util.shuffled(res, GameState.RNG)
+
     return res
 
 
@@ -132,12 +164,15 @@ static func get_cardinal(shuffled := false) -> Array[Direction]:
         east
     ]
 
-    if shuffled: res.shuffle()
+    if shuffled:
+        return Util.shuffled(res, GameState.RNG)
+        
     return res
 
 
 func _init(vec: Vector2i, _diagonal := false) -> void:
     vector = vec
+    normalized = Vector2(vec).normalized()
 
     if vec == Vector2i():
         _index = -1

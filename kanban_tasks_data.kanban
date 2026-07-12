@@ -1,0 +1,92 @@
+{
+	"categories": [
+		{
+			"uuid": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"title": "Task",
+			"color": "70bafa"
+		}
+	],
+	"stages": [
+		{
+			"uuid": "fdf643f5-972b-4502-bc90-e8bdfb958a66",
+			"title": "Todo",
+			"tasks": [
+				"62ca792d-2541-4484-92ac-31d2f5267a1b"
+			]
+		},
+		{
+			"uuid": "99502964-3cd9-4cf8-8e74-6053da6e5c8a",
+			"title": "Doing",
+			"tasks": [
+				"dbffda8c-3b94-4798-b28c-4edd9c6eacdb",
+				"3b5eb92b-0d4c-4395-99b4-0ef8a6171d37"
+			]
+		},
+		{
+			"uuid": "d526896f-25f2-4c99-8c82-7134d390ecf8",
+			"title": "Done",
+			"tasks": [
+				"b943a33f-9c8a-4350-b0c2-dd7e00ef7078",
+				"a4981929-85a9-46db-9aa9-5479f9adac4d",
+				"21a8d728-f490-4a81-bd50-f77ffe663c3a"
+			]
+		}
+	],
+	"tasks": [
+		{
+			"uuid": "b943a33f-9c8a-4350-b0c2-dd7e00ef7078",
+			"title": "New AttackIndicator object",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "a4981929-85a9-46db-9aa9-5479f9adac4d",
+			"title": "SpottyRed AI",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "21a8d728-f490-4a81-bd50-f77ffe663c3a",
+			"title": "QuickInfo object",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "62ca792d-2541-4484-92ac-31d2f5267a1b",
+			"title": "Rework Cursor object + Attach it to player",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "dbffda8c-3b94-4798-b28c-4edd9c6eacdb",
+			"title": "Fix AttackIndicator target area",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "3b5eb92b-0d4c-4395-99b4-0ef8a6171d37",
+			"title": "Filter number of affected units in SpottyRed attack",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		}
+	],
+	"layout": {
+		"columns": [
+			[
+				"fdf643f5-972b-4502-bc90-e8bdfb958a66"
+			],
+			[
+				"99502964-3cd9-4cf8-8e74-6053da6e5c8a"
+			],
+			[
+				"d526896f-25f2-4c99-8c82-7134d390ecf8"
+			]
+		]
+	}
+}

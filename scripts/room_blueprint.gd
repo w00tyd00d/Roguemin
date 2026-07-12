@@ -127,9 +127,16 @@ func _draw_exits() -> void:
 func _scan() -> void:
     for vec in get_used_cells():
         var glyph := Glyph.get_from(self, vec)
-        var ctx_id := glyph.get_context_id()
+        var ctx_id := _get_context_id(glyph)
         if ctx_id > -1:
             context_positions.get_or_add(ctx_id, []).append(vec)
-            tile_data[vec] = Glyph.GRASS
+            tile_data[vec] = Glyphs.GRASS
         else:
             tile_data[vec] = glyph
+
+
+func _get_context_id(glyph: Glyph) -> int:
+    var vec := Vector2i(glyph.atlas_pos)
+    if vec.y == 0 and vec.x >= 15 and vec.x <= 24:
+        return vec.x - 15
+    return -1

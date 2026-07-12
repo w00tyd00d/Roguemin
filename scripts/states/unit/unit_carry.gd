@@ -10,17 +10,18 @@ func enter(ent: Entity) -> void:
     super(ent)
 
 
-func do_action(ent: Entity) -> Array:
-    if not ent.held_object:
-        if ent.target.is_latch_position(ent.grid_position):
-            ent.grab_object(ent.target)
-            return [false]
-        return [ent.move_towards(ent.target.current_tile)]
+func do_action(ent: Entity) -> ActionResult:
+    var unit := _unit(ent)
     
-    return [false]
+    if not unit.held_object:
+        if unit.target.is_latch_position(unit.grid_position):
+            unit.grab_object(unit.target)
+            return result(false)
+        return result(unit.move_towards(unit.target.current_tile))
+    
+    return result(false)
 
 
 func exit(ent: Entity) -> void:
-    ent.drop_object()
+    _unit(ent).drop_object()
     super(ent)
-
