@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=4 uid="uid://w5k5gfelnqws"]
+[gd_scene format=4 uid="uid://w5k5gfelnqws"]
 
-[ext_resource type="PackedScene" uid="uid://bge48j21udel3" path="res://prefabs/entities/enemy.tscn" id="1_qmh5x"]
+[ext_resource type="PackedScene" uid="uid://bge48j21udel3" path="res://prefabs/entities/enemies/_enemy.tscn" id="1_qmh5x"]
 [ext_resource type="Script" uid="uid://cgfsibmntmhd3" path="res://scripts/entities/dwarf_red.gd" id="2_krgmn"]
 
 [node name="DwarfRed" instance=ExtResource("1_qmh5x")]

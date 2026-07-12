@@ -1,4 +1,5 @@
 @abstract
+@tool
 class_name Glyphs
 extends Object
 
