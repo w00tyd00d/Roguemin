@@ -90,6 +90,6 @@ func update(inp: StringName) -> Array:
 
 
 func exit() -> void:
-    player.cursor.hide_pointer()
+    player.cursor.hide()
     GameState.update_info_box.emit(null)
     super()

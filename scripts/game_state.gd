@@ -63,7 +63,7 @@ func is_valid_object(obj) -> bool:
 
 ## Returns if a blinking glyph is currently invisible or not.
 func glyph_blinking() -> bool:
-    const GLYPH_BLINK_THRESHOLD := 500
+    const GLYPH_BLINK_THRESHOLD := 600
     var msecs := Time.get_ticks_msec() % 850
     return msecs > GLYPH_BLINK_THRESHOLD
 

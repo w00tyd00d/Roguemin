@@ -104,13 +104,13 @@ func set_cursor_mode(_mode: Mode) -> void:
 		Mode.WHISTLE:
 			pointer.set_glyph(Vector2(), Glyphs.WHISTLE_CURSOR)
 	
+	show()
 	pointer.show()
 	
 
 func preview_whistle(pos: Vector2i, level: int) -> void:
 	_reset_whistle_anim()
 	preview_view.show()
-	#cursor.show()
 	grid_position = pos
 	_preview_size = level
 	
