@@ -78,10 +78,10 @@ var mrpas : MRPAS
 @onready var enemies_node := $Enemies as Node
 
 ## The [Whistle] object.
-@onready var whistle := $Whistle as Whistle
+# @onready var cursor := $Whistle as Whistle
 
-## The throwing cursor.
-@onready var throw_cursor := $ThrowCursor as Node2D
+## The player cursor used for targeting.
+@onready var cursor := $PlayerCursor as PlayerCursor
 
 # @onready var fog_of_war := $FogOfWar as TileMapLayer
 

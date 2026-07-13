@@ -3,9 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_ejma5"]
 [ext_resource type="Script" uid="uid://dxxivsxqj8buq" path="res://scripts/world/world.gd" id="2_ejma5"]
 [ext_resource type="Script" uid="uid://cmb6opbq1b2ow" path="res://scripts/test_layer.gd" id="3_6egb5"]
-[ext_resource type="PackedScene" uid="uid://borrl1q1erb2s" path="res://prefabs/whistle.tscn" id="4_131g2"]
-[ext_resource type="Script" uid="uid://dlrxav462qrlt" path="res://scripts/throw_cursor.gd" id="5_6f63f"]
 [ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="6_ns5t5"]
+[ext_resource type="PackedScene" uid="uid://mvttivhuisp7" path="res://prefabs/screens/game/cursor.tscn" id="6_sxotx"]
 
 [node name="World" unique_id=202947957 instance=ExtResource("1_ejma5")]
 z_index = -1
@@ -21,24 +20,9 @@ script = ExtResource("2_ejma5")
 z_index = 3
 script = ExtResource("3_6egb5")
 
-[node name="Whistle" parent="." index="5" unique_id=770507721 instance=ExtResource("4_131g2")]
-z_index = 2
+[node name="PlayerCursor" parent="." index="5" unique_id=1388617660 instance=ExtResource("6_sxotx")]
 
-[node name="ThrowCursor" type="Node2D" parent="." index="6" unique_id=1364984761]
-visible = false
-z_index = 2
-script = ExtResource("5_6f63f")
-
-[node name="Cursor" parent="ThrowCursor" index="0" unique_id=1642657567 instance=ExtResource("1_ejma5")]
-visible = false
-tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 1, 0, 2, 0)
-
-[node name="BackgroundLayer" parent="ThrowCursor/Cursor" index="0"]
-tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0)
-
-[node name="FogOfWar" type="TileMapLayer" parent="." index="7" unique_id=745421972]
+[node name="FogOfWar" type="TileMapLayer" parent="." index="6" unique_id=745421972]
 visible = false
 z_index = 5
 tile_set = ExtResource("6_ns5t5")
-
-[editable path="ThrowCursor/Cursor"]

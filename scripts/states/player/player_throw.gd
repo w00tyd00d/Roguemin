@@ -3,7 +3,7 @@ class_name PlayerThrow extends PlayerState
 var grid_position : Vector2i :
     set(vec):
         grid_position = vec
-        world.throw_cursor.grid_position = grid_position
+        world.cursor.grid_position = grid_position
 
         var tile := world.get_tile(grid_position)
         GameState.update_info_box.emit(tile.get_first_entity())
@@ -16,7 +16,7 @@ var _action_cost : int :
 func enter() -> void:
     super()
     grid_position = player.grid_position
-    world.throw_cursor.show()
+    world.cursor.set_cursor_mode(PlayerCursor.Mode.THROW)
     GameState.display_unit_toggle.emit(false)
 
 
@@ -90,6 +90,6 @@ func update(inp: StringName) -> Array:
 
 
 func exit() -> void:
-    world.throw_cursor.hide()
+    world.cursor.hide_pointer()
     GameState.update_info_box.emit(null)
     super()

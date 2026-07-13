@@ -32,7 +32,12 @@ static var LATCH_POINT := Glyph.new(0, Vector2(4,0)) # %
 
 static var TEST := Glyph.new(0, Vector2(20,1)) # T
 
-# World glyphs
+# UI Glyphs
+
+static var WHISTLE_CURSOR := Glyph.new(0, Vector2(24,1), 1)
+static var THROW_CURSOR := Glyph.new(0, Vector2(24,1), 2)
+
+# World Glyphs
 
 static var WALL := Glyph.new(0, Vector2(2,0), 1)
 static var GRASS := Glyph.new(0, Vector2(19,7), 1)
