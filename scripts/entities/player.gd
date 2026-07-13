@@ -44,6 +44,7 @@ var _units : Dictionary[Type.Unit, Dictionary] = {
 
 @onready var camera := $Camera2D as Camera2D
 @onready var controller := $PlayerController as Node
+@onready var cursor := $Cursor as PlayerCursor
 
 @onready var test_layer : DualMapLayer
 

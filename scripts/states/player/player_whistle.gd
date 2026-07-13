@@ -16,7 +16,7 @@ var whistle_level := 1 :
 func enter() -> void:
 	super()
 	grid_position = player.grid_position
-	world.cursor.set_cursor_mode(PlayerCursor.Mode.WHISTLE)
+	player.cursor.set_cursor_mode(PlayerCursor.Mode.WHISTLE)
 
 	GameState.display_unit_toggle.emit(true)
 
@@ -39,7 +39,7 @@ func update(inp: StringName) -> Array:
 			&"c_toggle_blue":
 				player.toggle_unit(Type.Unit.BLUE)
 			&"c_whistle", &"c_throw":
-				world.cursor.activate_whistle(whistle_level)
+				player.cursor.activate_whistle(whistle_level)
 				for pos in _get_whistle_area():
 					world.get_tile(pos).whistled()
 				
@@ -69,13 +69,13 @@ func update(inp: StringName) -> Array:
 
 
 func exit() -> void:
-	world.cursor.cancel_whistle_preview()
+	player.cursor.cancel_whistle_preview()
 	super()
 
 
 func _update_preview() -> void:
-	world.cursor.preview_whistle(grid_position, whistle_level)
+	player.cursor.preview_whistle(grid_position, whistle_level)
 
 
 func _get_whistle_area() -> Array[Vector2i]:
-	return world.cursor.get_whistle_area(whistle_level)
+	return player.cursor.get_whistle_area(whistle_level)

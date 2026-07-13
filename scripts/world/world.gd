@@ -81,7 +81,7 @@ var mrpas : MRPAS
 # @onready var cursor := $Whistle as Whistle
 
 ## The player cursor used for targeting.
-@onready var cursor := $PlayerCursor as PlayerCursor
+# @onready var cursor := $PlayerCursor as PlayerCursor
 
 # @onready var fog_of_war := $FogOfWar as TileMapLayer
 
