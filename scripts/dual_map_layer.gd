@@ -15,6 +15,22 @@ static func create() -> DualMapLayer:
 	return preload("uid://be46f0movhp5e").instantiate()
 
 
+static func set_tile(layer: TileMapLayer, pos: Vector2i, glyph: Glyph) -> void:
+	if not layer:
+		return
+
+	layer.set_cell(
+		pos,
+		glyph.source,
+		glyph.atlas_pos,
+		glyph.alt_tile_id
+	)
+
+
+static func get_tile(layer: TileMapLayer, pos: Vector2i) -> Glyph:
+	return Glyph.get_from(layer, pos)
+
+
 func _init() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
@@ -25,37 +41,26 @@ func _ready() -> void:
 
 func clear_glyphs() -> void:
 	clear()
-	background_layer.clear()
+	if background_layer:
+		background_layer.clear()
 
 
 func set_glyph(pos: Vector2i, glyph: Glyph) -> void:
-	_set_tile(self, pos, glyph)
+	set_tile(self, pos, glyph)
 
 
 func get_glyph(pos: Vector2i) -> Glyph:
-	return _get_tile(self, pos)
+	return get_tile(self, pos)
 
 
 func set_background(pos: Vector2i, glyph: Glyph):
-	_set_tile(background_layer, pos, glyph)
+	set_tile(background_layer, pos, glyph)
 
 
 func get_background(pos: Vector2i):
-	return _get_tile(background_layer, pos)
+	return get_tile(background_layer, pos)
 
 
 func _set_grid_position(pos: Vector2i) -> void:
 	grid_position = pos
 	position = pos * Globals.TILE_SIZE
-
-
-func _set_tile(layer: TileMapLayer, pos: Vector2i, glyph: Glyph) -> void:
-	layer.set_cell(
-		pos,
-		glyph.source,
-		glyph.atlas_pos,
-		glyph.alt_tile_id)
-
-
-func _get_tile(layer: TileMapLayer, pos: Vector2i) -> Glyph:
-	return Glyph.get_from(layer, pos)
