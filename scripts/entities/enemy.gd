@@ -96,6 +96,7 @@ func get_health_percent_num() -> int:
 func take_damage(dmg: int) -> void:
     current_health -= maxi(0, dmg)
     if current_health <= 0:
+        current_health = 0
         die()
 
 
@@ -150,7 +151,8 @@ func get_closest_target(radial := false) -> Entity:
 
     if pdist < udist and pdist <= limit:
         return player
-    elif udist <= limit:
+    
+    if udist <= limit:
         return unit
 
     return null

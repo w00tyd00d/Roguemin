@@ -2,7 +2,7 @@ class_name MediumTreasure extends Treasure
 
 
 static func create() -> MediumTreasure:
-    return preload("res://prefabs/entities/medium_treasure.tscn").instantiate()
+    return preload("uid://csr5a0h7f111d").instantiate()
 
 
 func _ready() -> void:

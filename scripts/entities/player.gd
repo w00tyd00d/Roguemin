@@ -44,12 +44,13 @@ var _units : Dictionary[Type.Unit, Dictionary] = {
 
 @onready var camera := $Camera2D as Camera2D
 @onready var controller := $PlayerController as Node
+@onready var cursor := $Cursor as PlayerCursor
 
 @onready var test_layer : DualMapLayer
 
 
 static func create() -> Player:
-	return preload("res://prefabs/entities/player.tscn").instantiate()
+	return preload("uid://cccw0ghftbjsr").instantiate()
 
 
 func _ready() -> void:
@@ -139,7 +140,7 @@ func get_all_units() -> Array[Unit]:
 	return res
 
 
-func take_damage(dmg: int, type: Type.Element) -> void:
+func take_damage(dmg: int, _type: Type.Element) -> void:
 	# ADD IN DIFFERENT EFFECTS/IMMUNITIES FOR ELEMENTAL TYPE DAMAGE
 	health -= dmg
 

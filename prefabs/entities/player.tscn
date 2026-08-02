@@ -1,16 +1,20 @@
-[gd_scene load_steps=4 format=3 uid="uid://cccw0ghftbjsr"]
+[gd_scene format=3 uid="uid://cccw0ghftbjsr"]
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://prefabs/dual_map_layer.tscn" id="1_wic5u"]
 [ext_resource type="Script" uid="uid://jreau2f5t6y2" path="res://scripts/entities/player.gd" id="2_delc5"]
 [ext_resource type="PackedScene" uid="uid://bwl0qh8yr5ome" path="res://prefabs/player_controller.tscn" id="3_l48dn"]
+[ext_resource type="PackedScene" uid="uid://mvttivhuisp7" path="res://prefabs/screens/game/cursor.tscn" id="4_grlhh"]
 
-[node name="Player" instance=ExtResource("1_wic5u")]
+[node name="Player" unique_id=633539854 instance=ExtResource("1_wic5u")]
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("2_delc5")
 
 [node name="BackgroundLayer" parent="." index="0"]
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0)
 
-[node name="PlayerController" parent="." index="1" instance=ExtResource("3_l48dn")]
+[node name="Camera2D" type="Camera2D" parent="." index="1" unique_id=147615931]
 
-[node name="Camera2D" type="Camera2D" parent="." index="2"]
+[node name="PlayerController" parent="." index="2" unique_id=2014162222 instance=ExtResource("3_l48dn")]
+
+[node name="Cursor" parent="." index="3" unique_id=1388617660 instance=ExtResource("4_grlhh")]
+top_level = true

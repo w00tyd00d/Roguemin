@@ -11,15 +11,26 @@
 			"uuid": "fdf643f5-972b-4502-bc90-e8bdfb958a66",
 			"title": "Todo",
 			"tasks": [
-				"62ca792d-2541-4484-92ac-31d2f5267a1b"
+				"3c94615a-b7a8-423e-9864-4984b44e59f0",
+				"95110d83-bd8d-47cb-b7e4-f7e76d9cfd4b",
+				"bb74a3b8-d6be-41e4-a977-25fa45980783",
+				"d0105f52-1ec3-4802-9292-110f68a30926",
+				"502dcf8a-5335-488f-9394-0ba7ff7332c6",
+				"bffb6b60-6b1a-4010-a348-d242768e1a8b",
+				"acf5b3a8-cd04-4e7d-aa1c-a7c22f67bd60",
+				"8d8249f7-c04e-4a25-a6d9-5c1bff4e0a41",
+				"ee7ba5bc-d3e0-4b93-bc16-dc3f9b3f4cc7",
+				"cf424312-b903-4e75-b89b-e83717add6a9",
+				"d31cbe3f-1773-4668-9b99-430ffe39b7bc",
+				"dfe7a6b4-2f75-44e7-adca-9e58fa1409d6",
+				"023d4dcb-c1ca-4b67-bbff-97529bd1261e"
 			]
 		},
 		{
 			"uuid": "99502964-3cd9-4cf8-8e74-6053da6e5c8a",
 			"title": "Doing",
 			"tasks": [
-				"dbffda8c-3b94-4798-b28c-4edd9c6eacdb",
-				"3b5eb92b-0d4c-4395-99b4-0ef8a6171d37"
+				"41671931-ba70-4993-903e-2717bf3297c5"
 			]
 		},
 		{
@@ -28,7 +39,10 @@
 			"tasks": [
 				"b943a33f-9c8a-4350-b0c2-dd7e00ef7078",
 				"a4981929-85a9-46db-9aa9-5479f9adac4d",
-				"21a8d728-f490-4a81-bd50-f77ffe663c3a"
+				"21a8d728-f490-4a81-bd50-f77ffe663c3a",
+				"dbffda8c-3b94-4798-b28c-4edd9c6eacdb",
+				"3b5eb92b-0d4c-4395-99b4-0ef8a6171d37",
+				"62ca792d-2541-4484-92ac-31d2f5267a1b"
 			]
 		}
 	],
@@ -72,6 +86,104 @@
 			"uuid": "3b5eb92b-0d4c-4395-99b4-0ef8a6171d37",
 			"title": "Filter number of affected units in SpottyRed attack",
 			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "3c94615a-b7a8-423e-9864-4984b44e59f0",
+			"title": "Side Context Menu",
+			"description": "Controls when throwing, move Pikmin toggling here, possibly even enemy info",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "95110d83-bd8d-47cb-b7e4-f7e76d9cfd4b",
+			"title": "Dwarf SpottyRed AI",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "bb74a3b8-d6be-41e4-a977-25fa45980783",
+			"title": "Combat",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "d0105f52-1ec3-4802-9292-110f68a30926",
+			"title": "Onion Menu/Unit Storage",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "502dcf8a-5335-488f-9394-0ba7ff7332c6",
+			"title": "Breakable walls",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "8d8249f7-c04e-4a25-a6d9-5c1bff4e0a41",
+			"title": "More rooms for procgen",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "bffb6b60-6b1a-4010-a348-d242768e1a8b",
+			"title": "Slope tiles (one way travel)",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "acf5b3a8-cd04-4e7d-aa1c-a7c22f67bd60",
+			"title": "Water tiles",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "ee7ba5bc-d3e0-4b93-bc16-dc3f9b3f4cc7",
+			"title": "Effects (composite pattern?)",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "41671931-ba70-4993-903e-2717bf3297c5",
+			"title": "Show tile line to cursor (bresenham)",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "cf424312-b903-4e75-b89b-e83717add6a9",
+			"title": "Game Log",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "023d4dcb-c1ca-4b67-bbff-97529bd1261e",
+			"title": "Post-Mortem Summary",
+			"description": "",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "d31cbe3f-1773-4668-9b99-430ffe39b7bc",
+			"title": "After Day Summary",
+			"description": "Show line chart of Pikmin growth/death with break down of each count, and show all other necessary metrics.",
+			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
+			"steps": []
+		},
+		{
+			"uuid": "dfe7a6b4-2f75-44e7-adca-9e58fa1409d6",
+			"title": "Add Target Destination system",
+			"description": "A player can set a target location and the \"target fuel\" amount coincides with that location relative to where the player currently is located.\n\nIn-game, if the player is below the minimum amount of fuel needed, the bottom fuel number will be white and the top number will be red. If the player has a target destination set and is above the minimum amount of fuel needed, the bottom number will turn blue while the top number either stays red or change to something like yellow. Whenever the top number is above the given threshold number below, it will be white.",
 			"category": "1cc9593e-303e-45bd-9fde-a46b9f56da9e",
 			"steps": []
 		}
