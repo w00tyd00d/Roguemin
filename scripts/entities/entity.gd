@@ -2,17 +2,23 @@ class_name Entity extends DualMapLayer
 
 ## The base class for all entities in the game.
 
+## The default cost for an entity to move 1 tile. (Also shorthand for
+## Globals.DEFAULT_TURN_COST)
 const STEP_COST := Globals.DEFAULT_TURN_COST
 
+## Short-hand reference to the global [GameState] RNG object.
 var RNG : RandomNumberGenerator :
 	get: return GameState.RNG
 
+## Short-hand reference to the current World object.
 var world : World :
 	get: return GameState.world
 
+## Short-hand reference to the Player object.
 var player : Player :
 	get: return GameState.player
 
+## The tile object the entity is currently located in.
 var current_tile : Tile :
 	get:
 		if not world: return null
@@ -34,7 +40,7 @@ var brain : Brain
 ## The in-game name of the entity.
 var entity_name := "Unknown Entity"
 
-# ## The value of time the entity has been synced up to.
+## The value of time the entity has been synced up to.
 var time : int :
 	set(n): if brain: brain.time = n
 	get: return brain.time if brain else 0

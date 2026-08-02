@@ -30,7 +30,7 @@ var energy := 0
 ## The state the enemy reverts to when they are killed.
 var dead_state := States.dead_state
 
-# The dictionary of states the entity refers to
+# The dictionary of states the entity refers to.
 var _states : Dictionary
 
 
