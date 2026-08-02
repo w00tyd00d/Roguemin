@@ -1,0 +1,12 @@
+[gd_scene format=4 uid="uid://csr5a0h7f111d"]
+
+[ext_resource type="PackedScene" uid="uid://gju7mj35brua" path="res://scripts/entities/items/_treasure.tscn" id="1_a47my"]
+[ext_resource type="Script" uid="uid://y6vk73n3rx8i" path="res://scripts/entities/items/medium_treasure/medium_treasure.gd" id="2_51wt7"]
+
+[node name="MediumTreasure" unique_id=1087471820 instance=ExtResource("1_a47my")]
+tile_map_data = PackedByteArray("AAD9////AAAEAAAAAQD9/wAAAAAEAAAAAQD+//7/AAAEAAAAAQD+////AAADAAAAAQD+/wAAAAADAAAAAQD+/wEAAAAEAAAAAQD///3/AAAEAAAAAQD///7/AAADAAAAAQD/////AAADAAAAAQD//wAAAAADAAAAAQD//wEAAAADAAAAAQD//wIAAAAEAAAAAQAAAP3/AAAEAAAAAQAAAP7/AAADAAAAAQAAAP//AAADAAAAAQAAAAAAAAADAAAAAQAAAAEAAAADAAAAAQAAAAIAAAAEAAAAAQABAP7/AAAEAAAAAQABAP//AAADAAAAAQABAAAAAAADAAAAAQABAAEAAAAEAAAAAQACAP//AAAEAAAAAQACAAAAAAAEAAAAAQA=")
+script = ExtResource("2_51wt7")
+money_value = 150
+
+[node name="BackgroundLayer" parent="." index="0"]
+tile_map_data = PackedByteArray("AAD+////AgAAAAAAAAD+/wAAAgAAAAAAAAD///7/AgAAAAAAAAD/////AgAAAAAAAAD//wAAAgAAAAAAAAD//wEAAgAAAAAAAAAAAP7/AgAAAAAAAAAAAP//AgAAAAAAAAAAAAAAAgAAAAAAAAAAAAEAAgAAAAAAAAABAP//AgAAAAAAAAABAAAAAgAAAAAAAAA=")

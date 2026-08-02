@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://bge48j21udel3"]
+
+[ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://scripts/dual_map_layer.tscn" id="1_06jcu"]
+[ext_resource type="Script" uid="uid://dxoxtpt6pls20" path="res://scripts/entities/enemies/enemy.gd" id="2_vtnd8"]
+[ext_resource type="PackedScene" uid="uid://cq22puxfuec4w" path="res://scripts/entities/enemies/_components/attack_indicator.tscn" id="3_midej"]
+[ext_resource type="PackedScene" uid="uid://cebmwelg60lhe" path="res://scripts/entities/enemies/_components/quick_info.tscn" id="4_d1qxm"]
+
+[node name="Enemy" unique_id=375234928 instance=ExtResource("1_06jcu")]
+script = ExtResource("2_vtnd8")
+fov_type = 0
+sight_range = 0
+wander_distance = 0
+attack_range = 0
+attack_damage = 0
+maximum_target_count = 0
+maximum_health = 0
+
+[node name="AttackIndicator" parent="." index="1" unique_id=1775046008 instance=ExtResource("3_midej")]
+area_size = 0.0
+
+[node name="QuickInfo" parent="." index="2" unique_id=483189359 node_paths=PackedStringArray("enemy") instance=ExtResource("4_d1qxm")]
+enemy = NodePath("..")
+
+[editable path="QuickInfo"]
