@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://gju7mj35brua"]
+
+[ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://scripts/dual_map_layer.tscn" id="1_eq15u"]
+[ext_resource type="Script" uid="uid://d2udmme35auk8" path="res://scripts/entities/items/treasure.gd" id="2_eq15u"]
+
+[node name="Treasure" unique_id=550760793 instance=ExtResource("1_eq15u")]
+script = ExtResource("2_eq15u")
+money_value = 0

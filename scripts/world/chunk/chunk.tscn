@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bn8yhy11tnaek"]
+
+[ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://scripts/dual_map_layer.tscn" id="1_swrid"]
+[ext_resource type="Script" uid="uid://dbtxrktvxa40u" path="res://scripts/world/chunk/chunk.gd" id="2_jumhl"]
+
+[node name="Chunk" instance=ExtResource("1_swrid")]
+rendering_quadrant_size = 12
+script = ExtResource("2_jumhl")
+
+[node name="FogOfWar" type="TileMapLayer" parent="." index="1"]
+visible = false

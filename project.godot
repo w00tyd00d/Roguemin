@@ -17,7 +17,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 config/name="Roguemin"
 config/description="Pikmin re-imagined as a traditional roguelike."
 config/version="ALPHA 0.1"
-run/main_scene="res://prefabs/main.tscn"
+run/main_scene="res://scripts/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -56,7 +56,6 @@ enabled=PackedStringArray("res://addons/editor_button/plugin.cfg", "res://addons
 folder_colors={
 "res://_notes/": "gray",
 "res://assets/": "green",
-"res://prefabs/": "purple",
 "res://scripts/": "blue"
 }
 

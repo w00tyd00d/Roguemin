@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://dl53ytlod4w2y"]
+
+[ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://scripts/dual_map_layer.tscn" id="1_3h5nr"]
+[ext_resource type="Script" uid="uid://dxxivsxqj8buq" path="res://scripts/world/world.gd" id="2_xnpnm"]
+[ext_resource type="Script" uid="uid://cmb6opbq1b2ow" path="res://scripts/world/test_layer.gd" id="3_ximeu"]
+[ext_resource type="TileSet" uid="uid://bbcj0verus68b" path="res://assets/tileset.tres" id="4_7bhta"]
+
+[node name="World" unique_id=202947957 instance=ExtResource("1_3h5nr")]
+z_index = -1
+script = ExtResource("2_xnpnm")
+
+[node name="Chunks" type="Node2D" parent="." index="1" unique_id=1274209024]
+
+[node name="Treasures" type="Node2D" parent="." index="2" unique_id=2068363417]
+
+[node name="Enemies" type="Node2D" parent="." index="3" unique_id=431106709]
+
+[node name="TEST" parent="." index="4" unique_id=260987032 instance=ExtResource("1_3h5nr")]
+z_index = 3
+script = ExtResource("3_ximeu")
+
+[node name="FogOfWar" type="TileMapLayer" parent="." index="5" unique_id=745421972]
+visible = false
+z_index = 5
+tile_set = ExtResource("4_7bhta")

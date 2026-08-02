@@ -1,0 +1,22 @@
+[gd_scene format=4 uid="uid://w5k5gfelnqws"]
+
+[ext_resource type="PackedScene" uid="uid://bge48j21udel3" path="res://scripts/entities/enemies/_enemy.tscn" id="1_nxgin"]
+[ext_resource type="Script" uid="uid://cgfsibmntmhd3" path="res://scripts/entities/enemies/dwarf_red/dwarf_red.gd" id="2_ceebq"]
+
+[node name="DwarfRed" unique_id=89655351 instance=ExtResource("1_nxgin")]
+tile_map_data = PackedByteArray("AAD/////AAACAAEAAQAAAAAAAAACAAEAAQD//wAAAAACAAEAAgAAAP//AAACAAEAAgD+////AAAWAAAAAgD///7/AAAPAAAAAgAAAP7/AAAQAAAAAgABAP//AAARAAAAAgABAAAAAAASAAAAAgAAAAEAAAATAAAAAgD//wEAAAAUAAAAAgD+/wAAAAAVAAAAAgA=")
+script = ExtResource("2_ceebq")
+fov_type = 1
+
+[node name="BackgroundLayer" parent="." index="0"]
+tile_map_data = PackedByteArray("AAD/////AgAAAAAAAAD//wAAAgAAAAAAAAAAAAAAAgAAAAAAAAAAAP//AgAAAAAAAAA=")
+
+[node name="QuickInfo" parent="." index="2" unique_id=483189359]
+visible = false
+
+[node name="Health" parent="QuickInfo" index="0"]
+offset_top = -16.0
+offset_bottom = -8.0
+
+[editable path="AttackIndicator"]
+[editable path="QuickInfo"]
