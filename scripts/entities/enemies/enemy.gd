@@ -64,6 +64,10 @@ var eye_position : Vector2i
 ## The field of view object attached to the enemy.
 var fov := EnemyFOV.new(self)
 
+## Whether or not the enemy is currently dead.
+var is_dead: bool:
+    get: return brain.state == brain.dead_state
+
 ## The attack indicator of the enemy.
 @onready var attack_indicator := $AttackIndicator as AttackIndicator
 

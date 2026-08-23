@@ -14,3 +14,10 @@ func _init() -> void:
 func _ready() -> void:
     super()
     entity_name = Strings.NAME_DWARF_RED
+
+
+func move_towards(target: Tile) -> bool:
+    if not is_dead:
+        turn_towards(target.grid_position)
+    
+    return super(target)

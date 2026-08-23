@@ -22,7 +22,9 @@ func _ready() -> void:
 
 
 func move_towards(target: Tile) -> bool:
-    turn_towards(target.grid_position)
+    if not is_dead:
+        turn_towards(target.grid_position)
+    
     return super(target)
 
 
