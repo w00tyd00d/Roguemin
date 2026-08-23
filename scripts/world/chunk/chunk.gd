@@ -1,6 +1,6 @@
 class_name Chunk extends DualMapLayer
 
-## A cluster of tiles.
+## A 23x23 cluster of tiles.
 
 ## A reference to the world the chunk exists in.
 var world : World

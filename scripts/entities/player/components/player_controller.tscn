@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://bwl0qh8yr5ome"]
+
+[ext_resource type="Script" uid="uid://b8nouyvqvlbdg" path="res://scripts/entities/player/states/player_controller.gd" id="1_e002t"]
+[ext_resource type="Script" uid="uid://0cpgmlkt6phn" path="res://scripts/entities/player/states/player_walk.gd" id="2_5augn"]
+[ext_resource type="Script" uid="uid://bnvacmoocrpvf" path="res://scripts/entities/player/states/player_whistle.gd" id="3_oixg1"]
+[ext_resource type="Script" uid="uid://dq6buap4icsuk" path="res://scripts/entities/player/states/player_throw.gd" id="4_f6ubk"]
+[ext_resource type="Script" uid="uid://diij5i72wuoln" path="res://scripts/entities/player/states/player_survey.gd" id="5_oq1ud"]
+
+[node name="PlayerController" type="Node"]
+script = ExtResource("1_e002t")
+
+[node name="Walk" type="Node" parent="."]
+script = ExtResource("2_5augn")
+
+[node name="Whistle" type="Node" parent="."]
+script = ExtResource("3_oixg1")
+
+[node name="Throw" type="Node" parent="."]
+script = ExtResource("4_f6ubk")
+
+[node name="Survey" type="Node" parent="."]
+script = ExtResource("5_oq1ud")

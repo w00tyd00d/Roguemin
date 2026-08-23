@@ -2,8 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://be46f0movhp5e" path="res://scripts/dual_map_layer.tscn" id="1_n1hb6"]
 [ext_resource type="Script" uid="uid://jreau2f5t6y2" path="res://scripts/entities/player/player.gd" id="2_dr1lc"]
-[ext_resource type="PackedScene" uid="uid://bwl0qh8yr5ome" path="res://scripts/entities/player/_components/player_controller.tscn" id="3_6nxnb"]
-[ext_resource type="PackedScene" uid="uid://mvttivhuisp7" path="res://scripts/entities/player/_components/cursor/cursor.tscn" id="4_7drg4"]
+[ext_resource type="PackedScene" uid="uid://bwl0qh8yr5ome" path="res://scripts/entities/player/components/player_controller.tscn" id="3_6nxnb"]
+[ext_resource type="PackedScene" uid="uid://mvttivhuisp7" path="res://scripts/entities/player/components/cursor/cursor.tscn" id="4_7drg4"]
 
 [node name="Player" unique_id=633539854 instance=ExtResource("1_n1hb6")]
 tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0)
