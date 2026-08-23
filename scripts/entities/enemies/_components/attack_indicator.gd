@@ -77,15 +77,20 @@ func update(attack: Enemy.Attack = null) -> void:
     reset()
 
     if attack:
-        attack_type = attack.type
-        area_size = attack.size
         attack_angle = attack.angle
+        attack_type = entity.attack_type if attack.type == Type.Attack.DEFAULT else attack.type
+        area_size = entity.attack_size if attack.size < 0 else attack.size
+    
+    assert(attack_type != Type.Attack.DEFAULT,
+        "{0} has default type assigned to their indicator.".format([entity.get_class_name()])
+    )
     
     match attack_type:
         Type.Attack.SQUARE: _set_area()
         Type.Attack.CIRCLE: _set_area(true)
         Type.Attack.BODY: _set_body()
         Type.Attack.CONE: _set_cone()
+        Type.Attack.CUSTOM: pass
 
 
 func _valid_tile(pos: Vector2i) -> bool:

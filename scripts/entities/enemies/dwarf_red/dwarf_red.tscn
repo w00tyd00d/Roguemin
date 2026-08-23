@@ -11,6 +11,12 @@ fov_type = 1
 [node name="BackgroundLayer" parent="." index="0"]
 tile_map_data = PackedByteArray("AAD/////AgAAAAAAAAD//wAAAgAAAAAAAAAAAAAAAgAAAAAAAAAAAP//AgAAAAAAAAA=")
 
+[node name="AttackIndicator" parent="." index="1" unique_id=1775046008]
+tile_map_data = PackedByteArray()
+
+[node name="BackgroundLayer" parent="AttackIndicator" index="0"]
+tile_map_data = PackedByteArray()
+
 [node name="QuickInfo" parent="." index="2" unique_id=483189359]
 visible = false
 

@@ -39,4 +39,5 @@ enum Attack {
     BODY, ## The attack uses the shape of the enemy as the area.
     CONE, ## The attack fires a cone centered on the target point.
     CUSTOM, ## The attack area is custom-drawn in the editor.
+    DEFAULT, ## Used to default to the enemy's assigned attack shape.
 }

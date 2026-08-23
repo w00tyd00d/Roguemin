@@ -39,6 +39,11 @@ func _ready() -> void:
 	pass
 
 
+func get_class_name() -> String:
+	var script := get_script() as Script
+	return script.get_global_name()
+
+
 func clear_glyphs() -> void:
 	clear()
 	if background_layer:
@@ -64,3 +69,4 @@ func get_background(pos: Vector2i):
 func _set_grid_position(pos: Vector2i) -> void:
 	grid_position = pos
 	position = pos * Globals.TILE_SIZE
+

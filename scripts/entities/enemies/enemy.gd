@@ -67,6 +67,14 @@ var fov := EnemyFOV.new(self)
 ## The attack indicator of the enemy.
 @onready var attack_indicator := $AttackIndicator as AttackIndicator
 
+## Proxy to the [member AttackIndicator.attack_type] property.
+@onready var attack_type: Type.Attack:
+    get: return attack_indicator.attack_type
+
+## Proxy to the [member AttackIndicator.area_size] property.
+@onready var attack_size: int:
+    get: return int(attack_indicator.area_size)
+
 ## The [QuickInfo] object attached to the enemy.
 @onready var quick_info := $QuickInfo as QuickInfo
 
@@ -218,23 +226,23 @@ func _assign_view_positions():
 ## A command pattern object that handles the details of an attack.
 class Attack:
     var tile : Tile
-    var type: Type.Attack
-    var size: int
     var action : Callable
     var angle: float
+    var size: int
+    var type: Type.Attack
 
     func _init(
         _tile: Tile,
-        _type: Type.Attack,
-        _size: int,
         _action: Callable,
-        _angle := 0.0) -> void:
+        _angle := 0.0,
+        _size := -1,
+        _type := Type.Attack.DEFAULT) -> void:
         
         tile = _tile
-        type = _type
-        size = _size
         action = _action
         angle = _angle
+        size = _size
+        type = _type
         
     func run() -> void:
         action.call()
